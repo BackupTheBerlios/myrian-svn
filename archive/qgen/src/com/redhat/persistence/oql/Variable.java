@@ -7,12 +7,12 @@ import java.util.*;
  * Variable
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/30 $
+ * @version $Revision: #2 $ $Date: 2004/01/16 $
  **/
 
 public class Variable extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Variable.java#1 $ by $Author: rhs $, $DateTime: 2003/12/30 22:37:27 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Variable.java#2 $ by $Author: rhs $, $DateTime: 2004/01/16 16:27:01 $";
 
     private String m_name;
 
@@ -20,44 +20,34 @@ public class Variable extends Expression {
         m_name = name;
     }
 
-    public String toSQL() {
-        return m_name;
-    }
-
-    void add(Environment env, Frame parent) {
-        // do nothing
-    }
-
-    void type(Environment env, Frame f) {
-        Property prop = env.getProperty(f.getParent(), m_name);
-        if (prop == null) { return; }
-        f.setType(prop.getType());
-    }
-
-    void count(Environment env, Frame f) {
-        Frame parent = f.getParent();
-
-        int c = env.getCorrelation(parent, m_name);
-        f.setCorrelationMax(env.getCorrelation(parent, m_name));
-        if (c != Integer.MAX_VALUE) {
-            f.setCorrelationMin(c);
-        }
-
-        Property prop = env.getProperty(parent, m_name);
-        if (prop == null) { return; }
-
-        if (prop.isCollection()) {
-            f.addAllKeys(getKeys(prop.getType()));
-        }
-
-        f.setCollection(prop.isCollection());
-        f.setNullable(prop.isNullable());
-
-        f.getInjection().add(prop);
+    void graph(Pane pane) {
+        final ResolveTypeNode type = new ResolveTypeNode(pane.frame, m_name);
+        pane.type = new GetTypeNode(type, m_name);
+        pane.variables = new VariableNode() {
+            { add(type); }
+            void updateVariables() {
+                variables.put(Variable.this, type.correlation);
+            }
+        };
+        pane.injection = new GetPropertyNode(type, m_name);
+        pane.constrained = new ConstraintNode() {void updateConstraints() {}};
+        pane.keys = new KeyNode() {
+            { add(type); }
+            void updateKeys() {
+                Property prop = type.type.getProperty(m_name);
+                if (prop.isCollection()) {
+                    addAll(getKeys(prop.getType()));
+                } else {
+                    add(Collections.EMPTY_LIST);
+                }
+            }
+        };
     }
 
     public String toString() {
         return m_name;
     }
+
+    String summary() { return m_name; }
 
 }

@@ -7,12 +7,12 @@ import java.util.*;
  * Get
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/30 $
+ * @version $Revision: #2 $ $Date: 2004/01/16 $
  **/
 
 public class Get extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#1 $ by $Author: rhs $, $DateTime: 2003/12/30 22:37:27 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#2 $ by $Author: rhs $, $DateTime: 2004/01/16 16:27:01 $";
 
     private Expression m_expr;
     private String m_name;
@@ -22,47 +22,24 @@ public class Get extends Expression {
         m_name = name;
     }
 
-    public String toSQL() {
-        return m_expr.toSQL() + "." + m_name;
-    }
-
-    void add(Environment env, Frame parent) {
-        env.add(m_expr, parent);
-    }
-
-    void type(Environment env, Frame f) {
-        Frame frame = env.getFrame(m_expr);
-        if (frame.getType() == null) { return; }
-        f.setType(frame.getType().getProperty(m_name).getType());
-    }
-
-    void count(Environment env, Frame f) {
-        Frame frame = env.getFrame(m_expr);
-
-        f.setCorrelationMax(frame.getCorrelationMax());
-        f.setCorrelationMin(frame.getCorrelationMin());
-
-        ObjectType type = frame.getType();
-        Property prop = type.getProperty(m_name);
-        if ((frame.isCollection() && frame.isKey(Collections.singleton(prop)))
-            || (!frame.isCollection())) {
-            f.addAllKeys(getKeys(prop.getType()));
-        }
-
-        if (isKey(type, Collections.singleton(prop))) {
-            f.getInjection().addAll(frame.getInjection());
-        }
-
-        if (!frame.isCollection() && !prop.isCollection()) {
-            f.setCollection(false);
-        }
-        if (!frame.isNullable() && !prop.isNullable()) {
-            f.setNullable(false);
-        }
+    void graph(Pane pane) {
+        Pane expr = pane.frame.graph(m_expr);
+        pane.type = new GetTypeNode(expr.type, m_name);
+        pane.variables = expr.variables;
+        pane.constrained = expr.constrained;
+        pane.keys = new GetKeyNode(expr.keys, expr.type, m_name);
     }
 
     public String toString() {
-        return "get(" + m_expr + ", \"" + m_name + "\")";
+        if (m_expr instanceof Variable ||
+            m_expr instanceof Get ||
+            m_expr instanceof Query) {
+            return m_expr + "." + m_name;
+        } else {
+            return "(" + m_expr + ")." + m_name;
+        }
     }
+
+    String summary() { return "get " + m_name; }
 
 }

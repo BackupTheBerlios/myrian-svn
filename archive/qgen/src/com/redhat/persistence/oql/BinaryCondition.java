@@ -4,12 +4,12 @@ package com.redhat.persistence.oql;
  * BinaryCondition
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/30 $
+ * @version $Revision: #2 $ $Date: 2004/01/16 $
  **/
 
 public abstract class BinaryCondition extends Condition {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/BinaryCondition.java#1 $ by $Author: rhs $, $DateTime: 2003/12/30 22:37:27 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/BinaryCondition.java#2 $ by $Author: rhs $, $DateTime: 2004/01/16 16:27:01 $";
 
     Expression m_left;
     Expression m_right;
@@ -19,25 +19,11 @@ public abstract class BinaryCondition extends Condition {
         m_right = right;
     }
 
-    public String toSQL() {
-        return "(" + m_left.toSQL() + ") " + getOperator() +
-            " (" + m_right.toSQL() + ")";
-    }
-
-    abstract String getOperator();
-
-    void add(Environment env, Frame parent) {
-        env.add(m_left, parent);
-        env.add(m_right, parent);
-    }
-
-    void count(Environment env, Frame f) {
-        f.setCorrelationMax
-            (Math.max(env.getFrame(m_left).getCorrelationMax(),
-                      env.getFrame(m_right).getCorrelationMax()));
-        f.setCorrelationMin
-            (Math.min(env.getFrame(m_left).getCorrelationMin(),
-                      env.getFrame(m_right).getCorrelationMin()));
+    void graph(Pane pane) {
+        Pane left = pane.frame.graph(m_left);
+        Pane right = pane.frame.graph(m_right);
+        pane.variables =
+            new UnionVariableNode(left.variables, right.variables);
     }
 
     private String str(Expression e) {
@@ -51,5 +37,9 @@ public abstract class BinaryCondition extends Condition {
     public String toString() {
         return str(m_left) + " " + getOperator() + " " + str(m_right);
     }
+
+    abstract String getOperator();
+
+    String summary() { return getOperator(); }
 
 }

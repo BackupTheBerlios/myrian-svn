@@ -15,7 +15,7 @@ import java.io.*;
  * OQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/12/30 $
+ * @version $Revision: #2 $ $Date: 2004/01/16 $
  */
 
 class OQLParser {
@@ -99,6 +99,11 @@ TOKEN:
   | <#DIGIT: ["0" - "9"]>
 }
 
+SPECIAL_TOKEN:
+{
+    <COMMENT: "//" (~["\n", "\r"])* ("\n"|"\r"|"\r\n")>
+}
+
 /**
  * Top level constructs.
  **/
@@ -108,7 +113,7 @@ Expression expression() :
     Expression e;
 }
 {
-    e = define() { return e; }
+    e = define() { return e; } | <EOF> { return null; }
 }
 
 Expression define() :

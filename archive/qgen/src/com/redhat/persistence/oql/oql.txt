@@ -1,3 +1,52 @@
+Steps to prove multiplicity of 0..1:
+  filter(a = test.A, exists(filter(link = a.links, link == l)))
+
+    1. a.links is set-wise an injection with a because of the reverse
+       0..1 multiplicity of the links association.
+
+    2. filter(link = a.links, link == l) constrains a because of (1)
+       constrained (must have extra level of correlation in filter
+       condition)
+
+    3. exists applied to query converts existence constraints to
+       boolean
+
+    4. outer a is unique and constrained, and so entire expression
+       must be 0..1
+
+  This means constrained must be a map to correlation rather than just
+  a set.
+
+
+Set modified = initial;
+do {
+  Set toUpdate = {};
+  for node in modified:
+    for output in node.outputs:
+      toUpdate.add(output);
+  modified = {};
+  for node in toUpdate:
+    if (node.update()) {
+      modified.add(node);
+    }
+} while (!modified.isEmpty());
+
+   outputs
+   .---.
+   |   |
+ Node--'
+  |
+  |---> TypeNode
+  |
+  |---> VariableNode
+  |
+  |---> RangeNode
+  |
+  |---> KeyNode
+  |
+  '---> ConstraintNode
+
+
 Below is the AST for the new OQL. This will very likely be
 methodically transformed into a grammer and so should not be all that
 different from the parse tree. There is currently no provision for
@@ -9,17 +58,13 @@ generic function and/or method calls.
 
   Expression
       |
-      |---> Literal
-      |
       |---> Variable
       |
-      |---> Path (This isn't the best name for this, it actually refers to an
-      |           attribute reference.)
+      |---> Get
+      |
+      |---> Define
+      |
       |---> Query
-      |       |
-      |       |---> Singleton
-      |       |
-      |       |---> Collection
       |       |
       |       |---> Filter
       |       |
@@ -32,10 +77,6 @@ generic function and/or method calls.
       |       |       |---> FullJoin
       |       |       |
       |       |       '---> CrossJoin
-      |       |
-      |       |---> Name
-      |       |
-      |       |---> Get
       |       |
       |       |---> Order
       |       |
@@ -60,11 +101,14 @@ generic function and/or method calls.
               '---> GreaterThan
 
 Inheritence Tree:
-  Expression.java
-    Variable.java
+Expression.java
+  Variable.java
+  Define.java
+  Get.java
   Condition.java
-    Not.java
-    Exists.java
+    UnaryCondition.java
+      Not.java
+      Exists.java
     BinaryCondition.java
       And.java
       Or.java
@@ -77,5 +121,3 @@ Inheritence Tree:
       LeftJoin.java
       RightJoin.java
     Filter.java
-    Define.java
-    Get.java

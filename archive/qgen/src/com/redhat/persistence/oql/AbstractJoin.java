@@ -7,12 +7,12 @@ import java.util.*;
  * AbstractJoin
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/30 $
+ * @version $Revision: #2 $ $Date: 2004/01/16 $
  **/
 
 public abstract class AbstractJoin extends Query {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/AbstractJoin.java#1 $ by $Author: rhs $, $DateTime: 2003/12/30 22:37:27 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/AbstractJoin.java#2 $ by $Author: rhs $, $DateTime: 2004/01/16 16:27:01 $";
 
     private Expression m_left;
     private Expression m_right;
@@ -24,102 +24,19 @@ public abstract class AbstractJoin extends Query {
         m_condition = condition;
     }
 
-    public String toSQL() {
-        return m_left.toSQL() + " " + getJoinType() + " join " +
-            m_right.toSQL() +
-            (m_condition == null ? "" : " on " + m_condition.toSQL());
-    }
-
-    abstract String getJoinType();
-
-    void add(Environment env, Frame parent) {
-        env.add(m_left, parent);
-        env.add(m_right, parent);
-        if (m_condition != null) {
-            env.add(m_condition, env.getFrame(this));
-        }
-    }
-
-    void type(Environment env, Frame f) {
-        Frame left = env.getFrame(m_left);
-        Frame right = env.getFrame(m_right);
-        if (left.getType() == null || right.getType() == null) { return; }
-        f.setType(join(left.getType(), right.getType()));
-    }
-
-    private static ObjectType join(ObjectType left, ObjectType right) {
-        Model anon = Model.getInstance("anonymous.join");
-        ObjectType result = new ObjectType
-            (anon, left.getQualifiedName() + "$" + right.getQualifiedName(),
-             null);
-        addProperties(result, left);
-        addProperties(result, right);
-        Set lkeys = getKeys(left);
-        Set rkeys = getKeys(right);
-        for (Iterator it = lkeys.iterator(); it.hasNext(); ) {
-            List lkey = (List) it.next();
-            for (Iterator iter = rkeys.iterator(); iter.hasNext(); ) {
-                List rkey = (List) iter.next();
-                List key = new ArrayList();
-                addToKey(result, key, lkey);
-                addToKey(result, key, rkey);
-                addKey(result, key);
-            }
-        }
-        return result;
-    }
-
-    private static void addToKey(ObjectType type, List key, List from) {
-        for (Iterator it = from.iterator(); it.hasNext(); ) {
-            Property prop = (Property) it.next();
-            key.add(type.getProperty(prop.getName()));
-        }
-    }
-
-    private static void addProperties(ObjectType to, ObjectType from) {
-        for (Iterator it = from.getProperties().iterator(); it.hasNext(); ) {
-            to.addProperty(copy((Property) it.next()));
-        }
-    }
-
-    private static Property copy(Property prop) {
-        final Property[] result = { null };
-        prop.dispatch(new Property.Switch() {
-            public void onRole(Role role) {
-                result[0] = new Role(role.getName(), role.getType(),
-                                     role.isComponent(), role.isCollection(),
-                                     role.isNullable());
-            }
-            public void onLink(Link link) {
-                throw new Error("not implemented yet");
-            }
-            public void onAlias(Alias alias) {
-                throw new Error("not implemented yet");
-            }
-        });
-        return result[0];
-    }
-
-    void count(Environment env, Frame f) {
-        Frame left = env.getFrame(m_left);
-        Frame right = env.getFrame(m_right);
-        Frame condition = m_condition == null ?
-            null : env.getFrame(m_condition);
-
-        int c = Math.max(left.getCorrelationMax(), right.getCorrelationMax());
-        if (condition != null) {
-            c = Math.max(c, condition.getCorrelationMax() - 1);
-        }
-        f.setCorrelationMax(c);
-
-        c = Math.min(left.getCorrelationMin(), right.getCorrelationMin());
-        if (condition != null) {
-            c = Math.min(c, condition.getCorrelationMin());
-        }
-        f.setCorrelationMin(c);
-
-        if (left.isSet() && right.isSet()) {
-            f.addAllKeys(getKeys(f.getType()));
+    void graph(Pane pane) {
+        Pane left = pane.frame.graph(m_left);
+        Pane right = pane.frame.graph(m_right);
+        pane.type = new JoinTypeNode(left.type, right.type);
+        Frame frame = new Frame(pane.frame, pane.type);
+        Pane cond = m_condition == null ? null : frame.graph(m_condition);
+        pane.variables =
+            new UnionVariableNode(left.variables, right.variables);
+        pane.keys = new JoinKeyNode(pane.type, left.keys, right.keys);
+        if (cond != null) {
+            pane.variables = new UnionVariableNode
+                (pane.variables, new ExternalVariableNode(cond.variables));
+            pane.keys = new FilterKeyNode(pane.keys, frame, cond.constrained);
         }
     }
 
@@ -127,5 +44,9 @@ public abstract class AbstractJoin extends Query {
         return getJoinType() + "(" + m_left + ", " + m_right +
             (m_condition == null ? "" : ", " + m_condition) + ")";
     }
+
+    abstract String getJoinType();
+
+    String summary() { return getJoinType(); }
 
 }

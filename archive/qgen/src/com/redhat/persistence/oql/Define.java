@@ -7,12 +7,12 @@ import java.util.*;
  * Define
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/30 $
+ * @version $Revision: #2 $ $Date: 2004/01/16 $
  **/
 
 public class Define extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Define.java#1 $ by $Author: rhs $, $DateTime: 2003/12/30 22:37:27 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Define.java#2 $ by $Author: rhs $, $DateTime: 2004/01/16 16:27:01 $";
 
     private Expression m_expr;
     private String m_name;
@@ -22,41 +22,47 @@ public class Define extends Expression {
         m_name = name;
     }
 
-    public String toSQL() {
-        return m_expr.toSQL() + " as " + m_name;
+    void graph(final Pane pane) {
+        final Pane expr = pane.frame.graph(m_expr);
+        pane.type = new TypeNode() {
+            { add(expr.type); }
+            void updateType() {
+                type = define(m_name, expr.type.type);
+            }
+        };
+        pane.variables = expr.variables;
+        pane.constrained = expr.constrained;
+        pane.keys = new KeyNode() {
+            { add(expr.keys); add(pane.type); }
+            void updateKeys() {
+                if (!expr.keys.isEmpty()) {
+                    add(pane.type.type.getProperties());
+                }
+            }
+        };
     }
 
-    void add(Environment env, Frame parent) {
-        env.add(m_expr, parent);
-    }
-
-    void type(Environment env, Frame f) {
-        Frame frame = env.getFrame(m_expr);
-        if (frame.getType() == null) { return; }
+    private static ObjectType define(final String name,
+                                     final ObjectType type) {
         Model anon = Model.getInstance("anonymous.define");
-        ObjectType type = new ObjectType
-            (anon, frame.getType().getQualifiedName() + "$" + m_name, null);
-        Property prop = new Role(m_name, frame.getType(), false, false, false);
-        type.addProperty(prop);
-        if (!getKeys(frame.getType()).isEmpty()) {
-            addKey(type, Collections.singleton(prop));
+        ObjectType result = new ObjectType
+            (anon, type.getQualifiedName() + "$" + name, null) {
+            public String toString() {
+                return "{" + type + " " + name + ";" + "}";
+            }
+        };
+        Property prop = new Role(name, type, false, false, false);
+        result.addProperty(prop);
+        if (!getKeys(type).isEmpty()) {
+            addKey(result, Collections.singleton(prop));
         }
-        f.setType(type);
-    }
-
-    void count(Environment env, Frame f) {
-        Frame frame = env.getFrame(m_expr);
-        f.setCorrelationMax(frame.getCorrelationMax());
-        f.setCorrelationMin(frame.getCorrelationMin());
-        f.setNullable(frame.isNullable());
-        f.setCollection(frame.isCollection());
-        if (frame.isSet()) {
-            f.addAllKeys(getKeys(f.getType()));
-        }
+        return result;
     }
 
     public String toString() {
-        return "define(" + m_expr + ", \"" + m_name + "\")";
+        return m_name + " = " + m_expr;
     }
+
+    String summary() { return "define " + m_name; }
 
 }
