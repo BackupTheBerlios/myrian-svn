@@ -1,4 +1,4 @@
-package com.redhat.persistence.jdotest;
+package com.redhat.persistence.jdo;
 
 import com.arsdigita.util.jdbc.Connections;
 import com.redhat.persistence.jdo.PersistenceManagerFactoryImpl;
@@ -35,7 +35,7 @@ public class JDOTestSetup extends TestSetup {
         s_pmf = JDOHelper.getPersistenceManagerFactory(p);
 
         PDL pdl = new PDL();
-        String pdlFile = "com/redhat/persistence/jdotest/package.pdl";
+        String pdlFile = "com/redhat/persistence/jdo/package.pdl";
         InputStream is = cl.getResourceAsStream(pdlFile);
         if (is != null) {
             pdl.load(new InputStreamReader(is), pdlFile);

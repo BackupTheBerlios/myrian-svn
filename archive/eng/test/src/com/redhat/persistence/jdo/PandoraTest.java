@@ -1,4 +1,4 @@
-package com.redhat.persistence.jdotest;
+package com.redhat.persistence.jdo;
 
 import com.arsdigita.runtime.RuntimeConfig;
 import com.redhat.persistence.Cursor;
@@ -44,7 +44,7 @@ import org.apache.log4j.Logger;
  * PandoraTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2004/06/29 $
+ * @version $Revision: #1 $ $Date: 2004/06/29 $
  **/
 
 public class PandoraTest extends AbstractCase {
@@ -190,7 +190,7 @@ public class PandoraTest extends AbstractCase {
         testObject(picture, new Object[] {
             "id", new Integer(100),
             "caption", "Pandora's Box",
-            "content", getImageBytes("com/redhat/persistence/jdotest/pandora.jpg")
+            "content", getImageBytes("com/redhat/persistence/jdo/pandora.jpg")
         });
     }
 

@@ -1,4 +1,4 @@
-package com.redhat.persistence.jdotest;
+package com.redhat.persistence.jdo;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -8,7 +8,7 @@ import java.util.Date;
  * Order
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/06/24 $
+ * @version $Revision: #1 $ $Date: 2004/06/29 $
  **/
 public class Order {
     private int id;

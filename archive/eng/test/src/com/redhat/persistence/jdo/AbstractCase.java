@@ -1,4 +1,4 @@
-package com.redhat.persistence.jdotest;
+package com.redhat.persistence.jdo;
 
 import java.math.BigInteger;
 import java.util.Properties;

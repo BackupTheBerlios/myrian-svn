@@ -1,4 +1,4 @@
-package com.redhat.persistence.jdotest;
+package com.redhat.persistence.jdo;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;

@@ -1,4 +1,4 @@
-package com.redhat.persistence.jdotest;
+package com.redhat.persistence.jdo;
 
 public class SimpleTest extends AbstractCase {
     public void test1() {

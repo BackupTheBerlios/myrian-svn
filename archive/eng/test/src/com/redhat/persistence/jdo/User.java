@@ -1,10 +1,10 @@
-package com.redhat.persistence.jdotest;
+package com.redhat.persistence.jdo;
 
 /**
  * User
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/06/25 $
+ * @version $Revision: #1 $ $Date: 2004/06/29 $
  **/
 
 public class User extends Party {

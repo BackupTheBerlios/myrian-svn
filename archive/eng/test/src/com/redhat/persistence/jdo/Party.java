@@ -1,4 +1,4 @@
-package com.redhat.persistence.jdotest;
+package com.redhat.persistence.jdo;
 
 import java.util.*;
 
@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
  * Party
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/06/28 $
+ * @version $Revision: #1 $ $Date: 2004/06/29 $
  **/
 
 public class Party {

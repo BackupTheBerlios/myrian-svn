@@ -10,8 +10,7 @@ import javax.jdo.spi.*;
 
 import org.apache.log4j.Logger;
 
-// XXX: should be package-scoped
-public class C {
+class C {
     private final static Logger s_log = Logger.getLogger(C.class);
 
     /*

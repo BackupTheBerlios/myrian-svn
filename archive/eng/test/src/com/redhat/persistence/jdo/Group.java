@@ -1,4 +1,4 @@
-package com.redhat.persistence.jdotest;
+package com.redhat.persistence.jdo;
 
 import java.util.*;
 
@@ -6,7 +6,7 @@ import java.util.*;
  * Group
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/06/28 $
+ * @version $Revision: #1 $ $Date: 2004/06/29 $
  **/
 public class Group extends Party {
     private String name;

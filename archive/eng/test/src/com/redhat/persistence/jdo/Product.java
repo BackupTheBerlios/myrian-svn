@@ -1,10 +1,10 @@
-package com.redhat.persistence.jdotest;
+package com.redhat.persistence.jdo;
 
 /**
  * Product
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/06/28 $
+ * @version $Revision: #1 $ $Date: 2004/06/29 $
  **/
 
 public class Product {

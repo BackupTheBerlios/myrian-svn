@@ -101,9 +101,7 @@ public class PersistenceManagerImpl implements PersistenceManager {
         return pmap;
     }
 
-    // XXX: temporary hack to make PandoraTest compile.  Will revert to
-    // package-scoped at first opportunity.
-    public final Session getSession() {
+    final Session getSession() {
         return m_ssn;
     }
 
@@ -276,6 +274,8 @@ public class PersistenceManagerImpl implements PersistenceManager {
 
         Class cls = pc.getClass();
         Root root = m_ssn.getRoot();
+        // XXX: This rests on the assumption that the Java class and the
+        // corresponding object type have the same name.
         ObjectType type = root.getObjectType(cls.getName());
         if (type == null) {
             throw new IllegalStateException("no such type " + cls.getName());
