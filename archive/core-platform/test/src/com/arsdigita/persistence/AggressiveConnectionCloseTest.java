@@ -46,7 +46,7 @@ import org.apache.log4j.varia.StringMatchFilter;
  */
 public class AggressiveConnectionCloseTest extends Log4jBasedTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/AggressiveConnectionCloseTest.java#4 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/AggressiveConnectionCloseTest.java#5 $";
 
     private Session ssn;
 
@@ -59,7 +59,7 @@ public class AggressiveConnectionCloseTest extends Log4jBasedTestCase {
     // the idea here is to pick an incredibly dirt-simple PDL file that
     // has an insert statement
     protected void persistenceSetUp() {
-        load("com/arsdigita/persistence/testpdl/static/Datatype.pdl");
+        load("com/arsdigita/persistence/testpdl/mdsql/Datatype.pdl");
         super.persistenceSetUp();
     }
 

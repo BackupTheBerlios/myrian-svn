@@ -18,15 +18,16 @@ package com.arsdigita.persistence;
 import com.arsdigita.tools.junit.extensions.BaseTestSetup;
 import com.arsdigita.tools.junit.framework.PackageTestSuite;
 import junit.framework.Test;
+import junit.framework.TestCase;
 
 /**
  * PersistenceSuite
  *
  * @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/08/15 $
  */
 public class PersistenceSuite extends PackageTestSuite {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceSuite.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceSuite.java#5 $ by $Author: jorris $, $DateTime: 2002/08/15 14:01:26 $";
 
     public PersistenceSuite() {
         super();
@@ -42,6 +43,8 @@ public class PersistenceSuite extends PackageTestSuite {
 
     public static Test suite() {
         PersistenceSuite suite = new PersistenceSuite();
+        //suite.addTestSuite(NullTest.class);
+
         populateSuite(suite);
         BaseTestSetup wrapper = new BaseTestSetup(suite);
         wrapper.setInitScriptTarget ("com.arsdigita.persistence.Initializer");

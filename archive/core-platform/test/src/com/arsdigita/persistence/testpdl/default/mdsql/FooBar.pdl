@@ -1,7 +1,0 @@
-model examples;
-object type FooBar  {
-    String name = foo_bar.name varchar(4000);
-    String[0..1] description = foo_bar.name varchar(200);
-    Boolean isEnabled = foo_bar.enabled_p char(1);
-	String gronk = foo_bar.name varchar(4000);
-}

@@ -66,12 +66,12 @@ import org.apache.log4j.Logger;
  * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2002/08/14 $
+ * @version $Revision: #10 $ $Date: 2002/08/15 $
  */
 
 public class DataStore {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataStore.java#9 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataStore.java#10 $ by $Author: jorris $, $DateTime: 2002/08/15 14:01:26 $";
 
     private static final Logger log =
         Logger.getLogger(DataStore.class.getName());

@@ -15,7 +15,6 @@
 
 package com.arsdigita.persistence;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 import org.apache.log4j.Logger;
@@ -25,12 +24,13 @@ import com.arsdigita.domain.DataObjectNotFoundException;
  * LinkAttributeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2002/08/14 $
+ * @version $Revision: #9 $ $Date: 2002/08/15 $
  **/
 
 public abstract class LinkAttributeTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LinkAttributeTest.java#8 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LinkAttributeTest.java#9 $ by $Author: jorris $, $DateTime: 2002/08/15 14:01:26 $";
+
 
     private static Logger s_log =
         Logger.getLogger(LinkAttributeTest.class.getName());
@@ -86,6 +86,13 @@ public abstract class LinkAttributeTest extends PersistenceTestCase {
     public void testLinkAttributes() throws DataObjectNotFoundException {
         Session ssn = SessionManager.getSession();
         DataObject article = ssn.create(getModelName() + ".Article");
+	DataObject user = ssn.create( "examples.User");
+	user.set("id", BigInteger.ZERO);
+	user.set("email", "foo@bar.com");
+	user.set("firstName", "foo");
+	user.set("lastNames", "bar");
+	user.save();
+
         article.set("id", BigInteger.ZERO);
         String text = "This is the article text.";
         article.set("text", text);
@@ -108,8 +115,8 @@ public abstract class LinkAttributeTest extends PersistenceTestCase {
             DataObject image = samples.getDataObject();
             DataObject link = images.add(image);
             link.set("caption", captionPrefix + image.getOID());
-            link.set("user", ssn.retrieve(new OID("com.arsdigita.kernel.User",
-                                                  new BigDecimal(-202))));
+
+	    link.set("user", user);
         }
 
         article.save();
@@ -120,9 +127,8 @@ public abstract class LinkAttributeTest extends PersistenceTestCase {
         while (cursor.next()) {
             DataObject image = cursor.getDataObject();
             DataObject link = cursor.getLink();
-            DataObject user = (DataObject)link.get("user");
-            assertEquals("The retrieved user is not correct; user = " + user,
-                         "-202", user.get("id").toString());
+            DataObject linkuser = (DataObject)link.get("user");
+	    assertNotNull("User is null!", linkuser);
             assertEquals("bad link object",
                          captionPrefix + image.getOID(),
                          link.get("caption"));

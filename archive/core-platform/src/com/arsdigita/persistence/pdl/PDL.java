@@ -58,12 +58,12 @@ import org.apache.log4j.Priority;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2002/08/14 $
+ * @version $Revision: #12 $ $Date: 2002/08/15 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#11 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#12 $ by $Author: jorris $, $DateTime: 2002/08/15 14:01:26 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
 
@@ -163,6 +163,7 @@ public class PDL {
         OPTIONS.put("-sqldir", null);
         OPTIONS.put("-debug", Boolean.FALSE);
         OPTIONS.put("-verbose", Boolean.FALSE);
+        OPTIONS.put("-testddl", null);
     }
 
     /**
@@ -189,6 +190,7 @@ public class PDL {
                     OPTIONS.put(arg, Boolean.FALSE);
                 } else if (args.size() > 0) {
                     OPTIONS.put(arg, args.get(0));
+                    System.out.println("Put " + arg + " val:" + args.get(0) );
                     args.remove(0);
                 } else {
                     usage();
@@ -252,6 +254,10 @@ public class PDL {
 
                 DDLWriter writer = new DDLWriter(ddlDir, sqlFiles);
 
+                if (Boolean.TRUE.equals(Boolean.valueOf((String) OPTIONS.get("-testddl")))) {
+                    System.out.println("Test DLL!");
+                        writer.setTestPDL(true);
+                }
                 try {
                     writer.write(MetadataRoot.getMetadataRoot());
                 } catch (IOException ioe) {

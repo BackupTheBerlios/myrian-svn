@@ -90,7 +90,7 @@ SKIP:
 TOKEN:
 {
     < #WHITESPACE: ( [" ", "\n", "\r", "\t"] )+ >
-  | < DOUBLE_AT: "@@" >
+  | < DOUBLE_AT: "@@" | "\\i" >
   | < STRING_LITERAL: "'" (~["'"])* ( "''" (~["'"])* )* "'" >
   | < DOUBLE_QUOTED_STRING_LITERAL: "\"" (~["\""])* ( "\"\"" (~["\""])* )* "\"" >
   | < PLSQL_BLOCK:  ( <CREATE> <WHITESPACE>

@@ -1,7 +1,7 @@
 --
 -- Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
 --
--- The contents of this file are subject to the ArsDigita Public 
+-- The contents of this file are subject to the ArsDigita Public
 -- License (the "License"); you may not use this file except in
 -- compliance with the License. You may obtain a copy of
 -- the License at http://www.arsdigita.com/ADPL.txt
@@ -17,16 +17,13 @@
 -- tests to run.
 --
 -- @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
--- @version $Revision: #6 $ $Date: 2002/08/14 $
+-- @version $Revision: #7 $ $Date: 2002/08/15 $
 --
 
 -- Right now this is duplicated from the individual files. This should
 -- be fixed at some point.
 
-
-@@ order-test.sql 
-@@ node-test.sql 
-@@ party-test.sql 
+@@ order-test.sql
 @@ test-create.sql
 @@ data-operation-test.sql
 @@ aggressive-test.sql

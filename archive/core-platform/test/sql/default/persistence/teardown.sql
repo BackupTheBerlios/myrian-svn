@@ -17,7 +17,7 @@
 -- tests to run.
 --
 -- @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
--- @version $Revision: #6 $ $Date: 2002/08/14 $
+-- @version $Revision: #7 $ $Date: 2002/08/15 $
 --
 
 -- Right now this is duplicated from the individual files. This should
@@ -26,18 +26,6 @@
 
 @@ test-drop.sql
 
-drop table t_order_other_item_map;
-drop table t_other_items;
-drop table t_orders_ext;
-drop table t_line_items;
-drop table t_orders;
-
-drop table t_nodes;
-
-drop table t_groups;
-drop table t_users;
-drop table t_colors;
-drop table t_parties;
 
 drop table PLSQLTestTable;
 @@ aggressive-teardown.sql

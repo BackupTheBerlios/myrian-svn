@@ -20,8 +20,8 @@ object type Order {
     String seller = t_orders.seller VARCHAR(100);
     String shippingAddress = t_orders.shipping_address VARCHAR(200);
     component LineItem[0..n] items = join t_orders.order_id to t_line_items.order_id;
-    Date shippingDate = t_orders.shipping_date DATE;
-    Boolean hasShipped = t_orders.shipped_p;
+    Date shippingDate = t_orders.shipping_date TIMESTAMP;
+    Boolean hasShipped = t_orders.shipped_p CHAR;
 
     object key (id);
 
@@ -131,6 +131,14 @@ association {
 }
 
 query OrdersMaxPrices {
+    BigDecimal orderId;
+    String buyer;
+    String seller;
+    String shippingAddress;
+    Date shippingDate;
+    Boolean hasShipped;
+    BigDecimal maxPrice;
+
     do {
         select t_orders.order_id,
                t_orders.buyer,
@@ -155,6 +163,7 @@ query OrdersMaxPrices {
 }
 
 query OrdersNumberOfLineItems {
+    BigDecimal order_id;
     do {
         select order_id from t_line_items
     } map {

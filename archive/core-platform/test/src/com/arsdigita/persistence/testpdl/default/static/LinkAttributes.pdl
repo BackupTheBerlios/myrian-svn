@@ -1,6 +1,6 @@
 model linkAttributes;
 
-import com.arsdigita.kernel.*;
+import examples.User;
 
 object type Article {
     BigInteger[1..1] id = t_articles.article_id INTEGER;

@@ -1,7 +1,5 @@
 model mdsql;
 
-import com.arsdigita.kernel.*;
-
 object type Article {
     BigInteger[1..1] id = t_articles.article_id INTEGER;
     String[0..1] text   = t_articles.text CLOB;
@@ -27,7 +25,7 @@ association {
                            to t_images.image_id;
 
     String[0..1] caption = t_article_image_map.caption VARCHAR(4000);
-    User[0..1] user = join t_article_image_map.user_id to users.user_id;
+    User[0..1] user = join t_article_image_map.user_id to t_users.user_id;
 
 
     // this must be here because of the way the association code works

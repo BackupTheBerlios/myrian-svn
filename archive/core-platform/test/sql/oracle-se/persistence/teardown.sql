@@ -17,13 +17,26 @@
 -- tests to run.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #8 $ $Date: 2002/08/14 $
+-- @version $Revision: #9 $ $Date: 2002/08/15 $
 --
 
 -- Right now this is duplicated from the individual files. This should
 -- be fixed at some point.
 
 drop table t_user_group_map;
+drop table t_article_image_map;
+drop table t_articles;
+drop table t_colors;
+drop table t_groups;
+drop table t_images;
+drop table t_line_items;
+drop table t_nodes;
+drop table t_order_other_item_map;
+drop table t_orders_ext;
+drop table t_other_items;
+drop table t_orders;
+drop table t_parties;
+drop table t_users; 
 
 @@ ../../default/persistence/teardown.sql
 
@@ -34,9 +47,6 @@ drop table t_data_query;
 
 drop table t_sql_operation;
 
-drop table t_article_image_map;
-drop table t_articles;
-drop table t_images;
 
 drop procedure DataOperationProcedure;
 drop function DataOperationFunction;

@@ -17,16 +17,8 @@
 -- cases.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #3 $ $Date: 2002/08/14 $
+-- @version $Revision: #4 $ $Date: 2002/08/15 $
 --
-
-
-
-create table t_orders_ext (
-    order_id     integer primary key references t_orders,
-    text         varchar(100)
-);
-
 
 create table t_order_other_item_map (
       order_id   integer references t_orders,

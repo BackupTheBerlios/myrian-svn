@@ -36,16 +36,18 @@ import java.util.Set;
  * DDLWriter
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2002/08/14 $
+ * @version $Revision: #9 $ $Date: 2002/08/15 $
  **/
 
 public class DDLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLWriter.java#8 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLWriter.java#9 $ by $Author: jorris $, $DateTime: 2002/08/15 14:01:26 $";
 
     private File m_base;
     private boolean m_overwrite;
     private Set m_files;
+
+    private boolean m_isTestPDL;
 
     public DDLWriter(String base,
                      Set files) {
@@ -74,6 +76,9 @@ public class DDLWriter {
         }
     }
 
+    public void setTestPDL(boolean isTestPDL) {
+        m_isTestPDL = isTestPDL;
+    }
     public void write(MetadataRoot root) throws IOException {
         write(root.getTables());
     }
@@ -178,10 +183,10 @@ public class DDLWriter {
             } else {
                 String dir = DbHelper.getDatabaseDirectory();
                 if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
-                    writer.write("\\i ddl/" + dir + "/table-" +
+                    writer.write("\\i " + getDDLPath() + "table-" +
                                  table.getName() + "-auto.sql\n");
                 } else {
-                    writer.write("@ ddl/" + dir + "/table-" +
+                    writer.write("@@ " + getDDLPath() + "table-" +
                                  table.getName() + "-auto.sql\n");
                 }
             }
@@ -194,4 +199,14 @@ public class DDLWriter {
         Assert.assertEquals(tables.size(), created.size());
     }
 
+    private String getDDLPath() {
+        if (m_isTestPDL) {
+            return "";
+        }
+
+        String dir = DbHelper.getDatabaseDirectory();
+        String path = "ddl/" + dir + "/";
+        return path;
+    }
 }
+

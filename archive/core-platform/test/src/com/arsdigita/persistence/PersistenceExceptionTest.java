@@ -31,7 +31,7 @@ import java.math.BigInteger;
  */
 public class PersistenceExceptionTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceExceptionTest.java#3 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceExceptionTest.java#4 $";
 
     private Session ssn;
 
@@ -42,7 +42,7 @@ public class PersistenceExceptionTest extends PersistenceTestCase {
     // the idea here is to pick an incredibly dirt-simple PDL file that
     // has an insert statement
     protected void persistenceSetUp() {
-        load("com/arsdigita/persistence/testpdl/static/Datatype.pdl");
+        load("com/arsdigita/persistence/testpdl/mdsql/Datatype.pdl");
         super.persistenceSetUp();
     }
 

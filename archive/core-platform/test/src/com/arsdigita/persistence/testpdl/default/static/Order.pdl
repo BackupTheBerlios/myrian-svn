@@ -226,6 +226,8 @@ object type LineItem {
 }
 
 query OrdersMaxPrices {
+
+
     do {
         select t_orders.order_id,
                t_orders.buyer,

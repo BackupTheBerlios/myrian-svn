@@ -1,7 +1,7 @@
 --
 -- Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
 --
--- The contents of this file are subject to the ArsDigita Public 
+-- The contents of this file are subject to the ArsDigita Public
 -- License (the "License"); you may not use this file except in
 -- compliance with the License. You may obtain a copy of
 -- the License at http://www.arsdigita.com/ADPL.txt
@@ -17,15 +17,13 @@
 -- tests to run.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #8 $ $Date: 2002/08/14 $
+-- @version $Revision: #9 $ $Date: 2002/08/15 $
 --
 
-@@ order-test.sql
+@@ create.sql
 @@ ../../default/persistence/setup.sql
 @@ party-test.sql
-@@ datatype-test.sql
 @@ data-query-test.sql
 @@ sql-operation-test.sql
 @@ data-operation-test.sql
-@@ link-test.sql
 

@@ -30,11 +30,11 @@ import com.arsdigita.persistence.metadata.ObjectType;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/08/15 $
  */
 public class GenericDataObjectTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/GenericDataObjectTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/GenericDataObjectTest.java#5 $ by $Author: jorris $, $DateTime: 2002/08/15 14:01:26 $";
 
     public GenericDataObjectTest(String name) {
         super(name);
@@ -197,6 +197,7 @@ public class GenericDataObjectTest extends PersistenceTestCase {
         order.set("shippingDate",
                   new java.sql.Date(System.currentTimeMillis()));
         order.set("hasShipped", Boolean.FALSE);
+        order.set("text", "This is some text!");
         order.save();
         OID oid = order.getOID();
 

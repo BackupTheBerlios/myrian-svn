@@ -33,12 +33,12 @@ import org.apache.log4j.Logger;
  * LobTest - for testing Blob and Clob datatype.
  *
  * @author Jeff Teeters (teeters@arsdigita.com)
- * @version $Revision: #7 $ $Date: 2002/08/14 $
+ * @version $Revision: #8 $ $Date: 2002/08/15 $
  */
 
 public class LobTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LobTest.java#7 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LobTest.java#8 $ by $Author: jorris $, $DateTime: 2002/08/15 14:01:26 $";
 
     private Logger s_cat =
         Logger.getLogger(LobTest.class);
@@ -61,12 +61,12 @@ public class LobTest extends PersistenceTestCase {
     }
 
     protected void persistenceSetUp() {
-        load("com/arsdigita/persistence/testpdl/static/Datatype.pdl");
+        load("com/arsdigita/persistence/testpdl/mdsql/Datatype.pdl");
         super.persistenceSetUp();
     }
 
     protected void persistenceTearDown() {
-        load("com/arsdigita/persistence/testpdl/static/Datatype.pdl");
+        load("com/arsdigita/persistence/testpdl/mdsql/Datatype.pdl");
         super.persistenceTearDown();
     }
 
