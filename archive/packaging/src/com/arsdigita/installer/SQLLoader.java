@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
  * SQLLoader
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/09/09 $
+ * @version $Revision: #3 $ $Date: 2003/09/26 $
  **/
 
 public abstract class SQLLoader {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/installer/SQLLoader.java#2 $ by $Author: rhs $, $DateTime: 2003/09/09 15:54:40 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/installer/SQLLoader.java#3 $ by $Author: rhs $, $DateTime: 2003/09/26 15:07:47 $";
 
     private static final Logger s_log = Logger.getLogger(SQLLoader.class);
 
@@ -97,7 +97,12 @@ public abstract class SQLLoader {
             front = parent(front);
         }
 
-        String resolved = front + "/" + back;
+        String resolved;
+        if (front == null) {
+            resolved = back;
+        } else {
+            resolved = front + "/" + back;
+        }
 
         if (s_log.isInfoEnabled()) {
             s_log.info("Recursively including: '" + resolved + "'");
