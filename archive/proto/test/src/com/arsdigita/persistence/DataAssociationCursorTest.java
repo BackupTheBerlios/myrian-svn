@@ -27,11 +27,11 @@ import java.util.*;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/03/28 $
  */
 public class DataAssociationCursorTest extends DataCollectionTest {
 
-    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/DataAssociationCursorTest.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/DataAssociationCursorTest.java#2 $ by $Author: rhs $, $DateTime: 2003/03/28 13:53:40 $";
 
     OrderAssociation m_orderAssoc;
 
@@ -84,19 +84,10 @@ public class DataAssociationCursorTest extends DataCollectionTest {
             found = cursor.get("id").equals(deadId);
         }
 
-        assertTrue("Id " + deadId + " removed from DataAssociation before save()!", found);
-
-        // need to save parent DataObject for removal to have effect.
-        m_orderAssoc.getOrder().save();
-        cursor.rewind();
-        while(cursor.next()) {
-            if( cursor.get("id").equals(deadId) ){
-                fail("Id " + deadId + " not removed from DataAssociation!");
-            }
-        }
-
-
+        assertFalse("Id " + deadId + " not removed from DataAssociation!",
+		    found);
     }
+
     /**
      *  Tests the ordering capability of DataQuery.
      *  Checks forward, reverse, and multiple field ordering.
