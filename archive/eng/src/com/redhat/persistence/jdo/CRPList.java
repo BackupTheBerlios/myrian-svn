@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
  * CRPList
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #17 $ $Date: 2004/07/27 $
+ * @version $Revision: #18 $ $Date: 2004/07/27 $
  **/
 
 class CRPList implements List {
@@ -320,7 +320,7 @@ class CRPList implements List {
     }
 
     public boolean containsAll(Collection coll) {
-        throw new UnsupportedOperationException();
+        return elements.values().containsAll(coll);
     }
 
     public Object remove(int index) {

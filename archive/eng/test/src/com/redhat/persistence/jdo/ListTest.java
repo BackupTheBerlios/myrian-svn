@@ -6,6 +6,7 @@ import com.redhat.persistence.jdo.PersistenceManagerImpl;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -14,7 +15,7 @@ import org.apache.log4j.Logger;
  * ListTest
  *
  * @since 2004-07-13
- * @version $Revision: #3 $ $Date: 2004/07/27 $
+ * @version $Revision: #4 $ $Date: 2004/07/27 $
  **/
 public class ListTest extends WithTxnCase {
     private final static Logger s_log = Logger.getLogger(ListTest.class);
@@ -22,6 +23,7 @@ public class ListTest extends WithTxnCase {
     private final static List EMAILS = Collections.unmodifiableList
         (Arrays.asList(new String[]
             {"asdf@example.com", "fdsa@example.com", "rhs@lhs.example.org"}));
+    private final static String NO_SUCH_EMAIL = "no such email@nowhere.com";
 
     private Session m_ssn;
     private Group m_group;
@@ -151,7 +153,7 @@ public class ListTest extends WithTxnCase {
         assertTrue("had zeroth element", hadZeroth);
         assertFalse("still contains zeroth element",
                     auxEmails.contains(EMAILS.get(0)));
-        assertFalse("had no such email", auxEmails.remove("no such email"));
+        assertFalse("had no such email", auxEmails.remove(NO_SUCH_EMAIL));
     }
 
     public void testSet() {
@@ -183,5 +185,18 @@ public class ListTest extends WithTxnCase {
         List auxEmails = addEmails();
         assertEquals("emails", EMAILS, auxEmails);
         assertEquals("hash codes", EMAILS.hashCode(), auxEmails.hashCode());
+    }
+
+    public void testContainsAll() {
+        List auxEmails = addEmails();
+        final int size = EMAILS.size();
+        for (int ii=0; ii<size; ii++) {
+            assertTrue("contains sublist",
+                       auxEmails.containsAll(EMAILS.subList(ii, size)));
+        }
+
+        List notASubset = new LinkedList(EMAILS);
+        notASubset.add(NO_SUCH_EMAIL);
+        assertFalse("contains sublist", auxEmails.containsAll(notASubset));
     }
 }
