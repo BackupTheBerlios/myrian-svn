@@ -121,10 +121,41 @@ from <code>jdotck-1_0-fcs-src-04_Mar_2002.zip</code>, which is an older version.
 
 <ul>
   <li><a href="http://www.jpox.org/docs/1_1/developer/jdotcktests.html">Running
-   the JDOTCK</a>.</li>
+   the JDOTCK</a> (instructions for JPOX).</li>
+  <li><a href="http://speedo.objectweb.org/doc/Jdotck_Speedo.htm">Testing Speedo
+    with the JDO TCK</a></li>
+
   <li><a href="http://java.sun.com/developer/technicalArticles/JCPtools2/">The
     Java Compatibility Test Tools: JavaTest Harness</a>
    </li>
+
+  <li><p> contains the following documents:</p>
+
+  <pre>README.html  <strong>(pretty useful)</strong>
+build.xml
+doc/Assertions/Assertions_002-Chapter_2.htm
+doc/Assertions/Assertions_000-Intro.htm
+doc/Assertions/Assertions_005-Chapter_5.htm
+doc/Assertions/Assertions_006-Chapter_6.htm
+doc/Assertions/Assertions_007-Chapter_7.htm
+doc/Assertions/Assertions_008-Chapter_8.htm
+doc/Assertions/Assertions_010-Chapter_10.htm
+doc/Assertions/Assertions_011-Chapter_11.htm
+doc/Assertions/Assertions_012-Chapter_12.htm
+doc/Assertions/Assertions_013-Chapter_13.htm
+doc/Assertions/Assertions_014-Chapter_14.htm
+doc/Assertions/Assertions_015-Chapter_15.htm
+doc/Assertions/Assertions_018-Chapter_18.htm
+doc/Assertions/Assertions_020-Chapter_20.htm
+doc/inheritance.pdf
+doc/company.pdf
+doc/javatest/editLinks.html
+doc/javatest/javatest.pdf
+javatest.jar
+COPYRIGHT-javatest.html
+README-javatest.html
+ReleaseNotes-javatest.html</pre>
+  </li>
 
 </ul>
 
@@ -136,6 +167,8 @@ from <code>jdotck-1_0-fcs-src-04_Mar_2002.zip</code>, which is an older version.
 $ cp /from/unpacked/jdotck-1_0-fcs-src-04_Mar_2002.zip/javatest.jar iut_jars
 $ cp ../../lib/jdo.jar iut_jars/
 </pre>
+
+   <p>IUT stands for <em>Implementation Under Test</em>.</p>
   </li>
 
   <li><pre>$ mkdir jdori_jars
@@ -152,13 +185,47 @@ $ ant build
 </pre>
   </li>
 
+  <li><p>To enhance test classes with the RI, execute</p>
+
+<pre>$ ant jdorienhance</pre>
+
+  <p>This currently dies with the following exception</p>
+
+<pre>NestedException: org.xml.sax.SAXParseException: Relative URI "jdo.dtd"; can not be resolved without a base URI.
+        at com.sun.jdori.enhancer.filter.Enhancer.enhanceClassFile(Unknown Source)
+        at com.sun.jdori.enhancer.ClassFileEnhancerTimer.enhanceClassFile(Unknown Source)
+</pre>
+
+  </li>
+
   <li><pre>$ java -jar iut_jars/javatest.jar &
 </pre>
 
-  <p>Configure the testsuite.</p>
+  <p>Configure the testsuite. Configuration settings get saved in
+  <code>datastore/work/jtData/default.jti</code></p>
 </li>
 
-  <li><code>$ ant runagent</code></li>
+  <li><pre>$ ant runagent</pre>
+
+    <p>This basically runs something like this:</p>
+
+<pre>$ java -Djava.security.manager -Djava.security.policy=jdotck.policy \
+-DPMFProperties=iut.properties -classpath \
+enhanced:classes:iut_jars/rhp-jdo.jar:iut_jars/javatest.jar:iut_jars/jdo.jar:iut_jars/jta1_0_1.jar:jdori_jars/btree.jar:jdori_jars/jdori.jar \
+com.sun.javatest.agent.<strong>AgentMain</strong> -activeHost localhost</pre>
+
+    <p>You can also use the GUI, like so</p>
+
+<pre>$ java -classpath \
+enhanced:classes:iut_jars/rhp-jdo.jar:iut_jars/javatest.jar:iut_jars/jdo.jar:iut_jars/jta1_0_1.jar:jdori_jars/btree.jar:jdori_jars/jdori.jar \
+com.sun.javatest.agent.<strong>AgentFrame</strong></pre>
+
+   <p>Note that you can pass the <strong><code>-trace</code></strong> to get a
+    detailed view of what the agent's doing. (This produces about 2M worth of
+    output in my setup.)
+   </p>
+
+  </li>
 
   <li>Start the tests from the harness.</li>
 </ol>
