@@ -1,5 +1,5 @@
 create table pl_us_counties (
-    county_id                   constraint pl_usc_county_id_fk
+    county_id                   integer constraint pl_usc_county_id_fk
                                 references places (place_id)
                                 constraint pl_us_counties_pk
                                 primary key,

@@ -9,7 +9,7 @@ create table vc_transactions (
     on delete cascade,
   modifying_user   integer,
   modifying_ip     varchar(400),
-  timestamp        timestamp default current_timestamp not null,
+  timestamp        date default sysdate not null,
   description      varchar(4000),
   tag              varchar(400)
 );

@@ -94,6 +94,7 @@ create view dual as select 1;
 \i default/notification/index-nt_requests.sql
 \i default/notification/table-nt_queue.sql
 
+-- Not a hope in hell of intermedia working with PG ;-)
 --\i default/search/table-search_content.sql
 --\i default/search/block-autogroup.sql
 --\i default/search/index-xml_content_index.sql
@@ -103,51 +104,51 @@ create view dual as select 1;
 --\i default/search/insert-dummy.sql
 --\i default/search/package-search_indexing.sql
 
---\i default/places/table-places.sql
---\i default/places/table-place_hierarchy.sql
---\i default/places/index-place_hierarchy.sql
---\i default/places/table-place_hierarchy_tc.sql
---\i default/places/index-place_hierarchy_tc.sql
---\i default/places/trigger-place_hierarchy.sql
---\i default/places/table-pl_countries.sql
---\i default/places/table-pl_regions.sql
---\i default/places/table-pl_municipalities.sql
---\i default/places/table-pl_postal_codes.sql
---\i default/places/table-pl_us_states.sql
---\i default/places/table-pl_us_counties.sql
---\i default/places/index-pl_us_counties.sql
+\i default/places/table-places.sql
+\i default/places/table-place_hierarchy.sql
+\i default/places/index-place_hierarchy.sql
+\i default/places/table-place_hierarchy_tc.sql
+\i default/places/index-place_hierarchy_tc.sql
+\i default/places/trigger-place_hierarchy.sql
+\i default/places/table-pl_countries.sql
+\i default/places/table-pl_regions.sql
+\i default/places/table-pl_municipalities.sql
+\i default/places/table-pl_postal_codes.sql
+\i default/places/table-pl_us_states.sql
+\i default/places/table-pl_us_counties.sql
+\i default/places/index-pl_us_counties.sql
 
---\i default/versioning/table-vc_objects.sql
---\i default/versioning/comment-vc_objects.sql
---\i default/versioning/table-vc_transactions.sql
---\i default/versioning/index-vc_transactions.sql
---\i default/versioning/comment-vc_transactions.sql
---\i default/versioning/table-vc_actions.sql
---\i default/versioning/comment-vc_actions.sql
---\i default/versioning/insert-vc_actions.sql
---\i default/versioning/table-vc_operations.sql
---\i default/versioning/index-vc_operations.sql
---\i default/versioning/comment-vc_operations.sql
---\i default/versioning/table-vc_generic_operations.sql
---\i default/versioning/comment-vc_generic_operations.sql
---\i default/versioning/table-vc_clob_operations.sql
---\i default/versioning/table-vc_blob_operations.sql
---\i default/versioning/function-last_attr_value.sql
+\i default/versioning/table-vc_objects.sql
+\i default/versioning/comment-vc_objects.sql
+\i default/versioning/table-vc_transactions.sql
+\i default/versioning/index-vc_transactions.sql
+\i default/versioning/comment-vc_transactions.sql
+\i default/versioning/table-vc_actions.sql
+\i default/versioning/comment-vc_actions.sql
+\i default/versioning/insert-vc_actions.sql
+\i default/versioning/table-vc_operations.sql
+\i default/versioning/index-vc_operations.sql
+\i default/versioning/comment-vc_operations.sql
+\i default/versioning/table-vc_generic_operations.sql
+\i default/versioning/comment-vc_generic_operations.sql
+\i postgres/versioning/table-vc_clob_operations.sql
+\i postgres/versioning/table-vc_blob_operations.sql
+\i postgres/versioning/function-last_attr_value.sql
 
---\i default/workflow/sequence-cw_sequences.sql
---\i default/workflow/table-cw_tasks.sql
---\i default/workflow/index-cw_tasks.sql
---\i default/workflow/table-cw_user_tasks.sql
---\i default/workflow/table-cw_task_dependencies.sql
---\i default/workflow/table-cw_task_comments.sql
---\i default/workflow/table-cw_system_tasks.sql
---\i default/workflow/table-cw_task_listeners.sql
---\i default/workflow/table-cw_task_user_assignees.sql
---\i default/workflow/table-cw_task_group_assignees.sql
---\i default/workflow/table-cw_processes.sql
---\i default/workflow/index-cw_processes.sql
---\i default/workflow/table-cw_process_task_map.sql
---\i default/workflow/table-cw_process_definitions.sql
+\i postgres/workflow/sequence-cw_sequences.sql
+\i default/workflow/table-cw_tasks.sql
+\i default/workflow/index-cw_tasks.sql
+\i default/workflow/table-cw_user_tasks.sql
+\i default/workflow/table-cw_task_dependencies.sql
+\i default/workflow/table-cw_task_comments.sql
+\i default/workflow/table-cw_system_tasks.sql
+\i default/workflow/table-cw_task_listeners.sql
+\i default/workflow/table-cw_task_user_assignees.sql
+\i default/workflow/table-cw_task_group_assignees.sql
+\i default/workflow/table-cw_processes.sql
+\i default/workflow/index-cw_processes.sql
+\i default/workflow/table-cw_process_task_map.sql
+\i default/workflow/table-cw_process_definitions.sql
 
 \i default/formbuilder/table-bebop_components.sql
 \i default/formbuilder/comment-bebop_components.sql
@@ -195,7 +196,7 @@ create view dual as select 1;
 \i postgres/persistence/table-persistence_dynamic_ot.sql
 \i postgres/persistence/table-persistence_dynamic_assoc.sql
 
---\i default/kernel/index-foreign_keys.sql 
+\i default/kernel/index-foreign_keys.sql 
 
 \i ddl/postgres/deferred.sql
 

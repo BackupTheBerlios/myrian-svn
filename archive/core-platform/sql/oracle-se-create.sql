@@ -119,7 +119,7 @@
 @@ default/search/insert-dummy.sql
 @@ default/search/package-search_indexing.sql
 
-@@ default/places/table-places.sql
+@@ oracle-se/places/table-places.sql
 @@ default/places/table-place_hierarchy.sql
 @@ default/places/index-place_hierarchy.sql
 @@ default/places/table-place_hierarchy_tc.sql
@@ -135,7 +135,7 @@
 
 @@ default/versioning/table-vc_objects.sql
 @@ default/versioning/comment-vc_objects.sql
-@@ default/versioning/table-vc_transactions.sql
+@@ oracle-se/versioning/table-vc_transactions.sql
 @@ default/versioning/index-vc_transactions.sql
 @@ default/versioning/comment-vc_transactions.sql
 @@ default/versioning/table-vc_actions.sql
@@ -153,9 +153,9 @@
 @@ default/workflow/sequence-cw_sequences.sql
 @@ default/workflow/table-cw_tasks.sql
 @@ default/workflow/index-cw_tasks.sql
-@@ default/workflow/table-cw_user_tasks.sql
+@@ oracle-se/workflow/table-cw_user_tasks.sql
 @@ default/workflow/table-cw_task_dependencies.sql
-@@ default/workflow/table-cw_task_comments.sql
+@@ oracle-se/workflow/table-cw_task_comments.sql
 @@ default/workflow/table-cw_system_tasks.sql
 @@ default/workflow/table-cw_task_listeners.sql
 @@ default/workflow/table-cw_task_user_assignees.sql

@@ -1,5 +1,5 @@
 create table pl_us_states (
-    state_id                    constraint pl_uss_state_id_fk
+    state_id                    integer constraint pl_uss_state_id_fk
                                 references pl_regions (region_id)
                                 constraint pl_uss_states_pk
                                 primary key,
