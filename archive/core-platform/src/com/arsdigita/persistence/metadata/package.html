@@ -10,9 +10,9 @@ and the database schema used to persist data objects. </p>
 
 <p> When the system starts up, the persistence layer reads the PDL
 files into an Abstract Syntax Tree using the files within {@link
-com.arsdigita.persistence.pdl.ast}.  The Abstract Syntax Tree then
-populates the classes within this package.  These classes are then
-used by the operational persistence layer (the classes within the
+com.arsdigita.persistence.proto.pdl.nodes}.  The Abstract Syntax Tree
+then populates the classes within this package.  These classes are
+then used by the operational persistence layer (the classes within the
 {@link com.arsdigita.persistence} package) to perform the standard
 operations.  </p>
 
@@ -28,16 +28,11 @@ namespace for all of the metadata information (such as object types,
 data queries, and data operations).  The model itself is composed of
 {@link com.arsdigita.persistence.metadata.ModelElement}s. </p>
 
-<p> There are three types of ModelElements: {@link
-com.arsdigita.persistence.metadata.Association}, {@link
-com.arsdigita.persistence.metadata.DataOperationType}, and {@link
+<p> There are two types of ModelElements: {@link
+com.arsdigita.persistence.metadata.Association} and {@link
 com.arsdigita.persistence.metadata.DataType}.  The Association model
-type holds information for associations between object types.
-DataOperationTypes contain {@link
-com.arsdigita.persistence.metadata.Operation}s SQL with some related
-information) and potentially mappings outlining how the results of the
-operation should be returned.  Finally, DataTypes contain both
-CompoundTypes and SimpleTypes.  </p>
+type holds information for associations between object types.  The
+DataType model contains both CompoundTypes and SimpleTypes.  </p>
 
 <p>
 {@link com.arsdigita.persistence.metadata.SimpleType}s are used to
@@ -49,8 +44,8 @@ within MAP blocks.
 </p>
 
 <p> A {@link com.arsdigita.persistence.metadata.CompoundType} can
-either be a {@link com.arsdigita.persistence.metadata.ObjectType} or a
-{@link com.arsdigita.persistence.metadata.QueryType}.  ObjectTypes
+be a {@link com.arsdigita.persistence.metadata.ObjectType}.
+ObjectTypes
 provide specific access special events that act on rows within the
 tables.  Each {@link com.arsdigita.persistence.DataObject} contains a
 single ObjectType and that ObjectType is what contains references to
@@ -61,22 +56,11 @@ database), Associations (mappings between database tables), and Events
 retrieved within the database).  </p>
 
 <p> A QueryType is composed of a set of Operations and {@link
-com.arsdigita.persistence.metadata.Mapping}s that allow the user to
-retrieve arbitrary information from the database.  </p>
-
-<p> The final section of the Metadata class is the collection of
-classes that automatically generate and persist events for object
-types.  Specifically, {@link
-com.arsdigita.persistence.metadata.MDSQLGenerator} is used to
-automatically generate events for Object Types.  {@link
-com.arsdigita.metadata.DynamicObjectType} allows
-developers to create their own object types and {@link
-com.arsdigita.persistence.metadata.DDLGenerator} generates the tables
-to store information for these new object types.
-</p> 
+com.arsdigita.persistence.proto.metadata.Mapping}s that allow the user
+to retrieve arbitrary information from the database.  </p>
 
 <hr>
-<font size="-2">Last modified: $Date: 2002/12/04 $</font>
+<font size="-2">Last modified: $Date: 2003/07/03 $</font>
     
 </body>
 </html>

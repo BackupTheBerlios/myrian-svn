@@ -60,7 +60,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #19 $ $Date: 2003/07/02 $
+ * @version $Revision: #20 $ $Date: 2003/07/03 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -456,7 +456,6 @@ public class Session {
      * @param type The type of the object to be created.
      * @return A persistent object of the specified type.
      * @see #create(String)
-     * @see GenericDataObjectFactory
      **/
     public DataObject create(ObjectType type) {
 	if (type == null) {
