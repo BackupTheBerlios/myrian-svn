@@ -31,12 +31,12 @@ import org.apache.log4j.Logger;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/05/02 $
+ * @version $Revision: #4 $ $Date: 2004/05/28 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/engine/rdbms/EventSwitch.java#3 $ by $Author: rhs $, $DateTime: 2004/05/02 13:12:27 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/engine/rdbms/EventSwitch.java#4 $ by $Author: rhs $, $DateTime: 2004/05/28 09:34:18 $";
 
     private static final Logger LOG = Logger.getLogger(EventSwitch.class);
 
@@ -395,8 +395,7 @@ class EventSwitch extends Event.Switch {
         Property prop = e.getProperty();
         ObjectType type = prop.getType();
         if (type.isKeyed()) { return; }
-        ObjectMap om = m_engine.getSession().getRoot().getObjectMap
-            (prop.getContainer());
+        ObjectMap om = e.getObjectMap();
         Mapping m = om.getMapping(Path.get(prop.getName()));
         Adapter ad = m_engine.getSession().getRoot().getAdapter(type);
         final int jdbcType[] = { ad.defaultJDBCType() };
