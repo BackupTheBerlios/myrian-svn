@@ -9,12 +9,12 @@ import java.util.*;
  * DirSource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/09/12 $
+ * @version $Revision: #5 $ $Date: 2003/09/12 $
  **/
 
 public class DirSource implements PDLSource {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/pdl/DirSource.java#4 $ by $Author: rhs $, $DateTime: 2003/09/12 10:06:13 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/pdl/DirSource.java#5 $ by $Author: rhs $, $DateTime: 2003/09/12 16:13:47 $";
 
     private final File m_dir;
     private final PDLFilter m_filter;
@@ -43,8 +43,12 @@ public class DirSource implements PDLSource {
                 parse(compiler, file);
             } else {
                 try {
-                    compiler.parse
-                        (new FileReader(file), file.getAbsolutePath());
+                    FileReader reader = new FileReader(file);
+                    try {
+                        compiler.parse(reader, file.getAbsolutePath());
+                    } finally {
+                        reader.close();
+                    }
                 } catch (IOException e) {
                     throw new UncheckedWrapperException(e);
                 }
