@@ -36,7 +36,7 @@ import java.io.UnsupportedEncodingException;
  * @since ACS 4.5a
  */
 public class Document {
-    public static final String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/xml/Document.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public static final String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/xml/Document.java#3 $ by $Author: dan $, $DateTime: 2003/10/21 05:49:43 $";
 
     private static final Logger s_log =
         Logger.getLogger(Document.class.getName());
@@ -133,7 +133,8 @@ public class Document {
         m_document.appendChild(rootNode.getInternalElement());
     }
 
-    public Document( String xmlString ) throws ParserConfigurationException, org.xml.sax.SAXException {
+    public Document( String xmlString ) 
+        throws ParserConfigurationException, org.xml.sax.SAXException {
         DocumentBuilder db = (DocumentBuilder)s_db.get();
         if (db == null) {
             throw new ParserConfigurationException
@@ -249,10 +250,8 @@ public class Document {
                 new StreamSource(new StringReader(identityXSL));
             identity = TransformerFactory.newInstance()
                 .newTransformer(identitySource);
-            if (indent) {
-                identity.setOutputProperty("method", "xml");
-                identity.setOutputProperty("indent", "yes");
-            }
+            identity.setOutputProperty("method", "xml");
+            identity.setOutputProperty("indent", (indent ? "yes" : "no"));
             identity.setOutputProperty("encoding", "UTF-8");
             identity.transform(new DOMSource(document), new StreamResult(os));
         } catch (javax.xml.transform.TransformerException e) {
