@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2002-08-23
- * @version $Id: //core-platform/proto/src/com/arsdigita/util/Debug.java#3 $ $Date: 2003/03/21 $
+ * @version $Id: //core-platform/proto/src/com/arsdigita/util/Debug.java#4 $ $Date: 2003/03/21 $
  **/
 public class Debug {
     private static final Logger s_log = Logger.getLogger(Debug.class);
@@ -142,18 +142,24 @@ public class Debug {
      * <code>true</code> for the
      * <code>ReflectPermission("suppressAccessChecks")</code> permission. Note
      * that this is an unchecked exception.
+     *
+     * @pre class != null && obj != null && fieldName != null
      **/
     public static Object getPrivateField(Class klass, Object obj,
                                          String fieldName)
         throws SecurityException {
+
+        Assert.assertNotNull(klass, "klass");
+        Assert.assertNotNull(obj, "obj");
+        Assert.assertNotNull(fieldName, "fieldName");
 
         try {
             Field field = klass.getDeclaredField(fieldName);
             field.setAccessible(true);
             return field.get(obj);
         } catch (NoSuchFieldException ex) {
-            throw new Error("No field named " + fieldName + " in " +
-                            klass.getName());
+            throw new IllegalArgumentException
+                ("No field named " + fieldName + " in " + klass.getName());
         } catch (IllegalAccessException ex) {
             throw new Error("This can't normally happen.");
         }
