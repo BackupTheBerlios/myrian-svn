@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/ui/admin/Admin.pdl#7 $ 
-// $DateTime: 2003/03/27 14:06:13 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/ui/admin/Admin.pdl#8 $ 
+// $DateTime: 2003/05/20 16:55:13 $
 
 model com.arsdigita.ui.admin;
 
@@ -33,7 +33,6 @@ query AllNoParentGroups {
 // Retrieve subgroup count for giving group id
 // without first retrieve information about group.
 query SubGroupCount {
-   BigDecimal groupID;
    BigDecimal count;
 
    do {
