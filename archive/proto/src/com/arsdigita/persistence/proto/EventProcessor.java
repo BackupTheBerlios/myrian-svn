@@ -19,13 +19,17 @@ package com.arsdigita.persistence.proto;
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
  * @since 2003-02-20
- * @version $Revision: #1 $ $Date: 2003/02/20 $
+ * @version $Revision: #2 $ $Date: 2003/03/31 $
  **/
 public abstract class EventProcessor {
 
     public final static String versionId =
-        "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/EventProcessor.java#1 $" +
-        " by $Author: vadim $, $DateTime: 2003/02/20 16:04:48 $";
+        "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/EventProcessor.java#2 $" +
+        " by $Author: vadim $, $DateTime: 2003/03/31 15:13:10 $";
+
+    protected void commit() {}
+
+    protected void rollback() {}
 
     protected abstract void write(Event ev);
 

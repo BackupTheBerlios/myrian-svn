@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #50 $ $Date: 2003/03/28 $
+ * @version $Revision: #51 $ $Date: 2003/03/31 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#50 $ by $Author: ashah $, $DateTime: 2003/03/28 12:30:01 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#51 $ by $Author: vadim $, $DateTime: 2003/03/31 15:13:10 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -798,9 +798,21 @@ public class Session {
         m_events.clear();
         m_visiting.clear();
         m_violations.clear();
+        commitEventProcessors();
         m_engine.commit();
         m_beforeFlushMarker = null;
         if (LOG.isDebugEnabled()) { setLevel(0); }
+    }
+
+    private void commitEventProcessors() {
+        for (Iterator eps = m_beforeFlush.iterator(); eps.hasNext(); ) {
+            EventProcessor ep = (EventProcessor) eps.next();
+            ep.commit();
+        }
+        for (Iterator eps = m_afterFlush.iterator(); eps.hasNext(); ) {
+            EventProcessor ep = (EventProcessor) eps.next();
+            ep.commit();
+        }
     }
 
     /**
@@ -814,9 +826,21 @@ public class Session {
         m_events.clear();
         m_visiting.clear();
         m_violations.clear();
+        rollbackEventProcessors();
         m_engine.rollback();
         m_beforeFlushMarker = null;
         if (LOG.isDebugEnabled()) { setLevel(0); }
+    }
+
+    private void rollbackEventProcessors() {
+        for (Iterator eps = m_beforeFlush.iterator(); eps.hasNext(); ) {
+            EventProcessor ep = (EventProcessor) eps.next();
+            ep.rollback();
+        }
+        for (Iterator eps = m_afterFlush.iterator(); eps.hasNext(); ) {
+            EventProcessor ep = (EventProcessor) eps.next();
+            ep.rollback();
+        }
     }
 
     Engine getEngine() {
