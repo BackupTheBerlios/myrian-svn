@@ -16,12 +16,12 @@ import java.io.*;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2003/02/28 $
+ * @version $Revision: #12 $ $Date: 2003/03/05 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#11 $ by $Author: rhs $, $DateTime: 2003/02/28 19:58:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#12 $ by $Author: rhs $, $DateTime: 2003/03/05 18:41:57 $";
 
     private static final HashMap SOURCES = new HashMap();
     private static final HashMap BLOCKS = new HashMap();
@@ -275,41 +275,36 @@ class QGen {
         ObjectMap map = Root.getRoot().getObjectMap(prop.getContainer());
         Mapping m = map.getMapping(Path.get(prop.getName()));
 
-        if (m == null) {
-            throw new Error("no metadata for path: " + path);
-        }
-
         m.dispatch(new Mapping.Switch() {
-                public void onValue(ValueMapping vm) {
-                    addJoin(path, getKey(vm.getColumn().getTable()));
+                public void onValue(Value m) {
+                    addJoin(path, getKey(m.getColumn().getTable()));
                     setColumn(path, Path.get(path.getParent() + "__" +
-                                             vm.getColumn()));
+                                             m.getColumn()));
                 }
 
-                public void onReference(ReferenceMapping rm) {
-                    if (rm.isJoinTo()) {
-                        Column to = rm.getJoin(0).getFrom();
-                        addJoin(path, getKey(to.getTable()));
-                        setColumn(path, Path.get(path.getParent() + "__" +
-                                                 to));
-                    } else if (rm.isJoinFrom()) {
-                        Column to = rm.getJoin(0).getTo();
-                        addJoin(path, to);
-                        setColumn(path, Path.get
-                                  (path.getParent() + "__" +
-                                   getKey(to.getTable())));
-                    } else if (rm.isJoinThrough()) {
-                        addJoin(path, rm.getJoin(0).getTo());
-                        setColumn
-                            (path, Path.get
-                             (path.getParent() + "__" +
-                              rm.getJoin(1).getFrom()));
-                    } else {
-                        throw new Error("huh?");
-                    }
+                public void onJoinTo(JoinTo m) {
+                    Column to = m.getKey().getColumns()[0];
+                    addJoin(path, getKey(to.getTable()));
+                    setColumn(path, Path.get(path.getParent() + "__" + to));
                 }
 
-                public void onStatic(StaticMapping sm) {
+                public void onJoinFrom(JoinFrom m) {
+                    Column to = m.getKey().getColumns()[0];
+                    addJoin(path, to);
+                    setColumn(path, Path.get
+                              (path.getParent() + "__" +
+                               getKey(to.getTable())));
+                }
+
+                public void onJoinThrough(JoinThrough m) {
+                    addJoin(path, m.getFrom().getColumns()[0]);
+                    setColumn
+                        (path, Path.get
+                         (path.getParent() + "__" +
+                          m.getTo().getColumns()[0]));
+                }
+
+                public void onStatic(Static m) {
                     // do nothing
                 }
             });

@@ -6,12 +6,12 @@ import java.util.*;
  * Node
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/02/26 $
+ * @version $Revision: #5 $ $Date: 2003/03/05 $
  **/
 
 public abstract class Node {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/Node.java#4 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/Node.java#5 $ by $Author: rhs $, $DateTime: 2003/03/05 18:41:57 $";
 
 
     /**
@@ -159,11 +159,14 @@ public abstract class Node {
      * The following code is used to perform traversals over the parse tree.
      **/
 
-    public static abstract class Filter {
-        public abstract boolean accept(Field f);
+    public static interface Filter {
+        boolean accept(Node child);
     }
 
-    public static class IncludeFilter extends Filter {
+    public static abstract class Traversal extends Node.Switch
+        implements Filter { }
+
+    public static class IncludeFilter implements Filter {
 
         private HashSet m_fields = new HashSet();
 
@@ -173,14 +176,16 @@ public abstract class Node {
             }
         }
 
-        public boolean accept(Field f) {
-            return m_fields.contains(f);
+        public boolean accept(Node child) {
+            return m_fields.contains(child.getField());
         }
     }
 
 
     public static final Filter ALL = new Filter() {
-            public boolean accept(Field f) { return true; }
+            public boolean accept(Node child) {
+                return true;
+            }
         };
 
 
@@ -193,10 +198,14 @@ public abstract class Node {
         dispatch(sw);
         for (Iterator it = m_children.iterator(); it.hasNext(); ) {
             Child child = (Child) it.next();
-            if (f.accept(child.getField())) {
+            if (f.accept(child.getNode())) {
                 child.getNode().traverse(sw, f);
             }
         }
+    }
+
+    public void traverse(Traversal t) {
+        traverse(t, t);
     }
 
 
@@ -212,6 +221,7 @@ public abstract class Node {
     private int m_column = -1;
 
     private Node m_parent = null;
+    private Field m_field = null;
     private ArrayList m_children = new ArrayList();
 
 
@@ -252,6 +262,10 @@ public abstract class Node {
         return result;
     }
 
+    public int getIndex() {
+        return ((List) getParent().get(getField())).indexOf(this);
+    }
+
     private void check(Node child) {
         if (child == null) {
             throw new IllegalArgumentException
@@ -267,6 +281,7 @@ public abstract class Node {
         check(field); check(child);
 
         child.m_parent = this;
+        child.m_field = field;
         m_children.add(new Child(field, child));
     }
 
@@ -300,6 +315,10 @@ public abstract class Node {
     /**
      * Under Construction
      **/
+
+    public Field getField() {
+        return m_field;
+    }
 
     public Node getParent() {
         return m_parent;

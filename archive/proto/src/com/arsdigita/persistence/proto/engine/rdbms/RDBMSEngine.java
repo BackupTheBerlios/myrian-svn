@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #19 $ $Date: 2003/02/26 $
+ * @version $Revision: #20 $ $Date: 2003/03/05 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#19 $ by $Author: rhs $, $DateTime: 2003/02/26 22:04:12 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#20 $ by $Author: rhs $, $DateTime: 2003/03/05 18:41:57 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -26,7 +26,6 @@ public class RDBMSEngine extends Engine {
     private ArrayList m_operations = new ArrayList();
     private HashMap m_operationMap = new HashMap();
     private EventSwitch m_switch = new EventSwitch(this);
-    private StaticEventSwitch m_staticSwitch = new StaticEventSwitch(this);
     private HashMap m_environments = new HashMap();
 
     private ConnectionSource m_source;
@@ -164,7 +163,6 @@ public class RDBMSEngine extends Engine {
 
     public void write(Event ev) {
         ev.dispatch(m_switch);
-        ev.dispatch(m_staticSwitch);
     }
 
     public void flush() {

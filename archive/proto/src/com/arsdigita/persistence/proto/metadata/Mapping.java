@@ -7,17 +7,19 @@ import java.util.*;
  * Mapping
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2003/02/26 $
+ * @version $Revision: #8 $ $Date: 2003/03/05 $
  **/
 
 public abstract class Mapping extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Mapping.java#7 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Mapping.java#8 $ by $Author: rhs $, $DateTime: 2003/03/05 18:41:57 $";
 
     public static abstract class Switch {
-        public abstract void onValue(ValueMapping vm);
-        public abstract void onReference(ReferenceMapping rm);
-        public abstract void onStatic(StaticMapping sm);
+        public abstract void onValue(Value m);
+        public abstract void onJoinTo(JoinTo m);
+        public abstract void onJoinFrom(JoinFrom m);
+        public abstract void onJoinThrough(JoinThrough m);
+        public abstract void onStatic(Static m);
     }
 
     private Path m_path;
@@ -36,6 +38,8 @@ public abstract class Mapping extends Element {
     public Path getPath() {
         return m_path;
     }
+
+    public abstract Table getTable();
 
     public SQLBlock getRetrieve() {
         return m_retrieve;
@@ -63,11 +67,7 @@ public abstract class Mapping extends Element {
 
     public abstract void dispatch(Switch sw);
 
-    public abstract boolean isValue();
-
-    public abstract boolean isReference();
-
-    Object getKey() {
+    Object getElementKey() {
         return getPath();
     }
 

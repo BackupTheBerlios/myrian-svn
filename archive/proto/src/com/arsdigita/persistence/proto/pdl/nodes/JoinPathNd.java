@@ -6,12 +6,12 @@ import java.util.*;
  * JoinPath
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/01/15 $
+ * @version $Revision: #3 $ $Date: 2003/03/05 $
  **/
 
 public class JoinPathNd extends StatementNd {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/JoinPathNd.java#2 $ by $Author: rhs $, $DateTime: 2003/01/15 17:57:03 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/JoinPathNd.java#3 $ by $Author: rhs $, $DateTime: 2003/03/05 18:41:57 $";
 
     public static final Field JOINS =
         new Field(JoinPathNd.class, "joins", JoinNd.class, 1, 2);
@@ -21,8 +21,8 @@ public class JoinPathNd extends StatementNd {
         sw.onJoinPath(this);
     }
 
-    public Collection getJoins() {
-        return (Collection) get(JOINS);
+    public List getJoins() {
+        return (List) get(JOINS);
     }
 
 }

@@ -7,12 +7,12 @@ import java.util.*;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2003/02/26 $
+ * @version $Revision: #9 $ $Date: 2003/03/05 $
  **/
 
 public class ObjectType extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectType.java#8 $ by $Author: rhs $, $DateTime: 2003/02/26 20:44:08 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectType.java#9 $ by $Author: rhs $, $DateTime: 2003/03/05 18:41:57 $";
 
     private Model m_model;
     private String m_name;
@@ -169,8 +169,8 @@ public class ObjectType extends Element {
         }
     }
 
-    Object getKey() {
-        return toString();
+    Object getElementKey() {
+        return getQualifiedName();
     }
 
     public String toString() {

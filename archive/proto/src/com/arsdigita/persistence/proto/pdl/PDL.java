@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #25 $ $Date: 2003/03/03 $
+ * @version $Revision: #26 $ $Date: 2003/03/05 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#25 $ by $Author: rhs $, $DateTime: 2003/03/03 12:39:31 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#26 $ by $Author: rhs $, $DateTime: 2003/03/05 18:41:57 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -154,15 +154,18 @@ public class PDL {
             root.addObjectType(m_symbols.getEmitted(ot));
         }
 
+        m_ast.traverse(new Node.Switch() {
+                public void onObjectType(ObjectTypeNd otn) {
+                    root.addObjectMap
+                        (new ObjectMap(m_symbols.getEmitted(otn)));
+                }
+            });
+
         emitDDL(root);
 
         m_errors.check();
 
         emitMapping(root);
-
-        m_errors.check();
-
-        emitConstraints(root);
 
         m_errors.check();
 
@@ -453,7 +456,74 @@ public class PDL {
         Object fetch(ResultSet rs, String column) throws SQLException;
     }
 
-    private void emitDDL(Root root) {
+    private class UniqueTraversal extends Node.Traversal {
+
+        private ArrayList m_cols = new ArrayList();
+        private Node m_nd;
+        private HashSet m_ids = new HashSet();
+        private boolean m_primary;
+
+        public UniqueTraversal(Node nd, Collection ids,
+                               boolean primary) {
+            m_nd = nd;
+            m_primary = primary;
+            for (Iterator it = ids.iterator(); it.hasNext(); ) {
+                m_ids.add(((IdentifierNd) it.next()).getName());
+            }
+        }
+
+        public boolean accept(Node child) {
+            Node.Field f = child.getField();
+            if (f == ObjectTypeNd.PROPERTIES) {
+                PropertyNd p = (PropertyNd) child;
+                return m_ids.contains(p.getName().getName());
+            } else if (f == PropertyNd.MAPPING) {
+                return true;
+            } else if (f == JoinPathNd.JOINS) {
+                return child.getIndex() == 0;
+            } else {
+                return false;
+            }
+        }
+
+        public void onColumn(ColumnNd colnd) {
+            m_cols.add(colnd);
+        }
+
+        public void emit(Root root) {
+            if (m_cols.size() == 0) {
+                m_errors.warn(m_nd, "no metadata");
+                return;
+            }
+
+            Column[] cols = new Column[m_cols.size()];
+            for (int i = 0; i < cols.length; i++) {
+                cols[i] = lookup(root, (ColumnNd) m_cols.get(i));
+            }
+            unique(m_nd, cols, m_primary);
+        }
+
+    }
+
+    private void unique(Node nd, Column[] cols, boolean primary) {
+        Table table = cols[0].getTable();
+        if (table.getUniqueKey(cols) != null) {
+            m_errors.warn(nd, "duplicate key");
+            return;
+        }
+        UniqueKey key = new UniqueKey(table, null, cols);
+        if (primary) {
+            table.setPrimaryKey(key);
+        }
+    }
+
+    private void unique(Root root, Node nd, Collection ids, boolean primary) {
+        UniqueTraversal ut = new UniqueTraversal(nd, ids, primary);
+        nd.getParent().traverse(ut);
+        ut.emit(root);
+    }
+
+    private void emitDDL(final Root root) {
         final HashMap tables = new HashMap();
         for (Iterator it = root.getTables().iterator(); it.hasNext(); ) {
             Table table = (Table) it.next();
@@ -495,65 +565,14 @@ public class PDL {
                 root.addTable(table);
             }
         }
-    }
 
-    private void unique(ObjectMap map, Node nd, Collection ids,
-                        boolean primary) {
-        final ArrayList cols = new ArrayList();
-        for (Iterator it = ids.iterator(); it.hasNext(); ) {
-            IdentifierNd id = (IdentifierNd) it.next();
-            Mapping m = map.getMapping(Path.get(id.getName()));
-            // XXX: no metadata
-            if (m == null) {
-                return;
-            }
-            m.dispatch(new Mapping.Switch() {
-                    public void onValue(ValueMapping vm) {
-                        cols.add(vm.getColumn());
-                    }
-
-                    public void onReference(ReferenceMapping rm) {
-                        if (!rm.isJoinTo()) {
-                            throw new Error("can't do this");
-                        }
-
-                        cols.add(rm.getJoin(0).getFrom());
-                    }
-
-                    public void onStatic(StaticMapping sm) {
-                        throw new Error("can't do this");
-                    }
-                });
-        }
-
-        unique(nd, (Column[]) cols.toArray(new Column[0]), primary);
-    }
-
-    private void unique(Node nd, Column[] cols, boolean primary) {
-        Table table = cols[0].getTable();
-        if (table.getUniqueKey(cols) != null) {
-            m_errors.warn(nd, "duplicate key");
-            return;
-        }
-        UniqueKey key = new UniqueKey(table, null, cols);
-        if (primary) {
-            table.setPrimaryKey(key);
-        }
-    }
-
-    private void emitConstraints(final Root root) {
         m_ast.traverse(new Node.Switch() {
-                private ObjectMap getMap(Node nd) {
-                    return root.getObjectMap
-                        (m_symbols.getEmitted((ObjectTypeNd) nd.getParent()));
-                }
-
                 public void onObjectKey(ObjectKeyNd nd) {
-                    unique(getMap(nd), nd, nd.getProperties(), true);
+                    unique(root, nd, nd.getProperties(), true);
                 }
 
                 public void onUniqueKey(UniqueKeyNd nd) {
-                    unique(getMap(nd), nd, nd.getProperties(), false);
+                    unique(root, nd, nd.getProperties(), false);
                 }
 
                 public void onReferenceKey(ReferenceKeyNd nd) {
@@ -565,24 +584,24 @@ public class PDL {
                     if (nd.isUnique()) {
                         ArrayList ids = new ArrayList();
                         ids.add(nd.getName());
-                        unique(getMap(nd), nd, ids, false);
+                        unique(root, nd, ids, false);
                     }
                 }
             }, new Node.IncludeFilter(new Node.Field[] {
-                AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.OBJECT_KEY,
-                ObjectTypeNd.UNIQUE_KEYS, ObjectTypeNd.REFERENCE_KEY,
-                ObjectTypeNd.PROPERTIES
+                AST.FILES, FileNd.OBJECT_TYPES, FileNd.ASSOCIATIONS,
+                ObjectTypeNd.OBJECT_KEY, ObjectTypeNd.UNIQUE_KEYS,
+                ObjectTypeNd.REFERENCE_KEY, ObjectTypeNd.PROPERTIES,
+                AssociationNd.ROLE_ONE, AssociationNd.ROLE_TWO,
+                AssociationNd.PROPERTIES
             }));
     }
 
-    private void emitMapping(final Root root) {
-        m_ast.traverse(new Node.Switch() {
-                public void onObjectType(ObjectTypeNd otn) {
-                    root.addObjectMap
-                        (new ObjectMap(m_symbols.getEmitted(otn)));
-                }
-            });
+    private ObjectMap getMap(Root root, Node nd) {
+        return root.getObjectMap
+            (m_symbols.getEmitted((ObjectTypeNd) nd.getParent()));
+    }
 
+    private void emitMapping(final Root root) {
         m_ast.traverse(new Node.Switch() {
                 public void onIdentifier(IdentifierNd id) {
                     ObjectTypeNd ot =
@@ -600,11 +619,13 @@ public class PDL {
                 public void onProperty(PropertyNd pn) {
                     Property prop = (Property) m_properties.get(pn);
                     if (prop == null) { return; }
+
+                    ObjectMap om = root.getObjectMap(prop.getContainer());
+
                     Object mapping = pn.getMapping();
                     if (mapping == null) {
-                        return;
-                    }
-                    if (mapping instanceof ColumnNd) {
+                        om.addMapping(new Static(Path.get(prop.getName())));
+                    } else if (mapping instanceof ColumnNd) {
                         emitMapping(root, prop, (ColumnNd) mapping);
                     } else {
                         emitMapping(root, prop, (JoinPathNd) mapping);
@@ -612,37 +633,25 @@ public class PDL {
                 }
             });
 
-        for (Iterator it = m_symbols.getObjectTypes().iterator();
-             it.hasNext(); ) {
-            ObjectTypeNd otn = (ObjectTypeNd) it.next();
-            ReferenceKeyNd rkn = otn.getReferenceKey();
-            if (rkn != null) {
-                Column from = lookup(root, rkn.getCol());
-                Column to;
-
-                ObjectType ot = m_symbols.getEmitted(otn);
-                ObjectType sup = ot.getSupertype();
-                ObjectMap om = root.getObjectMap(ot);
-                ObjectMap supm = root.getObjectMap(sup);
-                if (supm.getSuperJoin() == null) {
-                    Property prop =
-                        (Property) supm.getKeyProperties().iterator().next();
-                    Mapping m = supm.getMapping(Path.get(prop.getName()));
-                    if (m.isValue()) {
-                        to = ((ValueMapping) m).getColumn();
-                    } else {
-                        to = ((Join) ((ReferenceMapping) m)
-                              .getJoins().iterator().next()).getFrom();
-                    }
-                } else {
-                    to = supm.getSuperJoin().getFrom();
+        m_ast.traverse(new Node.Switch() {
+                public void onReferenceKey(ReferenceKeyNd rkn) {
+                    Column key = lookup(root, rkn.getCol());
+                    ObjectMap om = getMap(root, rkn);
+                    om.setTable(key.getTable());
                 }
 
-                om.setSuperJoin(new Join(from, to));
-            }
-        }
+                public void onObjectKey(ObjectKeyNd okn) {
+                    ObjectMap om = getMap(root, okn);
+                    IdentifierNd prop =
+                        (IdentifierNd) okn.getProperties().iterator().next();
+                    Mapping m = om.getMapping(Path.get(prop.getName()));
+                    if (m != null) {
+                        om.setTable(m.getTable());
+                    }
+                }
+            });
 
-        m_ast.traverse(new Node.Switch() {
+/*        m_ast.traverse(new Node.Switch() {
                 public void onJoin(JoinNd nd) {
                     ObjectMap om = root.getObjectMap
                         (m_symbols.getEmitted
@@ -653,7 +662,7 @@ public class PDL {
             }, new Node.IncludeFilter(new Node.Field[] {
                 AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.JOIN_PATHS,
                 JoinPathNd.JOINS
-            }));
+                }));*/
 
         m_ast.traverse(new Node.Switch() {
                 public void onIdentifier(IdentifierNd nd) {
@@ -671,20 +680,68 @@ public class PDL {
 
     private void emitMapping(Root root, Property prop, ColumnNd colNd) {
         ObjectMap om = root.getObjectMap(prop.getContainer());
-        ValueMapping vm = new ValueMapping(Path.get(prop.getName()),
-                                           lookup(root, colNd));
-        om.addMapping(vm);
+        Value m = new Value(Path.get(prop.getName()), lookup(root, colNd));
+        om.addMapping(m);
+    }
+
+    private ForeignKey fk(Root root, JoinNd jn, boolean forward) {
+        ColumnNd fromnd;
+        ColumnNd tond;
+
+        if (forward) {
+            fromnd = jn.getFrom();
+            tond = jn.getTo();
+        } else {
+            fromnd = jn.getTo();
+            tond = jn.getFrom();
+        }
+
+        Column from = lookup(root, fromnd);
+        Column to = lookup(root, tond);
+
+        ForeignKey fk = from.getTable().getForeignKey(new Column[] {from});
+        if (fk != null) {
+            return fk;
+        }
+
+        UniqueKey uk = to.getTable().getUniqueKey(new Column[] {to});
+        if (uk == null) {
+            m_errors.warn(tond, "not a unique key");
+            return null;
+        }
+        return new ForeignKey
+            (from.getTable(), null, new Column[] {from}, uk, false);
     }
 
     private void emitMapping(Root root, Property prop, JoinPathNd jpn) {
         ObjectMap om = root.getObjectMap(prop.getContainer());
-        ReferenceMapping rm = new ReferenceMapping(Path.get(prop.getName()));
-        for (Iterator it = jpn.getJoins().iterator(); it.hasNext(); ) {
-            JoinNd jn = (JoinNd) it.next();
-            rm.addJoin(new Join(lookup(root, jn.getFrom()),
-                                lookup(root, jn.getTo())));
+        Path path = Path.get(prop.getName());
+        List joins = jpn.getJoins();
+        Mapping m;
+        if (joins.size() == 1) {
+            JoinNd jn = (JoinNd) joins.get(0);
+            if (lookup(root, jn.getTo()).isUniqueKey()) {
+                ForeignKey fk = fk(root, jn, true);
+                m = new JoinTo(path, fk);
+            } else if (lookup(root, jn.getFrom()).isUniqueKey()) {
+                ForeignKey fk = fk(root, jn, false);
+                m = new JoinFrom(path, fk);
+            } else {
+                m_errors.fatal(jpn, "neither end unique");
+                return;
+            }
+        } else if (joins.size() == 2) {
+            JoinNd first = (JoinNd) joins.get(0);
+            JoinNd second = (JoinNd) joins.get(1);
+            ForeignKey from = fk(root, first, false);
+            ForeignKey to = fk(root, second, true);
+            m = new JoinThrough(path, from, to);
+        } else {
+            m_errors.fatal(jpn, "bad join path");
+            return;
         }
-        om.addMapping(rm);
+
+        om.addMapping(m);
     }
 
     private Column lookup(Root root, ColumnNd colNd) {
@@ -861,10 +918,6 @@ public class PDL {
     private Mapping getMapping(ObjectMap om, String role) {
         Path path = Path.get(role);
         Mapping m = om.getMapping(path);
-        if (m == null) {
-            m = new StaticMapping(path);
-            om.addMapping(m);
-        }
         return m;
     }
 

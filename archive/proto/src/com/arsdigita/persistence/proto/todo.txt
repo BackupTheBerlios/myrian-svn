@@ -37,3 +37,5 @@ Documentation:
  * javadoc
  * Design documents
  * release notes
+
+Disable all cascading deletes.

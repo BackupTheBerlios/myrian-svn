@@ -8,19 +8,19 @@ import java.util.*;
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2003/02/26 $
+ * @version $Revision: #13 $ $Date: 2003/03/05 $
  **/
 
 public class ObjectMap extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#12 $ by $Author: rhs $, $DateTime: 2003/02/26 20:44:08 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#13 $ by $Author: rhs $, $DateTime: 2003/03/05 18:41:57 $";
 
     private ObjectType m_type;
     private Mist m_mappings = new Mist(this);
     private ArrayList m_key = new ArrayList();
-    private Join m_superJoin;
-    private ArrayList m_joins = new ArrayList();
     private ArrayList m_fetched = new ArrayList();
+    private Table m_table;
+
     private SQLBlock m_retrieveAll;
     private ArrayList m_retrieves = new ArrayList();
     private ArrayList m_inserts = new ArrayList();
@@ -101,12 +101,24 @@ public class ObjectMap extends Element {
     }
 
     public Collection getFetchedPaths() {
-        HashSet result = new HashSet();
+        final HashSet result = new HashSet();
         for (Iterator it = getMappings().iterator(); it.hasNext(); ) {
-            Mapping m = (Mapping) it.next(); 
-            if (m.isValue()) {
-                result.add(m.getPath());
-            }
+            Mapping m = (Mapping) it.next();
+            m.dispatch(new Mapping.Switch() {
+                    public void onValue(Value m) {
+                        result.add(m.getPath());
+                    }
+
+                    public void onJoinTo(JoinTo m) {
+                        result.add(m.getPath());
+                    }
+
+                    public void onJoinFrom(JoinFrom m) {}
+
+                    public void onJoinThrough(JoinThrough m) {}
+
+                    public void onStatic(Static m) {}
+                });
         }
 
         result.addAll(m_fetched);
@@ -120,62 +132,12 @@ public class ObjectMap extends Element {
         }
     }
 
-    public void setSuperJoin(Join join) {
-        m_superJoin = join;
-    }
-
-    public Join getSuperJoin() {
-        return m_superJoin;
-    }
-
-    public Collection getAllJoins() {
-        ArrayList result = new ArrayList();
-
-        if (getSuperMap() != null) {
-            result.addAll(getSuperMap().getAllJoins());
-        }
-
-        if (getSuperJoin() != null) {
-            result.add(getSuperJoin());
-        }
-        result.addAll(getJoins());
-
-        return result;
-    }
-
-    public Collection getJoins() {
-        return m_joins;
-    }
-
-    public void addJoin(Join join) {
-        m_joins.add(join);
-    }
-
-    private Collection getDeclaredJoins() {
-        ArrayList joins = new ArrayList();
-        if (m_superJoin != null) {
-            joins.add(m_superJoin);
-        }
-        joins.addAll(m_joins);
-        return joins;
-    }
-
     public Table getTable() {
-        Join sup = getSuperJoin();
-        if (sup == null) {
-            Property key = (Property) getKeyProperties().iterator().next();
-            Mapping m = getMapping(Path.get(key.getName()));
-            if (m == null) { return null; }
-            if (m.isValue()) {
-                return ((ValueMapping) m).getColumn().getTable();
-            } else if (m.isReference()) {
-                return ((ReferenceMapping) m).getJoin(0).getFrom().getTable();
-            } else {
-                return null;
-            }
-        } else {
-            return sup.getFrom().getTable();
-        }
+        return m_table;
+    }
+
+    public void setTable(Table table) {
+        m_table = table;
     }
 
     public Collection getDeclaredTables() {
@@ -192,29 +154,11 @@ public class ObjectMap extends Element {
              it.hasNext(); ) {
             Property prop = (Property) it.next();
             Mapping m = getMapping(Path.get(prop.getName()));
-            // XXX: no metadata
-            if (m == null) { continue; }
-            m.dispatch(new Mapping.Switch() {
-                    public void onValue(ValueMapping vm) {
-                        Table t = vm.getColumn().getTable();
-                        if (!result.contains(t)) {
-                            result.add(t);
-                        }
-                    }
-
-                    public void onReference(ReferenceMapping rm) {
-                        if (rm.isJoinTo()) {
-                            Table t = rm.getJoin(0).getFrom().getTable();
-                            if (!result.contains(t)) {
-                                result.add(t);
-                            }
-                        }
-                    }
-
-                    public void onStatic(StaticMapping sm) {
-                        // do nothing
-                    }
-                });
+            Table t = m.getTable();
+            if (t == null) { continue; }
+            if (!result.contains(t)) {
+                result.add(t);
+            }
         }
         return result;
     }
@@ -291,7 +235,7 @@ public class ObjectMap extends Element {
         m_deletes.add(delete);
     }
 
-    Object getKey() {
+    Object getElementKey() {
         return getObjectType();
     }
 
