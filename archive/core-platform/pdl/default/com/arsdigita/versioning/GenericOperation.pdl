@@ -15,58 +15,10 @@
 model com.arsdigita.versioning;
 
 object type GenericOperation extends Operation {
-  String[1..1]      datatype;
-  String[0..1]      old_value;
-  String[0..1]      new_value;     
+  String[1..1]      datatype = vc_generic_operations.datatype VARCHAR(200);
+  String[0..1]      old_value = vc_generic_operations.old_value VARCHAR(4000);
+  String[0..1]      new_value = vc_generic_operations.new_value VARCHAR(4000);
 
-  retrieve {
-    do {
-        select action, attribute, old_value, new_value, datatype
-        from
-           vc_generic_operations, vc_operations
-        where
-           vc_generic_operations.operation_id = vc_operations.operation_id
-           and vc_operations.operation_id = :id
-    } map {
-        datatype = vc_operations.datatype;
-        action = vc_operations.action;         
-        attribute = vc_operations.attribute;          
-        old_value = vc_generic_operations.old_value;          
-        new_value = vc_generic_operations.new_value; 
-    }
-  }
-
-  insert {
-    super;
-
-    do {
-    insert into vc_generic_operations (
-        operation_id, old_value, new_value, datatype
-    ) values (
-        :id, :old_value, :new_value, :datatype
-    )
-    }
-  }
-
-  update {
-    super;
-
-    do {
-    update vc_generic_operations
-    set 
-        old_value = :old_value,          
-        new_value = :new_value,
-        datatype = :datatype
-    where operation_id = :id
-    }
-  }
-
-  delete {
-    do {
-    delete from vc_generic_operations
-      where operation_id = :id
-    }
-  }
-
+  reference key (vc_generic_operations.operation_id);
 }
 

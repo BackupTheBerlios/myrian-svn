@@ -18,85 +18,14 @@ model com.arsdigita.versioning;
 import com.arsdigita.kernel.*;
 
 object type Operation {
-  BigDecimal[1..1]     id;
-  Transaction[1..1]    transaction;
-  String[1..1]         action;
-  String[1..1]         attribute;
-  String[1..1]         classname;
-
+  BigDecimal[1..1]     id = vc_operations.operation_id;
+  String[1..1]         action = vc_operations.action;
+  String[1..1]         attribute = vc_operations.attribute;
+  String[1..1]         classname = vc_operations.classname;
+  Transaction[1..1]    transaction = join vc_operations.transaction_id 
+                                       to vc_transactions.transaction_id;
   object key (id);
 
-  retrieve {
-    do {
-      select 
-        action, attribute, transaction_id, classname
-      from
-        vc_operations o
-      where
-        o.id = :id
-    } map {
-      action           = o.action;         
-      attribute        = o.attribute; 
-      transaction.id   = o.transaction_id;
-      classname        = o.classname;
-    }
-  }
-
-  insert {
-    do {
-      insert into vc_operations (
-        operation_id, transaction_id, action, attribute, 
-        classname
-      ) values (
-        :id, :transaction.id, :action, :attribute, 
-        :classname
-      )
-    }
-  }
-
-  update {
-    do {
-      update vc_operations
-    set 
-      transaction_id = :transaction_id,
-      action         = :action,         
-      attribute      = :attribute,
-      classname      = :classname
-    where 
-      operation_id = :id
-    }
-  }
-
-  delete {
-    do {
-      delete from vc_operations where operation_id = :id
-    }
-  }
-
-  retrieve transaction {
-    do {
-      select 
-        t.modifying_user, t.modifying_ip, t.timestamp, 
-        t.description, t.tag, o.transaction_id, t.master_id
-      from
-        vc_transactions t, vc_operations o
-      where
-        t.transaction_id = o.transaction_id 
-      and
-        o.operation_id = :id
-    } map {
-      transaction.id             = o.transaction_id;
-      transaction.modUser.id     = t.modifying_user;
-      transaction.modifying_ip   = t.modifying_ip;  
-      transaction.timestamp      = t.timestamp;     
-      transaction.description    = t.description;   
-      transaction.tag            = t.tag;   
-      transaction.master.id      = t.master_id;
-    }
-  }
-
-  add transaction {
-  }
-
+  aggressive load (transaction.id);
 }
 

@@ -15,61 +15,8 @@
 model com.arsdigita.versioning;
 
 object type BlobOperation extends Operation {
-  Blob[0..1]      old_value;
-  Blob[0..1]      new_value;     
+  Blob[0..1]      old_value = vc_blob_operations.old_value BLOB;
+  Blob[0..1]      new_value = vc_blob_operations.new_value BLOB;     
 
-  retrieve {
-    do {
-      select action, attribute, old_value, new_value
-      from
-      vc_blob_operations, vc_operations
-      where
-      vc_blob_operations.operation_id = vc_operations.operation_id
-      and vc_operations.operation_id = :id
-    } map {
-      action = vc_operations.action;         
-      attribute = vc_operations.attribute;          
-      old_value = vc_blob_operations.old_value;          
-      new_value = vc_blob_operations.new_value; 
-    }
-  }
-
-  insert {
-    super;
-    
-    do {
-      insert into vc_blob_operations (
-        operation_id, old_value, new_value
-      ) values (
-       :id, :old_value, :new_value
-      )
-    } map {
-      old_value: BLOB;
-      new_value: BLOB;
-    }
-  }
-
-  update {
-    super;
-
-    do {
-
-      update vc_blob_operations
-      set 
-        old_value = :old_value,          
-        new_value = :new_value     
-      where operation_id = :id
-    } map {
-      old_value: BLOB;
-      new_value: BLOB;
-    }
-  }
-
-  delete {
-    do {
-      delete from vc_blob_operations
-      where operation_id = :id
-    }
-  }
-
+  reference key (vc_blob_operations.operation_id);
 }

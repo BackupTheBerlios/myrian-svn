@@ -19,120 +19,10 @@ import com.arsdigita.kernel.*;
 object type VersionedACSObject extends ACSObject {
 
   Boolean[1..1]             isDeleted = vc_objects.is_deleted CHAR(1);
-  VersionedACSObject[0..1]  master;
+  VersionedACSObject[0..1]  master = join vc_objects.master_id 
+                                       to vc_objects.object_id;
 
   reference key (vc_objects.object_id);
-
-  // WARNING: The retrieve event does NOT call super,
-  // in the interests of extra speed. This will cause all
-  // kinds of interesting bugs if ACSObject is ever modified.
-  retrieve {   
-    do {
-      select
-        o.object_type, o.display_name, o.default_domain_class,
-        v.is_deleted, v.master_id
-      from
-        acs_objects o, vc_objects v
-      where
-        o.object_id = :id
-      and
-        v.object_id = :id
-    } map {
-      objectType           = o.object_type;
-      displayName          = o.display_name;
-      defaultDomainClass   = o.default_domain_class;
-      isDeleted            = v.is_deleted;
-      master.id            = v.master_id;
-    }
-  }
-
-  //retrieve {
-  //  super;
-  //      
-  //  do {
-  //    select
-  //      v.is_deleted, v.master_id
-  //    from
-  //      vc_objects v
-  //    where
-  //      v.object_id = :id
-  //  } map {
-  //    isDeleted            = v.is_deleted;
-  //    master.id            = v.master_id;
-  //  }
-  //}
-
-  retrieve all {
-    do {
-      select
-        o.object_type, o.display_name, o.default_domain_class,
-        v.is_deleted, v.master_id
-      from
-        acs_objects o, vc_objects v
-      where
-        o.object_id = v.object_id
-    } map {
-      objectType           = o.object_type;
-      displayName          = o.display_name;
-      defaultDomainClass   = o.default_domain_class;
-      isDeleted            = v.is_deleted;
-      master.id            = v.master_id;
-    }
-  }    
-
-  insert {
-    super;
-    
-    do {
-      insert into vc_objects (object_id, is_deleted, master_id) 
-      values (:id, :isDeleted, :master.id)
-    }
-  }
-
-  update {
-    super;
-
-    do {
-      update vc_objects set 
-        is_deleted = :isDeleted,
-        master_id  = :master.id
-      where object_id = :id
-    }
-  }
-
-  delete {
-    do {
-      delete from vc_objects where object_id = :id
-    }
-
-    super;
-  }
-
-  retrieve master {
-    do {
-      select
-        o.object_id, o.object_type, o.display_name, o.default_domain_class,
-        v2.is_deleted, v2.master_id
-      from
-        acs_objects o, vc_objects v, vc_objects v2
-      where
-        o.object_id = v.master_id
-      and
-        v.object_id = :id
-      and
-        v2.object_id = v.master_id
-    } map {
-      master.id                   = o.object_id;
-      master.objectType           = o.object_type;
-      master.displayName          = o.display_name;
-      master.defaultDomainClass   = o.default_domain_class;
-      master.isDeleted            = v2.is_deleted;
-      master.master.id            = v2.master_id;
-    }
-  }
-
-  add master {}
-  remove master {}
 }
 
 query rollbackOperations {
@@ -176,6 +66,7 @@ query rollbackOperations {
   }
 }
 
+// this can be removed with proper usage of associations
 data operation reparentTransactions {
   do {
     update vc_transactions set master_id = :master
@@ -218,7 +109,7 @@ query objectHistoryQuery {
       where
         master_id = :masterID
       and
-        p.party_id(+) = t.modifying_user
+        p.party_id = t.modifying_user(+)
       and
         t.tag is not null
     union

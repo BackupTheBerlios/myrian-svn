@@ -15,61 +15,8 @@
 model com.arsdigita.versioning;
 
 object type ClobOperation extends Operation {
-  String[0..1]      old_value;  // Really a CLOB
-  String[0..1]      new_value;  // Really a CLOB
+  String[0..1]      old_value = vc_clob_operations.old_value CLOB;
+  String[0..1]      new_value = vc_clob_operations.new_value CLOB;
 
-  retrieve {
-    do {
-      select action, attribute, old_value, new_value
-      from
-      vc_clob_operations, vc_operations
-      where
-      vc_clob_operations.operation_id = vc_operations.operation_id
-      and vc_operations.operation_id = :id
-    } map {
-      action = vc_operations.action;         
-      attribute = vc_operations.attribute;          
-      old_value = vc_clob_operations.old_value;          
-      new_value = vc_clob_operations.new_value; 
-    }
-  }
-  
-  insert {
-    super;
-    
-    do {
-      insert into vc_clob_operations (
-        operation_id, old_value, new_value
-      ) values (
-        :id, :old_value, :new_value
-      )
-    } map {
-      old_value: CLOB;
-      new_value: CLOB;
-    }
-  }
-  
-  update {
-    super;
-    
-    do {
-      update vc_clob_operations
-      set 
-        old_value = :old_value,          
-        new_value = :new_value     
-      where operation_id = :id
-    } map {
-      old_value: CLOB;
-      new_value: CLOB;
-    }
-  }
-
-  delete {
-    do {
-      delete from vc_clob_operations
-      where operation_id = :id
-    }
-  }
-
+  reference key (vc_clob_operations.operation_id);
 }
-

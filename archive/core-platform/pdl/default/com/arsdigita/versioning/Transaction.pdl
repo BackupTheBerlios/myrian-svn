@@ -17,90 +17,28 @@ model com.arsdigita.versioning;
 import com.arsdigita.kernel.*;
 
 object type Transaction {
-  BigDecimal[1..1]  id;
-  User[0..1]        modUser;
-  String[0..1]      modifying_ip;
-  Date[0..1]        timestamp;
-  String[0..1]      description;   
-  String[0..1]      tag;   
+  BigDecimal[1..1]  id = vc_transactions.transaction_id;
+  String[0..1]      modifying_ip = vc_transactions.modifying_ip;
+  Date[0..1]        timestamp = vc_transactions.timestamp;
+  String[0..1]      description = vc_transactions.description;
+  String[0..1]      tag = vc_transactions.tag;
+  User[0..1]        modUser = join vc_transactions.modifying_user 
+                                to users.user_id;
 
-  component Operation[0..n] operations;
+  component Operation[0..n] operations = join vc_transactions.transaction_id
+                                           to vc_operations.transaction_id;
 
-  VersionedACSObject[1..1]  master;
-  VersionedACSObject[1..1]  acsObject;
+  VersionedACSObject[1..1]  master = join vc_transactions.master_id 
+                                       to acs_objects.object_id;
+  VersionedACSObject[1..1]  acsObject = join vc_transactions.object_id 
+                                          to acs_objects.object_id;
 
   object key (id);
 
-  retrieve {
-    do {
-      select 
-        t.transaction_id, t.modifying_user, t.modifying_ip, 
-        t.timestamp, t.description, t.tag, t.master_id, t.object_id,
-        o1.default_domain_class as oc1, 
-        o1.display_name as od1, 
-        o1.object_type as ot1,
-        o2.default_domain_class as oc2, 
-        o2.display_name as od2,   
-        o2.object_type as ot2
-      from
-        vc_transactions t, acs_objects o1, acs_objects o2
-      where
-        transaction_id = :id
-      and 
-        o1.object_id = t.master_id
-      and 
-        o2.object_id = t.object_id
-    } map {
-      modifying_ip   = t.modifying_ip;  
-      timestamp      = t.timestamp;     
-      description    = t.description;   
-      tag            = t.tag;   
-      master.id                     = t.master_id;
-      master.defaultDomainClass     = oc1;
-      master.objectType             = ot1;
-      master.displayName            = od1;
-      acsObject.id                  = t.object_id;
-      acsObject.defaultDomainClass  = oc2;
-      acsObject.objectType          = ot2;
-      acsObject.displayName         = od2;
-      modUser.id     =  t.modifying_user;
-    }
-  }
+  aggressive load (master.id, master.defaultDomainClass, master.objectType, master.displayName, acsObject.id, acsObject.defaultDomainClass, acsObject.objectType, acsObject.displayName, modUser.id);
 
-  retrieve all {
-    do {
-      select 
-        t.transaction_id, t.modifying_user, t.modifying_ip, 
-        t.timestamp, t.description, t.tag, t.master_id, t.object_id,
-        o1.default_domain_class as oc1, 
-        o1.display_name as od1, 
-        o1.object_type as ot1,
-        o2.default_domain_class as oc2, 
-        o2.display_name as od2,   
-        o2.object_type as ot2
-      from
-        vc_transactions t, acs_objects o1, acs_objects o2
-      where
-        o1.object_id = t.master_id
-      and 
-        o2.object_id = t.object_id
-    } map {
-      id             = t.transaction_id;
-      modifying_ip   = t.modifying_ip;  
-      timestamp      = t.timestamp;     
-      description    = t.description;   
-      tag            = t.tag;   
-      master.id                     = t.master_id;
-      master.defaultDomainClass     = oc1;
-      master.objectType             = ot1;
-      master.displayName            = od1;
-      acsObject.id                  = t.object_id;
-      acsObject.defaultDomainClass  = oc2;
-      acsObject.objectType          = ot2;
-      acsObject.displayName         = od2;
-    }
-  }
-
+    // this could be removed by moving the default currentDate() in to the
+    // java layer
   insert {
     do {
       insert into vc_transactions (
@@ -108,116 +46,11 @@ object type Transaction {
         modifying_ip, timestamp, description, tag, 
         object_id, master_id
       ) values (
-        :id, :modUser.id, :modifying_ip, sysdate, :description, :tag,
+        :id, :modUser.id, :modifying_ip, currentDate(), :description, :tag,
         :acsObject.id, :master.id
       )
     }
   }
-
-  update {
-    do {
-      update vc_transactions
-      set 
-        modifying_user = :modUser.id,
-        modifying_ip   = :modifying_ip,  
-        timestamp      = :timestamp,     
-        description    = :description,
-        tag            = :tag,
-        object_id      = :acsObject.id,
-        master_id      = :master.id
-      where 
-        transaction_id = :id
-    }
-  }
-
-  delete {
-    do {
-      delete from vc_transactions where transaction_id = :id
-    }
-  }
-
-  retrieve master {
-    do {
-      select 
-        o.object_id, 
-        o.default_domain_class, o.display_name, o.object_type
-      from 
-        vc_transactions t, acs_objects o
-      where
-        t.transaction_id = :id
-      and
-        o.object_id = t.master_id
-    } map {
-      master.id                  = o.object_id;
-      master.defaultDomainClass  = o.default_domain_class;
-      master.objectType          = o.object_type;
-      master.displayName         = o.display_name;      
-    }
-  }
-
-  add master {}
-
-  remove master {}
-
-  retrieve acsObject {
-    do {
-      select 
-        o.object_id, 
-        o.default_domain_class, o.display_name, o.object_type
-      from 
-        vc_transactions t, acs_objects o
-      where
-        t.transaction_id = :id
-      and
-        o.object_id = t.object_id
-    } map {
-      acsObject.id                  = o.object_id;
-      acsObject.defaultDomainClass  = o.default_domain_class;
-      acsObject.objectType          = o.object_type;
-      acsObject.displayName         = o.display_name;      
-    }
-  }
-
-  add acsObject {}
-
-  remove acsObject {}
-
-  retrieve operations {
-    do {
-      select 
-        o.operation_id, o.action, o.attribute, o.classname
-      from 
-        vc_operations o, vc_generic_operations g
-      where 
-        o.transaction_id = :id
-    } map {
-      operations.id           = o.operation_id;
-      operations.action       = o.action;
-      operations.attribute    = o.attribute;
-      operations.classname    = o.classname;
-    }
-  }
-
-  add operations {
-  }
-
-  remove operations {
-  }
-
-  retrieve modUser {
-    do {
-      select modifying_user from vc_transactions where transaction_id = :id
-    } map {
-      modUser.id = modifying_user;
-    }
-  }
-
-  add modUser {
-  }
-
-  remove modUser {
-  }
-
 }
 
 
