@@ -20,23 +20,24 @@ import junit.framework.TestSuite;
 import org.apache.log4j.Logger;
 
 /**
- * DataAssociationImplTest
- * <p> This class performs unit tests on com.arsdigita.persistence.DataAssociationImpl </p>
+ * DataAssociationImplTest <p> This class performs unit tests on
+ * com.arsdigita.persistence.DataAssociationImpl </p>
  *
  * <p> Explanation about the tested class and its responsibilities </p>
  *
- *     DataAssociationImpl implements com.arsdigita.persistence.DataAssociation </p>
+ *     DataAssociationImpl implements
+ *     com.arsdigita.persistence.DataAssociation </p>
  *
  * @author Michael Bryzek
- * @date $Date: 2002/12/11 $
- * @version $Revision: #7 $
+ * @date $Date: 2003/05/12 $
+ * @version $Revision: #8 $
  *
  * @see com.arsdigita.persistence.DataAssociationImpl
  **/
 
 public class DataAssociationImplTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataAssociationImplTest.java#7 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataAssociationImplTest.java#8 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
     private static Logger log =
         Logger.getLogger(DataAssociationImplTest.class.getName());
 
@@ -85,8 +86,6 @@ public class DataAssociationImplTest extends PersistenceTestCase {
         li.set("price", new Float(2.99));
 
         m_orderAssoc.getLineItems().add(li);
-        assertTrue("Item should be not be added until after parent saved!",
-                   !findItemById(m_orderAssoc.getLineItems().cursor(), newId));
         m_orderAssoc.getOrder().save();
 
         assertTrue("Item should be added after parent saved!",
@@ -104,7 +103,8 @@ public class DataAssociationImplTest extends PersistenceTestCase {
         while( c.next() ) {
             log.info("id: " + c.get("id"));
         }
-        assertEquals("Cursor contains insufficient items!!!", OrderAssociation.NUM_ITEMS, c.size() );
+        assertEquals("Cursor contains insufficient items!!!",
+		     OrderAssociation.NUM_ITEMS, c.size());
 
     }
 
@@ -113,7 +113,8 @@ public class DataAssociationImplTest extends PersistenceTestCase {
      **/
 
     public void testGetDataCollection() {
-        DataAssociation items = (DataAssociation) m_orderAssoc.getOrder().get("items");
+        DataAssociation items =
+	    (DataAssociation) m_orderAssoc.getOrder().get("items");
         DataCollection dc1 = items.getDataCollection();
         DataCollection dc2 = items.getDataCollection();
 
@@ -128,14 +129,16 @@ public class DataAssociationImplTest extends PersistenceTestCase {
             assertEquals("incorrect name", "Item " + i++, dc1.get("name"));
         }
 
-        assertEquals("incorrect number of iterations", OrderAssociation.NUM_ITEMS, i);
+        assertEquals("incorrect number of iterations",
+		     OrderAssociation.NUM_ITEMS, i);
 
         i = 0;
         while (dc2.next()) {
             assertEquals("incorrect name", "Item " + i++, dc2.get("name"));
         }
 
-        assertEquals("incorrect number of iterations", OrderAssociation.NUM_ITEMS, i);
+        assertEquals("incorrect number of iterations",
+		     OrderAssociation.NUM_ITEMS, i);
     }
 
     public void testGetLink() {
@@ -150,15 +153,16 @@ public class DataAssociationImplTest extends PersistenceTestCase {
         li.set("id", newId);
         m_orderAssoc.getLineItems().add(li);
 
-        assertTrue("assocation not modified after add!!", m_orderAssoc.getLineItems().isModified());
+        assertTrue("assocation not modified after add!!",
+		   m_orderAssoc.getLineItems().isModified());
         m_orderAssoc.getLineItems().remove(li);
-        assertTrue("assocation modified after remove!!", !m_orderAssoc.getLineItems().isModified());
 
         DataAssociationCursor c = m_orderAssoc.getLineItems().cursor();
         c.next();
         li = c.getDataObject();
         m_orderAssoc.getLineItems().remove(li);
-        assertTrue("assocation not modified after remove!!", m_orderAssoc.getLineItems().isModified());
+        assertTrue("assocation not modified after remove!!",
+                   m_orderAssoc.getLineItems().isModified());
 
         c.close();
     }
@@ -169,9 +173,8 @@ public class DataAssociationImplTest extends PersistenceTestCase {
         DataObject li = c.getDataObject();
         BigDecimal id = (BigDecimal) li.get("id");
         m_orderAssoc.getLineItems().remove(li);
-        assertTrue("assocation not modified after remove!!", m_orderAssoc.getLineItems().isModified());
-        assertTrue("Item shouldn't be removed from cursor until parent saved!",
-                   findItemById(m_orderAssoc.getLineItems().cursor(), id));
+        assertTrue("assocation not modified after remove!!",
+		   m_orderAssoc.getLineItems().isModified());
         m_orderAssoc.getOrder().save();
         assertTrue("Item should be removed from cursor after parent saved!",
                    !findItemById(m_orderAssoc.getLineItems().cursor(), id));
@@ -184,9 +187,8 @@ public class DataAssociationImplTest extends PersistenceTestCase {
         DataObject li = c.getDataObject();
         BigDecimal id = (BigDecimal) li.get("id");
         m_orderAssoc.getLineItems().remove(li.getOID());
-        assertTrue("assocation not modified after remove!!", m_orderAssoc.getLineItems().isModified());
-        assertTrue("Item shouldn't be removed from cursor until parent saved!",
-                   findItemById(m_orderAssoc.getLineItems().cursor(), id));
+        assertTrue("assocation not modified after remove!!",
+		   m_orderAssoc.getLineItems().isModified());
         m_orderAssoc.getOrder().save();
         c.close();
         c = m_orderAssoc.getLineItems().cursor();
@@ -210,12 +212,15 @@ public class DataAssociationImplTest extends PersistenceTestCase {
         // We move the cursor in lineItems two rows. This makes it
         // easy to test that the call to get returns an independent
         // DataAssociation.
-        DataAssociationCursor firstCursor = m_orderAssoc.getLineItems().cursor();
+        DataAssociationCursor firstCursor =
+	    m_orderAssoc.getLineItems().cursor();
         firstCursor.next();
         firstCursor.next();
-        assertTrue("m_orderAssoc.getLineItems() is still at first element after calling next",
-               ! (firstCursor.isFirst() || firstCursor.isBeforeFirst()));
-        DataAssociation items = (DataAssociation) m_orderAssoc.getOrder().get("items");
+        assertTrue("m_orderAssoc.getLineItems() is still at first element " +
+		   "after calling next",
+		   ! (firstCursor.isFirst() || firstCursor.isBeforeFirst()));
+        DataAssociation items =
+	    (DataAssociation) m_orderAssoc.getOrder().get("items");
         DataAssociationCursor secondCursor = items.cursor();
         assertEquals("Consecutive calls to get returned data associations " +
                      "of different sizes",
@@ -255,7 +260,8 @@ public class DataAssociationImplTest extends PersistenceTestCase {
         other.set("inStock", new Boolean(true));
         other.save();
 
-        DataAssociation items = (DataAssociation) order.get("relatedOtherItems");
+        DataAssociation items =
+	    (DataAssociation) order.get("relatedOtherItems");
         assertNull("Other Item not yet association with the order " +
                    "so this should return null", other.get("order"));
 
@@ -289,13 +295,13 @@ public class DataAssociationImplTest extends PersistenceTestCase {
                order.equals(orderObject));
         items.remove(other);
         order.save();
-        DataAssociation items2 = (DataAssociation) order2.get("relatedOtherItems");
+        DataAssociation items2 =
+	    (DataAssociation) order2.get("relatedOtherItems");
         items2.add(other);
         order2.save();
         assertTrue("the order changed but the value held by 'order' did not",
                !orderObject.equals(other.get("order")));
     }
-
 
     private boolean findItemById(DataAssociationCursor c, BigDecimal id) {
         while(c.next()) {
@@ -306,13 +312,15 @@ public class DataAssociationImplTest extends PersistenceTestCase {
         }
         return false;
     }
+
     /**
      * Main method needed to make a self runnable class
      *
      * @param args This is required for main method
      **/
     public static void main(String[] args) {
-        junit.textui.TestRunner.run( new TestSuite(DataAssociationImplTest.class) );
+        junit.textui.TestRunner.run
+	    (new TestSuite(DataAssociationImplTest.class));
     }
 
 }

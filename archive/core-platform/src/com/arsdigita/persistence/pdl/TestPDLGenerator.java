@@ -1,9 +1,10 @@
 package com.arsdigita.persistence.pdl;
 
 import com.arsdigita.db.DbHelper;
-import com.arsdigita.persistence.metadata.DDLWriter;
 import com.arsdigita.persistence.metadata.MetadataRoot;
-import com.arsdigita.persistence.metadata.Table;
+import com.arsdigita.persistence.proto.metadata.Root;
+import com.arsdigita.persistence.proto.metadata.Table;
+import com.arsdigita.persistence.proto.pdl.DDLWriter;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -81,22 +82,15 @@ public class TestPDLGenerator {
             PDL.setDebugDirectory(debugDir);
         }
 
+	PDL.compilePDLFiles(library);
+	PDL.compilePDLFiles(files);
 
         Map map = getTestDirectoryMapping(files);
-        for (Iterator iterator = map.keySet().iterator(); iterator.hasNext();) {
-
-            String directory = (String) iterator.next();
+        for (Iterator it = map.keySet().iterator(); it.hasNext(); ) {
+            String directory = (String) it.next();
             List filesForDirectory = (List) map.get(directory);
-            Set all = new HashSet();
-            all.addAll(library);
-            all.addAll(filesForDirectory);
-
-            MetadataRoot.clear();
-            PDL.compilePDLFiles(all);
-
             generateSQL(directory, filesForDirectory, options);
         }
-
     }
 
     private static Map getTestDirectoryMapping(List files) {
@@ -116,7 +110,8 @@ public class TestPDLGenerator {
 
     }
 
-    private static void generateSQL(String directory, List files, Map options) throws PDLException {
+    private static void generateSQL(String directory, List files, Map options)
+	throws PDLException {
         MetadataRoot root = MetadataRoot.getMetadataRoot();
 
         String ddlDir = (String) options.get("-generate-ddl");
@@ -136,20 +131,19 @@ public class TestPDLGenerator {
 
             writer.setTestPDL(true);
 
-            List tables = new ArrayList(root.getTables());
+            List tables = new ArrayList(Root.getRoot().getTables());
             for (Iterator it = tables.iterator(); it.hasNext(); ) {
                 Table table = (Table) it.next();
-                if (!files.contains(table.getFilename())) {
+                if (!files.contains(Root.getRoot().getFilename(table))) {
                     it.remove();
                 }
             }
+
             try {
                 writer.write(tables);
             } catch (IOException ioe) {
                 throw new PDLException(ioe.getMessage());
             }
-
-
         }
     }
 

@@ -25,12 +25,12 @@ import org.apache.log4j.Logger;
  * NodeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/30 $
+ * @version $Revision: #6 $ $Date: 2003/05/12 $
  */
 
 public abstract class NodeTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/NodeTest.java#5 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/NodeTest.java#6 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
 
     private static Logger s_log =
         Logger.getLogger(NodeTest.class.getName());
@@ -80,6 +80,7 @@ public abstract class NodeTest extends PersistenceTestCase {
             fail("Set parent to an invalid type!");
 
         } catch (PersistenceException e) {
+            node.delete();
         }
 
         try {
@@ -89,6 +90,7 @@ public abstract class NodeTest extends PersistenceTestCase {
             fail("Set an invalid attribute!");
 
         } catch (PersistenceException e) {
+            node.delete();
         }
 
 
@@ -170,8 +172,6 @@ public abstract class NodeTest extends PersistenceTestCase {
                      "from parent association.",
                      parent.getObjectType().getQualifiedName(),
                      getModelName() + ".Node");
-        DataContainer data = ((GenericDataObject) parent).getDataContainer();
-        s_log.info(data + ": " + data.hashCode());
         assertEquals("Parent id was not successfully retrieved " +
                      "from the parent association.",
                      new BigDecimal(0),

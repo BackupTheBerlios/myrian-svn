@@ -19,7 +19,7 @@ package com.arsdigita.util;
  * Implementations of this interface can be used for pretty-printing graphs.
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
- * @version $Date: 2003/01/24 $
+ * @version $Date: 2003/05/12 $
  * @since 2003-01-23
  **/
 public interface GraphFormatter {
@@ -45,10 +45,23 @@ public interface GraphFormatter {
      *  }
      * </pre>
      **/
-    String formatNode(Object node);
+    String nodeName(Object node);
+
+    /**
+     * Returns [bracketed] node attributes.
+     *
+     * <pre>
+     *  digraph g {
+     *      C<strong>[label="The C Language"]</strong>;
+     *      J<strong[label="The Java Language"]</strong>;
+     *      C -> J;
+     *  }
+     * </pre>
+     **/
+    String nodeAttributes(Object node);
 
     /**
      * Returns a short textual label describing the edge.
      **/
-    String formatEdge(Object edge);
+    String edge(Object edge);
 }

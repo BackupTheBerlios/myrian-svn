@@ -46,7 +46,7 @@ import org.apache.log4j.varia.StringMatchFilter;
  */
 public class AggressiveConnectionCloseTest extends Log4jBasedTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/AggressiveConnectionCloseTest.java#9 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/AggressiveConnectionCloseTest.java#10 $";
 
     private Session ssn;
 
@@ -70,7 +70,7 @@ public class AggressiveConnectionCloseTest extends Log4jBasedTestCase {
         super.setUp();
 
         ssn = getSession();
-        originalCloseValue = TransactionContextImpl.getAggressiveClose();
+        originalCloseValue = ssn.getTransactionContext().getAggressiveClose();
     }
 
     /**
@@ -79,30 +79,25 @@ public class AggressiveConnectionCloseTest extends Log4jBasedTestCase {
     public void tearDown() throws Exception {
         super.tearDown();
 
-        TransactionContextImpl.setAggressiveClose(originalCloseValue);
+        ssn.getTransactionContext().setAggressiveClose(originalCloseValue);
     }
 
     public void testAggressiveClosing() {
-        StringMatchFilter filterHold = new StringMatchFilter();
         StringMatchFilter filterReturn = new StringMatchFilter();
-        String holdString = "connectionUserCountHitZero holding on to connection";
         String returnString = "connectionUserCountHitZero returning connection";
-        filterHold.setStringToMatch(holdString);
         filterReturn.setStringToMatch(returnString);
-        filterHold.setAcceptOnMatch(true);
         filterReturn.setAcceptOnMatch(true);
-        log.addFilter(filterHold);
         log.addFilter(filterReturn);
         log.addFilter(new DenyAllFilter());
 
-        TransactionContextImpl.setAggressiveClose(true);
+        ssn.getTransactionContext().setAggressiveClose(true);
 
-        // do something simple, should result in a "holding on to" message
+        // do something simple, should result in a holding on to the
+        // connection
         DataObject dt = ssn.create("examples.Datatype");
         dt.set("id", BigInteger.ZERO);
         dt.save();
 
-        assertLogContains(holdString);
         assertLogDoesNotContain(returnString);
 
         clearLog();
@@ -112,14 +107,13 @@ public class AggressiveConnectionCloseTest extends Log4jBasedTestCase {
         ssn.getTransactionContext().commitTxn();
         ssn.getTransactionContext().beginTxn();
 
-        // do something else simple, should *not* result in a "holding on to" message
+        // do something else simple, should result in a return message
         dt = ssn.retrieve(new OID("examples.Datatype", BigInteger.ZERO));
         assertNotNull("Should have actually retrieved something", dt);
         try {
-            assertLogDoesNotContain(holdString);
             assertLogContains(returnString);
 
-            TransactionContextImpl.setAggressiveClose(false);
+            ssn.getTransactionContext().setAggressiveClose(false);
 
             // abort prev transaction, start a new one, so that we can have a
             // clean connection
@@ -133,7 +127,6 @@ public class AggressiveConnectionCloseTest extends Log4jBasedTestCase {
             dt.set("date", new java.util.Date(1000));
             dt.save();
 
-            assertLogDoesNotContain(holdString);
             assertLogDoesNotContain(returnString);
         } finally {
             // delete, since we had to commit earlier.

@@ -26,17 +26,22 @@ import java.util.Set;
 import java.io.File;
 import java.io.InputStream;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * PersistenceTestCase
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2002/10/01 $
+ * @version $Revision: #10 $ $Date: 2003/05/12 $
  */
 
 public class PersistenceTestCase extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceTestCase.java#9 $ by $Author: rhs $, $DateTime: 2002/10/01 15:44:47 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceTestCase.java#10 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+
+    private static final Logger LOG =
+        Logger.getLogger(PersistenceTestCase.class);
 
     // Prevent loading the same PDL file twice
     private static Set s_loadedPDLResources = new HashSet();
@@ -122,20 +127,25 @@ public class PersistenceTestCase extends TestCase {
         persistenceSetUp();
         try {
             super.runBare();
+            m_session.getProtoSession().flushAll();
         } finally {
             persistenceTearDown();
         }
     }
 
     protected void persistenceSetUp() {
+        LOG.warn("Starting " + getClass().getName() + "." + getName());
         m_session = SessionManager.getSession();
         m_session.getTransactionContext().beginTxn();
     }
 
     protected void persistenceTearDown() {
-        m_session = SessionManager.getSession();
-        if (m_session.getTransactionContext().inTxn()) {
-            m_session.getTransactionContext().abortTxn();
+        try {
+            if (m_session.getTransactionContext().inTxn()) {
+                m_session.getTransactionContext().abortTxn();
+            }
+        } finally {
+            LOG.warn("Ending " + getClass().getName() + "." + getName());
         }
     }
 

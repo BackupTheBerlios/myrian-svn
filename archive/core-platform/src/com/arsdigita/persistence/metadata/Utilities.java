@@ -31,7 +31,7 @@ import java.util.Iterator;
  **/
 public class Utilities  {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Utilities.java#5 $ by $Author: richardl $, $DateTime: 2002/10/16 14:39:19 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Utilities.java#6 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
 
     public final static String LINE_BREAK =
         System.getProperty("line.separator", "\n\r");
@@ -105,54 +105,6 @@ public class Utilities  {
         }
 
     }
-
-    /**
-     * Returns the Property that composes the Object Key.
-     *
-     * @param type the ObjectType to get the ObjectKey from
-     * @return the Property that composes the Object Key
-     */
-    protected static Property getKeyProperty(ObjectType type) {
-        Iterator key = type.getKeyProperties();
-
-        if (!key.hasNext()) {
-            if (type.getSupertype() == null) {
-                //                s_log.warn(type.getName() + " has no object key defined!");
-            }
-
-            return null;
-        }
-
-        Property prop = (Property)key.next();
-
-        if (prop.getColumn() == null) {
-            boolean error = false;
-            Iterator iter = type.getProperties();
-
-            while (iter.hasNext()) {
-                prop = (Property)iter.next();
-
-                if (prop.isAttribute() && (prop.getColumn() != null)) {
-                    error = true;
-                }
-            }
-
-            if (error) {
-                //                s_log.warn(type.getName() + " does not have a key column " +
-                //                           "defined even though some properties do have " +
-                //                           "columns specified.");
-            }
-
-            return null;
-        }
-
-        if (key.hasNext()) {
-            return null;
-        }
-
-        return prop;
-    }
-
 
     /**
      * "join" a List of Strings into a single string, with each string

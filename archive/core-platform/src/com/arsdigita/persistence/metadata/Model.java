@@ -15,54 +15,43 @@
 
 package com.arsdigita.persistence.metadata;
 
-import java.util.Iterator;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Collection;
-import java.util.ArrayList;
-import java.io.PrintStream;
+import com.arsdigita.persistence.proto.metadata.Root;
+
+import java.util.*;
 
 /**
  * A Model provides a logical namespace for a related set of ObjectTypes and
  * Associations.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2003/05/12 $
  */
 
 public class Model extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Model.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Model.java#5 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
 
-    /**
-     * The name of the model.
-     **/
-    private String m_name;
+    static Model wrap(Root root,
+		      com.arsdigita.persistence.proto.metadata.Model model) {
+	if (model == null) {
+	    return null;
+	} else {
+	    return new Model(root, model);
+	}
+    }
 
-    /**
-     * The types this model contains.
-     **/
-    private Map m_types = new HashMap();
-
-    /**
-     * The associations this model contains.
-     **/
-    private Set m_assns = new HashSet();
-
-    /**
-     * The data operations this model contains.
-     **/
-    private Map m_opTypes = new HashMap();
-
+    private Root m_root;
+    private com.arsdigita.persistence.proto.metadata.Model m_model;
 
     /**
      * Constructs a new model with the given name.
      **/
 
-    public Model(String name) {
-        m_name = name;
+    private Model(Root root,
+		  com.arsdigita.persistence.proto.metadata.Model model) {
+        super(root, model);
+	m_root = root;
+        m_model = model;
     }
 
 
@@ -73,32 +62,7 @@ public class Model extends Element {
      **/
 
     public String getName() {
-        return m_name;
-    }
-
-
-    /**
-     * Adds the given type to this Model.
-     *
-     * @param type The type to add.
-     **/
-
-    public void addDataType(DataType type) {
-        if (hasDataType(type.getName())) {
-            throw new IllegalArgumentException(
-                                               "This Model already contains a type named " + type.getName()
-                                               );
-        }
-
-        if (type.getModel() != null) {
-            throw new IllegalArgumentException(
-                                               "DataType " + type.getName() +
-                                               " already belongs to Model " + type.getModel().getName()
-                                               );
-        }
-
-        m_types.put(type.getName(), type);
-        type.setModel(this);
+        return m_model.getQualifiedName();
     }
 
 
@@ -111,10 +75,8 @@ public class Model extends Element {
      **/
 
     public DataType getDataType(String name) {
-        Object result = m_types.get(name);
-        if (result == null)
-            result = caseInsensativeGet(m_types, name);
-        return (DataType) result;
+	return ObjectType.wrap
+	    (m_root.getObjectType(m_model.getName() + "." + name));
     }
 
 
@@ -125,7 +87,7 @@ public class Model extends Element {
      **/
 
     public boolean hasDataType(String name) {
-        return m_types.containsKey(name);
+        return getDataType(name) != null;
     }
 
 
@@ -138,12 +100,7 @@ public class Model extends Element {
      **/
 
     public ObjectType getObjectType(String name) {
-        DataType result = getDataType(name);
-        if (result != null && result instanceof ObjectType) {
-            return (ObjectType) result;
-        } else {
-            return null;
-        }
+	return (ObjectType) getDataType(name);
     }
 
     /**
@@ -152,119 +109,23 @@ public class Model extends Element {
      * @return a collection of ObjectTypes that this Model contains
      */
     public Collection getObjectTypes() {
-        Iterator it = m_types.values().iterator();
-        Collection retval = new ArrayList();
+        ArrayList result = new ArrayList();
 
-        while (it.hasNext()) {
-            DataType dt = (DataType)it.next();
+	for (Iterator it = m_root.getObjectTypes().iterator();
+	     it.hasNext(); ) {
+	    com.arsdigita.persistence.proto.metadata.ObjectType ot =
+		(com.arsdigita.persistence.proto.metadata.ObjectType)
+		it.next();
+	    if (ot.getModel().equals(m_model)) {
+		result.add(ot);
+	    }
+	}
 
-            if (dt instanceof ObjectType) {
-                retval.add(dt);
-            }
-        }
-
-        return retval;
-    }
-
-
-    /**
-     * Returns the QueryType with the given name.
-     *
-     * @param name The name of the QueryType to get.
-     *
-     * @return The QueryType with the given name.
-     **/
-
-    public QueryType getQueryType(String name) {
-        DataType result = getDataType(name);
-        if (result != null && result instanceof QueryType) {
-            return (QueryType) result;
-        } else {
-            return null;
-        }
-    }
-
-
-    /**
-     * Adds the given Association to this Model.
-     *
-     * @param assn The Association to add.
-     **/
-
-    public void addAssociation(Association assn) {
-        m_assns.add(assn);
-        assn.setModel(this);
+	return ObjectType.wrap(result);
     }
 
     public Set getAssociations() {
-        return m_assns;
+        throw new Error("not implemented");
     }
 
-
-    /**
-     * Adds a DataOperationType to this Model.
-     *
-     * @param opType The DataOperationType to add.
-     **/
-
-    public void addDataOperationType(DataOperationType opType) {
-        m_opTypes.put(opType.getName(), opType);
-        opType.setModel(this);
-    }
-
-    /**
-     * Returns the DataOperationType with the specified name.
-     *
-     * @param name The name of the DataOperationType.
-     *
-     * @return The DataOperationType with the specified name.
-     **/
-
-    public DataOperationType getDataOperationType(String name) {
-        Object result = m_opTypes.get(name);
-        if (result == null) {
-            result = caseInsensativeGet(m_opTypes, name);
-        }
-        return (DataOperationType) result;
-    }
-
-
-    /**
-     * Outputs a serialized representation of this Model on the given
-     * PrintStream.
-     *
-     * The format used:
-     *
-     * <pre>
-     *     "model" &lt;name&gt; ";"
-     *
-     *     &lt;datatypes&gt; ";"
-     *
-     *     &lt;associations&gt; ";"
-     * </pre>
-     *
-     * @param out The PrintStream to use for output.
-     **/
-
-    public void outputPDL(PrintStream out) {
-        out.println("model " + m_name + ";");
-
-        for (Iterator it = m_types.values().iterator(); it.hasNext(); ) {
-            out.println();
-            Element el = (Element) it.next();
-            el.outputPDL(out);
-            out.println();
-        }
-
-        for (Iterator it = m_assns.iterator(); it.hasNext(); ) {
-            out.println();
-            Element el = (Element) it.next();
-            el.outputPDL(out);
-            out.println();
-        }
-    }
-
-    public String toString() {
-        return "Model: " + m_name;
-    }
 }

@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/UserAuthentication.pdl#9 $ 
-// $DateTime: 2003/01/23 12:15:45 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/UserAuthentication.pdl#10 $ 
+// $DateTime: 2003/05/12 18:19:45 $
 
 model com.arsdigita.kernel;
 

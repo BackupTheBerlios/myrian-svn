@@ -16,6 +16,13 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.MetadataRoot;
+import com.arsdigita.persistence.proto.EventProcessor;
+import com.arsdigita.persistence.proto.EventProcessorManager;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -28,19 +35,20 @@ import org.apache.log4j.Logger;
  *
  * @see Initializer
  * @author Archit Shah 
- * @version $Revision: #7 $ $Date: 2002/12/11 $
+ * @version $Revision: #8 $ $Date: 2003/05/12 $
  */
 
 public class SessionManager {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SessionManager.java#7 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SessionManager.java#8 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
 
     private static String s_url = null;           // the jdbc URL
     private static String s_username = null;      // the database username
     private static String s_password = null;      // the database password
     private static ThreadLocal s_session;  // the session
     private static SQLUtilities s_sqlUtil;
-    private static SessionFactory s_factory;
+    private static Set s_beforeFlushProcManagers = new HashSet();
+    private static Set s_afterFlushProcManagers  = new HashSet();
 
     private static final Logger s_cat =
         Logger.getLogger(SessionManager.class.getName());
@@ -67,8 +75,42 @@ public class SessionManager {
         return (Session) s_session.get();
     }
 
-    static InternalSession getInternalSession() {
-        return (InternalSession) s_session.get();
+    /**
+     * This method provides an indirect way for applications to register {@link
+     * com.arsdigita.persistence.proto.EventProcessor event processors} with the
+     * {@link Session session} object.
+     *
+     * <p>This works like so</p>
+     *
+     * <ul>
+     *  <li>You register your {@link EventProcessorManager event processor manager}
+     *      with this session manager.</li>
+     *
+     *  <li>Each {@link Session session} returned by {@link #getSession()} will
+     *  have a reference to a single (per thread) instance of the {@link
+     *  com.arsdigita.persistence.proto.EventProcessor event processor} managed
+     *  the {@link EventProcessorManager event processor manager} that you
+     *  registered.</li>
+     *
+     *  <li>The {@link com.arsdigita.persistence.proto.Session session} will
+     *  dispatch events from its {@link
+     *  com.arsdigita.persistence.proto.Session#flush()} method to to your event
+     *  processor's <code>write(Event)</code> method. </li>
+     * </ul>
+     **/
+    public static synchronized void addBeforeFlushProcManager
+        (EventProcessorManager manager) {
+
+        s_beforeFlushProcManagers.add(manager);
+    }
+
+    /**
+     * @see #addBeforeFlushProcManager(EventProcessorManager)
+     **/
+    public static synchronized void addAfterFlushProcManager
+        (EventProcessorManager manager) {
+
+        s_afterFlushProcManagers.add(manager);
     }
 
      /**
@@ -90,9 +132,9 @@ public class SessionManager {
         s_password = password;
     }
 
-    static synchronized void setSessionFactory(SessionFactory factory) {
+/*    static synchronized void setSessionFactory(SessionFactory factory) {
         s_factory = factory;
-    }
+        }*/
 
     /**
      *  This resets the connection info by "forgetting" the schema, url,
@@ -119,8 +161,17 @@ public class SessionManager {
                                                         "not been initialized: " +
                                                         sb.toString());
                     }
-                    Session s = s_factory.newSession("", s_url, s_username, s_password);
-                    //s.setSchemaConnectionInfo("", s_url, s_username, s_password);
+                    Session s = new Session();
+                    for (Iterator ii=s_beforeFlushProcManagers.iterator(); ii.hasNext(); ) {
+                        EventProcessorManager mngr = 
+                            (EventProcessorManager) ii.next();
+                        s.getProtoSession().addBeforeFlush(mngr.getEventProcessor());
+                    }
+                    for (Iterator ii=s_afterFlushProcManagers.iterator(); ii.hasNext(); ) {
+                        EventProcessorManager mngr = 
+                            (EventProcessorManager) ii.next();
+                        s.getProtoSession().addAfterFlush(mngr.getEventProcessor());
+                    }
                     return s;
                 }
             };

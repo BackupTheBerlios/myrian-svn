@@ -16,39 +16,18 @@
 package com.arsdigita.persistence;
 
 
-import com.arsdigita.persistence.sql.Element;
-
-
-
 /**
  * This manipulates SQL in a way that is specific to Oracle.  For
  * instance, it has the ability to replace bind variables with the
  * value of null with "is null" or "is not null"
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/11/01 $
+ * @version $Revision: #6 $ $Date: 2003/05/12 $
  */
 
 class OracleSQLUtilities implements SQLUtilities  {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/OracleSQLUtilities.java#5 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
-
-    /**
-     *  This takes the SQL Element and the source which contains variable
-     *  values and processes them accordingly.  It then returns
-     *  the resulting SQL element.  For instance, for the
-     *  OracleSQLUtilities.processNulls, this will replace all
-     *  bind variables with the value of null with "is null" or
-     *  "is not null"
-     *  This code does not work so it currently just returns the
-     *  passed in element
-     *  @deprecated This is a no-op so it will be removed.
-     */
-    public Element processNulls(Element sql, DataContainer source) {
-        // this does not work so right now it does not do anything.
-        return sql;
-    }
-
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/OracleSQLUtilities.java#6 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
 
     /**
      *  This method takes a comparator (e.g. =, <=, >=, !=, <>)

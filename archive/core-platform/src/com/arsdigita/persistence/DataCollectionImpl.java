@@ -1,150 +1,53 @@
-/*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
- *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
- *
- * Software distributed under the License is distributed on an "AS
- * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * rights and limitations under the License.
- *
- */
-
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.ObjectType;
-import com.arsdigita.persistence.metadata.Property;
-import com.arsdigita.persistence.metadata.Operation;
-
-import java.util.Iterator;
-import java.util.Map;
+import com.arsdigita.persistence.proto.PersistentCollection;
 
 /**
- * Title:       DataCollectionImpl class
- * Description: This class is similar to a cursor except that it
- *              conceptually represents a list of GenericDataObjects.
+ * DataCollectionImpl
  *
- * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/10/16 $
- */
+ * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
+ * @version $Revision: #6 $ $Date: 2003/05/12 $
+ **/
 
-class DataCollectionImpl extends DataQueryImpl
-    implements DataCollection {
+class DataCollectionImpl extends DataQueryImpl implements DataCollection {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataCollectionImpl.java#5 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataCollectionImpl.java#6 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
 
-
-    /**
-     * Create a new DataCollectionImpl
-     *
-     * @param type The Object Type for this DataCollection.
-     * @param op The operation used to execute this DataCollection.
-     **/
-
-    DataCollectionImpl(ObjectType type, Operation op) {
-        super(type, op);
+    DataCollectionImpl(Session ssn, PersistentCollection pc) {
+        super(ssn, pc);
     }
-
-
-    /**
-     *  This returns the next DataObject in the "collection"
-     **/
-
-    public DataObject getDataObject() {
-        Session ssn = SessionManager.getSession();
-        DataObject data =
-            GenericDataObjectFactory.createObject((ObjectType) m_type, ssn,
-                                                  false);
-
-        DataContainer dc = ((GenericDataObject) data).getDataContainer();
-        Map props = getDataContainer().getProperties();
-        for (Iterator it = props.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry me = (Map.Entry) it.next();
-            dc.initProperty((String) me.getKey(), me.getValue());
-        }
-
-        return data;
-    }
-
-
-    /**
-     *  This returns the ObjectType for the DataObjects returned by
-     *  this "collection"
-     **/
 
     public ObjectType getObjectType() {
-        return (ObjectType) m_type;
+        return C.fromType(getOriginal().getSignature().getObjectType());
     }
 
-
-    /**
-     * Allows a user to bind a parameter within a named query.
-     *
-     * @deprecated.  There is a raging debate about whether or not
-     *  this should be deprecated.  One side says it should stay
-     *  because it makes sense, the other side says it should go
-     *  because Collections are types of Associations and that Associations
-     *  should be pure "retrieve" calls without embedded parameters
-     *  and the like.  If you find yourself using a parameter on
-     *  a DataCollection, they you should rethink the design and maybe
-     *  make it a DataQuery that returns DataObjects instead of
-     *  a DataCollection.
-     *
-     * @param parameterName The name of the parameter to bind
-     * @param value The value to assign to the parameter
-     **/
-
-    public void setParameter(String parameterName, Object value) {
-        super.setParameter(parameterName, value);
+    public DataObject getDataObject() {
+        return (DataObject) m_cursor.get();
     }
 
-
     /**
-     * Allows a caller to get a parameter value for a parameter that
-     * has already been set
-     *
-     * @deprecated.  There is a raging debate about whether or not
-     *  this should be deprecated.  One side says it should stay
-     *  because it makes sense, the other side says it should go
-     *  because Collections are types of Associations and that Associations
-     *  should be pure "retrieve" calls without embedded parameters
-     *  and the like.  If you find yourself using a parameter on
-     *  a DataCollection, they you should rethink the design and maybe
-     *  make it a DataQuery that returns DataObjects instead of
-     *  a DataCollection.
-     *
-     * @param parameterName The name of the parameter to retrieve
-     * @return This returns the object representing the value of the
-     * parameter specified by the name or "null" if the parameter value
-     * has not yet been set.
+     * @deprecated
      **/
 
-    public Object getParameter(String parameterName) {
-        return super.getParameter(parameterName);
+    public void setParameter(String p, Object o) {
+        super.setParameter(p, o);
+    }
+
+    /**
+     * @deprecated
+     **/
+
+    public Object getParameter(String p) {
+        return super.getParameter(p);
     }
 
     public boolean contains(OID oid) {
-        ObjectType myBase = getObjectType().getBasetype();
-        ObjectType hisBase = oid.getObjectType().getBasetype();
-        if (!myBase.equals(hisBase)) { return false; }
-
-        for (Iterator it = myBase.getKeyProperties(); it.hasNext(); ) {
-            Property prop = (Property) it.next();
-            addEqualsFilter(prop.getName(), oid.get(prop.getName()));
-        }
-
-        try {
-            return next();
-        } finally {
-            close();
-        }
+        throw new Error("not implemented");
     }
 
     public boolean contains(DataObject data) {
-        return contains(data.getOID());
+        throw new Error("not implemented");
     }
 
 }

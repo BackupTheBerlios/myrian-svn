@@ -28,11 +28,11 @@ import org.apache.log4j.Logger;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author Jon Orris
- * @version $Revision: #6 $ $Date: 2002/12/11 $
+ * @version $Revision: #7 $ $Date: 2003/05/12 $
  */
 public class DataCollectionImplTest extends DataCollectionTest
 {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataCollectionImplTest.java#6 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataCollectionImplTest.java#7 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
     private static Logger s_log =
         Logger.getLogger(DataCollectionImplTest.class.getName());
     private ObjectType m_nodeType;
@@ -41,6 +41,7 @@ public class DataCollectionImplTest extends DataCollectionTest
     {
         super(name);
     }
+
     protected void persistenceSetUp() {
         load("com/arsdigita/persistence/testpdl/static/Node.pdl");
         load("com/arsdigita/persistence/testpdl/static/Order.pdl");

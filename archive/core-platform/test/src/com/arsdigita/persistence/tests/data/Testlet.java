@@ -27,12 +27,12 @@ import java.util.*;
  * Testlet
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/01/07 $
+ * @version $Revision: #3 $ $Date: 2003/05/12 $
  **/
 
 public abstract class Testlet {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/Testlet.java#2 $ by $Author: dennis $, $DateTime: 2003/01/07 14:51:38 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/Testlet.java#3 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
 
     private static final Logger LOG = Logger.getLogger(Testlet.class);
 
@@ -197,6 +197,26 @@ public abstract class Testlet {
             Property prop = tree.getProperty(subtree.getName());
 
             DataObject child = (DataObject) data.get(prop.getName());
+
+            for (Iterator attrs = subtree.getAttributes().iterator();
+                 attrs.hasNext(); ) {
+                Property key = (Property) attrs.next();
+                // assuming noncompound key
+                if (key.isKeyProperty()) {
+                    Object id = ds.getTestData(subtree, key.getName());
+                    child = data.getSession().retrieve
+                        (new OID(child.getOID().getObjectType(), id));
+                    if (child == null) {
+                        child = create(subtree, ds);
+                        child.save();
+                    }
+
+                    data.set(prop.getName(), child);
+                    data.save();
+                    break;
+                }
+            }
+
             update(child, subtree, ds);
             child.save();
         }

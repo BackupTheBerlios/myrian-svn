@@ -16,32 +16,18 @@
 package com.arsdigita.persistence;
 
 
-import com.arsdigita.persistence.sql.Element;
-
 /**
  *  This is the interface for random SQL utilities that are needed
  *  to allow the system to work with different databases.  For instance
  *  the Oracle instance of this replaces "= null" with "is null"
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/11/01 $
+ * @version $Revision: #6 $ $Date: 2003/05/12 $
  */
 
 public interface SQLUtilities  {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SQLUtilities.java#5 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
-
-    /**
-     *  This takes the SQL Element and the source which contains variable
-     *  values and processes them accordingly.  It then returns
-     *  the resulting SQL element.  For instance, for the
-     *  OracleSQLUtilities.processNulls, this will replace all
-     *  bind variables with the value of null with "is null" or
-     *  "is not null"
-     *  @deprecated This is a no-op so it will be removed.
-     */
-    Element processNulls(Element sql, DataContainer source);
-
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SQLUtilities.java#6 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
 
     /**
      *  This method takes a comparator (e.g. =, <=, >=, !=, <>)

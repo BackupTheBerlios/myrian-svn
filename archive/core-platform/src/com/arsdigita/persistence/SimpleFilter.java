@@ -4,12 +4,12 @@ package com.arsdigita.persistence;
  * SimpleFilter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/03/19 $
+ * @version $Revision: #2 $ $Date: 2003/05/12 $
  **/
 
 class SimpleFilter extends FilterImpl {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SimpleFilter.java#1 $ by $Author: rhs $, $DateTime: 2003/03/19 18:16:01 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SimpleFilter.java#2 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
 
     String m_conditions;
 
@@ -27,15 +27,8 @@ class SimpleFilter extends FilterImpl {
      *  so that we know what namespace to use for binding.
      **/
 
-    public String getSQL(DataQuery query) {
-        // if there are not any conditions then it does not make
-        // sense to return any SQL
-        if (m_conditions == null) {
-            return null;
-        } else {
-            return mangleBindVars
-		(((DataQueryImpl) query).mapSQL(m_conditions));
-        }
+    public String getConditions() {
+	return m_conditions;
     }
 
     /**

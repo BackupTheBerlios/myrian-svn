@@ -15,12 +15,10 @@
 
 package com.arsdigita.persistence;
 
-import com.arsdigita.persistence.metadata.DataOperationType;
-import com.arsdigita.persistence.metadata.Operation;
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.sql.SQLException;
-import com.arsdigita.db.CallableStatement;
+import com.arsdigita.persistence.proto.common.*;
+import com.arsdigita.persistence.proto.engine.rdbms.*;
+import com.arsdigita.persistence.proto.metadata.SQLBlock;
+import java.util.*;
 import org.apache.log4j.Logger;
 
 
@@ -30,21 +28,19 @@ import org.apache.log4j.Logger;
  *
  * @author Patrick McNeill
  * @since 4.5
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#8 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#9 $
  */
-public class DataOperation extends AbstractDataOperation {
+public class DataOperation {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#8 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
-
-    private Session m_session;
-    private DataOperationType m_type;
-    private CallableStatement m_callableStatement = null;
-
-    // This is used to hold the variables, in order, for a CallableStatement
-    private ArrayList variables;
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#9 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
 
     private static final Logger s_cat =
         Logger.getLogger(DataOperation.class);
+
+    private Session m_session;
+    private SQLBlock m_sql;
+    private HashMap m_parameters = new HashMap();
+
 
     /**
      * Creates a new data operation to run within a particular session.
@@ -53,9 +49,9 @@ public class DataOperation extends AbstractDataOperation {
      *             the "set" methods are also protected.
      * @param session the session to get a connection from
      */
-    DataOperation(Session session, DataOperationType type) {
+    DataOperation(Session session, SQLBlock sql) {
         m_session = session;
-        m_type = type;
+        m_sql = sql;
     }
 
 
@@ -67,19 +63,11 @@ public class DataOperation extends AbstractDataOperation {
      * only available for the last one.
      */
     public void execute() {
-        DataStore dataStore = SessionManager.getInternalSession().getDataStore();
-        for (Iterator it = m_type.getEvent().getOperations(); it.hasNext(); ) {
-            Operation op = (Operation) it.next();
-            variables = new ArrayList();
-            if (op.isCallableStatement()) {
-                m_callableStatement = dataStore.fireCallableOperation
-                    (op, m_source, variables);
-            } else {
-                dataStore.fireOperation(op, m_source);
-                m_callableStatement = null;
-                variables = null;
-            }
-        }
+	try {
+	    m_session.getEngine().execute(m_sql, m_parameters);
+	} catch (UnboundParameterException e) {
+	    throw new PersistenceException(e);
+	}
     }
 
 
@@ -90,16 +78,7 @@ public class DataOperation extends AbstractDataOperation {
      * {@link #get(String parameterName)}
      */
     public synchronized void close() {
-        if (m_callableStatement != null) {
-            try {
-                // associated statement closing should be handled
-                // automatically if close after use flag was set.
-                m_callableStatement.close();
-            } catch (SQLException e) {
-                throw PersistenceException.newInstance(e);
-            }
-            m_callableStatement = null;
-        }
+        // do nothing
     }
 
 
@@ -119,29 +98,34 @@ public class DataOperation extends AbstractDataOperation {
      *  @param parameterName The name of the parameter to retrieve
      */
     public Object get(String parameterName) {
-        try {
-            if (m_callableStatement != null) {
-                int index = variables.indexOf(parameterName);
-                if (index > -1) {
-                    return m_callableStatement.getObject(index + 1);
-                } else {
-                    throw new PersistenceException
-                        ("The variable you have requested (" + parameterName +
-                         "is not found within the executed statement");
-                }
-            } else {
-                throw new PersistenceException
-                    ("You must call execute() before trying to retrieve " +
-                     "values");
-            }
-        } catch (SQLException e) {
-            throw PersistenceException.newInstance(e);
-        }
+        throw new Error("not implemented");
+    }
+
+    /**
+     * Allows a user to bind a parameter within a named query.
+     *
+     * @param parameterName The name of the parameter to bind
+     * @param value The value to assign to the parameter
+     */
+    public void setParameter(String parameterName, Object value) {
+        m_parameters.put(Path.get(":" + parameterName), value);
+    }
+
+
+    /**
+     * Allows a caller to get a parameter value for a parameter that
+     * has already been set
+     *
+     * @param parameterName The name of the parameter to retrieve
+     * @return This returns the object representing the value of the
+     * parameter specified by the name or "null" if the parameter value
+     * has not yet been set.
+     */
+    public Object getParameter(String parameterName) {
+        return m_parameters.get(Path.get(":" + parameterName));
     }
 
     public String toString() {
-        return "DataOperation: " + Utilities.LINE_BREAK + " + " +
-            "Type = " + m_type + Utilities.LINE_BREAK +
-            "+ Bindings = " + m_source;
+        return "DataOperation: " + m_sql;
     }
 }

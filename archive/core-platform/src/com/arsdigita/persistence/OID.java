@@ -51,10 +51,10 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2002/11/27 $ */
+ * @version $Revision: #10 $ $Date: 2003/05/12 $ */
 
 public class OID {
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/OID.java#9 $ by $Author: rhs $, $DateTime: 2002/11/27 17:41:53 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/OID.java#10 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
 
     private ObjectType m_type;
     private Map m_values = new HashMap();
@@ -301,14 +301,22 @@ public class OID {
             // null has no type
             // if prop isn't an attribute, not sure what to do with it.
             if (prop.isAttribute() && value != null) {
-                // we can be sure this is a simpletype because isAttribute was true.
+                // we can be sure this is a simpletype because
+                // isAttribute was true.
                 SimpleType expectedType = (SimpleType)prop.getType();
-                Assert.assertTrue(expectedType.getJavaClass().isAssignableFrom(value.getClass()),
-                                  "expected value of type: " + expectedType.getJavaClass() +
-                                  "actual type used:" + value.getClass());
+                Assert.assertTrue
+		    (expectedType.getJavaClass().isAssignableFrom
+		     (value.getClass()),
+		     "expected value of type: " + expectedType.getJavaClass() +
+		     "actual type used:" + value.getClass());
             }
-            // TODO: can we do any data validation if the key property isn't an
-            // attribute?
+            // TODO: can we do any data validation if the key property
+            // isn't an attribute?
+        }
+
+        if (hasProperty(propertyName)) {
+            throw new IllegalArgumentException
+                (propertyName + " is already set to " + get(propertyName));
         }
 
         m_values.put(propertyName, value);
@@ -388,6 +396,11 @@ public class OID {
      **/
     public ObjectType getObjectType() {
         return m_type;
+    }
+
+    void specialize(ObjectType subtype) {
+        ObjectType.verifySubtype(m_type, subtype);
+        m_type = subtype;
     }
 
 

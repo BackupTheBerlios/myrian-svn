@@ -16,8 +16,10 @@
 package com.arsdigita.persistence.oql;
 
 import com.arsdigita.persistence.*;
-import com.arsdigita.persistence.metadata.*;
-import com.arsdigita.persistence.metadata.Table;
+import com.arsdigita.persistence.proto.*;
+import com.arsdigita.persistence.proto.common.*;
+import com.arsdigita.persistence.proto.metadata.*;
+import com.arsdigita.persistence.proto.engine.rdbms.*;
 import com.arsdigita.db.DbHelper;
 import com.arsdigita.util.StringUtils;
 import org.apache.log4j.Logger;
@@ -29,12 +31,12 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #13 $ $Date: 2003/03/20 $
+ * @version $Revision: #14 $ $Date: 2003/05/12 $
  **/
 
 public class QueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#13 $ by $Author: rhs $, $DateTime: 2003/03/20 15:12:57 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#14 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
 
     private static final Logger s_log =
         Logger.getLogger(QueryTest.class);
@@ -44,22 +46,23 @@ public class QueryTest extends PersistenceTestCase {
     }
 
     private void doTest(String name, String typeName, String[] properties) {
-        MetadataRoot root = MetadataRoot.getMetadataRoot();
+        Root root = Root.getRoot();
         ObjectType type = root.getObjectType(typeName);
         assertTrue("No such type: " + typeName, type != null);
-        Query query = new Query(type);
+        Signature sig = new Signature(type);
+        Query query = new Query(sig, null);
 
         if (properties == null) {
-            query.fetchDefault();
+            sig.addDefaultProperties();
         } else {
             for (int i = 0; i < properties.length; i++) {
-                query.fetch(properties[i]);
+                sig.addPath(Path.get(properties[i]));
             }
         }
 
-        query.generate();
-        Operation actual = query.getOperation();
-        compare(name + ".op", actual.toString());
+        OracleWriter w = new OracleWriter();
+        w.write(query);
+        compare(name + ".op", w.getSQL());
     }
 
     private void compare(String expectedResource, String actual) {
@@ -245,7 +248,7 @@ public class QueryTest extends PersistenceTestCase {
     }
 
     private void doTableTest(String tableName) {
-        MetadataRoot root = MetadataRoot.getMetadataRoot();
+        Root root = Root.getRoot();
         Table table = root.getTable(tableName);
         assertTrue("No such table: " + tableName, table != null);
         compare(table.getName() + ".sql", table.getSQL(false));

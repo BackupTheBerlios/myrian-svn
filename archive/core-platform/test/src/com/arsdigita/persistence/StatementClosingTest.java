@@ -47,7 +47,7 @@ import org.apache.log4j.varia.StringMatchFilter;
  */
 public class StatementClosingTest extends Log4jBasedTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/StatementClosingTest.java#7 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/StatementClosingTest.java#8 $";
 
     private Session ssn;
 
@@ -72,7 +72,7 @@ public class StatementClosingTest extends Log4jBasedTestCase {
         super.setUp();
 
         ssn = getSession();
-        originalCloseValue = TransactionContextImpl.getAggressiveClose();
+        originalCloseValue = ssn.getTransactionContext().getAggressiveClose();
     }
 
     /**
@@ -81,38 +81,29 @@ public class StatementClosingTest extends Log4jBasedTestCase {
     public void tearDown() throws Exception {
         super.tearDown();
 
-        TransactionContextImpl.setAggressiveClose(originalCloseValue);
+        ssn.getTransactionContext().setAggressiveClose(originalCloseValue);
     }
 
     public void testStatementClosing() {
-        StringMatchFilter rsEventFilter = new StringMatchFilter();
-        String rsEventString = "Setting resultSetEventListener";
-        rsEventFilter.setStringToMatch(rsEventString);
-        rsEventFilter.setAcceptOnMatch(true);
-
         StringMatchFilter closeFilter = new StringMatchFilter();
         String closeString = "Closing Statement because resultset was closed";
         closeFilter.setStringToMatch(closeString);
         closeFilter.setAcceptOnMatch(true);
 
-        log.addFilter(rsEventFilter);
         log.addFilter(closeFilter);
         log.addFilter(new DenyAllFilter());
 
-        TransactionContextImpl.setAggressiveClose(true);
+        ssn.getTransactionContext().setAggressiveClose(true);
 
         // do something simple
         DataObject dt = ssn.create("examples.Datatype");
         dt.set("id", BigInteger.ZERO);
         dt.save();
 
-        assertLogDoesNotContain(rsEventString);
         assertLogDoesNotContain(closeString);
 
         dt = ssn.retrieve(new OID("examples.Datatype", BigInteger.ZERO));
-        assertLogContains(rsEventString);
         assertLogContains(closeString);
-
     }
 
     /**

@@ -15,6 +15,8 @@
 
 package com.arsdigita.persistence.metadata;
 
+import com.arsdigita.persistence.proto.metadata.Root;
+
 /**
  * The DataType class represents the type of a persistently stored datum.
  * There are two flavors of DataTypes. SimpleTypes, and CompoundTypes.
@@ -26,17 +28,14 @@ package com.arsdigita.persistence.metadata;
  * @see CompoundType
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2003/05/12 $
  */
 
 abstract public class DataType extends ModelElement {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DataType.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DataType.java#4 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
 
-    /**
-     * The semantically meaningful name of the datatype.
-     **/
-    private String m_name;
+    private com.arsdigita.persistence.proto.metadata.ObjectType m_type;
 
     /**
      * Constructs a new DataType with the given name.
@@ -44,14 +43,10 @@ abstract public class DataType extends ModelElement {
      * @param name The semantically meaningful name of the datatype.
      **/
 
-    protected DataType(String name) {
-        if (name == null || name.length() == 0) {
-            throw new IllegalArgumentException(
-                                               "A non-null non-empty name is required."
-                                               );
-        }
-
-        m_name = name;
+    protected DataType
+	(com.arsdigita.persistence.proto.metadata.ObjectType obj) {
+        super(obj.getRoot(), obj.getModel(), obj);
+	m_type = obj;
     }
 
     /**
@@ -61,8 +56,9 @@ abstract public class DataType extends ModelElement {
      **/
 
     public String getName() {
-        return m_name;
+	return m_type.getName();
     }
+
 
     /**
      * Returns the fully qualified name of this DataType. The fully qualified
@@ -73,13 +69,9 @@ abstract public class DataType extends ModelElement {
      **/
 
     public String getQualifiedName() {
-        Model m = getModel();
-        if (m == null) {
-            return getName();
-        } else {
-            return m.getName() + "." + getName();
-        }
+	return m_type.getQualifiedName();
     }
+
 
     /**
      * Returns true if this DataType is a compound type, false otherwise.
@@ -89,7 +81,9 @@ abstract public class DataType extends ModelElement {
      * @return True if this DataType is a compound type. False otherwise.
      **/
 
-    abstract public boolean isCompound();
+    public boolean isCompound() {
+	return m_type.isCompound();
+    }
 
     /**
      * Returns true if this DataType is a simple type, false otherwise. Simple

@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/auditing/BasicAuditTrail.pdl#5 $ 
-// $DateTime: 2002/10/16 14:12:35 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/auditing/BasicAuditTrail.pdl#6 $ 
+// $DateTime: 2003/05/12 18:19:45 $
 
 model com.arsdigita.auditing;
 
@@ -29,8 +29,8 @@ object type BasicAuditTrail {
   Date[1..1]        lastModifiedDate = acs_auditing.last_modified TIMESTAMP;
   String[0..1]      lastModifiedIP = acs_auditing.modifying_ip VARCHAR(50);
 
-  User[1..1]        creationUser = join acs_auditing.creation_user to users.user_id;
-  User[1..1]        lastModifiedUser = join acs_auditing.modifying_user to users.user_id;
+  User[0..1]        creationUser = join acs_auditing.creation_user to users.user_id;
+  User[0..1]        lastModifiedUser = join acs_auditing.modifying_user to users.user_id;
 
   object key (id);
 

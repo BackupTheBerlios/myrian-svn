@@ -68,7 +68,7 @@ import org.apache.log4j.varia.StringMatchFilter;
  */
 public class Log4jBasedTestCase extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/Log4jBasedTestCase.java#6 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/Log4jBasedTestCase.java#7 $";
 
     /**
      * The log object.  Should be modified
@@ -87,14 +87,21 @@ public class Log4jBasedTestCase extends PersistenceTestCase {
         super(name);
     }
 
+    public void runBare() throws Throwable {
+        try {
+            logSetUp();
+            super.runBare();
+        } finally {
+            logTearDown();
+        }
+    }
+
     /**
      * Turns on all logging so that the desired log messages will be found.
      * Adds a new logger, by default logging everything except for
      * secure messages to the member stringwriter variable.
      */
-    public void setUp() throws Exception {
-        super.setUp();
-
+    public void logSetUp() throws Exception {
         // nuke all priorities back to DEBUG
         Category root = Category.getRoot();
         Enumeration enum = root.getCurrentCategories();
@@ -116,9 +123,7 @@ public class Log4jBasedTestCase extends PersistenceTestCase {
     /**
      * Restores all logging & aggressive connection close setting to original state.
      */
-    public void tearDown() throws Exception {
-        super.tearDown();
-
+    public void logTearDown() throws Exception {
         Category root = Category.getRoot();
         root.info("All categories will be restored to their original values");
 

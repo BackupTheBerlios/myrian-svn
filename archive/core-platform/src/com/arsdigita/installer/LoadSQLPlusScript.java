@@ -15,19 +15,20 @@
 
 package com.arsdigita.installer;
 
-import java.lang.reflect.InvocationTargetException;
+import com.arsdigita.util.UncheckedWrapperException;
+import com.arsdigita.db.DbHelper;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.io.FileNotFoundException;
+import java.io.*;
 import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 
 public class LoadSQLPlusScript {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#9 $ by $Author: jorris $, $DateTime: 2003/02/19 13:23:12 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#10 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
 
     private static final Logger s_log =
         Logger.getLogger(LoadSQLPlusScript.class);
@@ -38,17 +39,13 @@ public class LoadSQLPlusScript {
     private boolean m_onErrorContinue = false;
     private boolean m_echoSQLStatement = false;
     private int m_exitValue = 0;
-    private String m_database = "oracle";
 
     public static void main (String args[]) {
-
-        ConsoleAppender log = new ConsoleAppender();
-        BasicConfigurator.configure(log);
+        BasicConfigurator.configure();
 
         if (args.length != 4) {
-            s_log.error (
-                         "Usage: LoadSQLPlusScript " +
-                         "<JDBC_URL> <username> <password> <script_filename>");
+            s_log.error("Usage: LoadSQLPlusScript " +
+			"<JDBC_URL> <username> <password> <script_filename>");
             System.exit(1);
         }
 
@@ -58,45 +55,46 @@ public class LoadSQLPlusScript {
         String scriptFilename = args[3];
 
         LoadSQLPlusScript loader = new LoadSQLPlusScript();
-
-        try {
-            loader.setConnection (jdbcUrl, dbUsername, dbPassword);
-            loader.loadSQLPlusScript(scriptFilename);
-        } catch (Exception e) {
-            s_log.error (e.toString());
-            System.exit(1);
-        }
-
-        System.exit( loader.getExitValue() );
-
-    }
-
-    public void setDatabase (String database) {
-        m_database = database;
+	loader.setConnection (jdbcUrl, dbUsername, dbPassword);
+	loader.loadSQLPlusScript(scriptFilename, true, true);
+        System.exit(loader.getExitValue());
     }
 
     public void setConnection (Connection connection) {
         m_con = connection;
     }
 
-    public void setConnection (String jdbcUrl, String dbUsername, String dbPassword)
-        throws SQLException {
-        m_con = DriverManager.getConnection(jdbcUrl,
-                                            dbUsername,
-                                            dbPassword);
+    public void setConnection (String jdbcUrl, String dbUsername,
+			       String dbPassword) {
+	try {
+	    int db = DbHelper.getDatabaseFromURL(jdbcUrl);
+
+	    switch (db) {
+	    case DbHelper.DB_POSTGRES:
+		Class.forName("org.postgresql.Driver");
+		break;
+	    case DbHelper.DB_ORACLE:
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		break;
+	    default:
+		throw new IllegalArgumentException("unsupported database");
+	    }
+
+	    s_log.warn("Using database " + DbHelper.getDatabaseName(db));
+	    m_con = DriverManager.getConnection(jdbcUrl, dbUsername,
+						dbPassword);
+	} catch (SQLException e) {
+	    throw new UncheckedWrapperException(e);
+	} catch (ClassNotFoundException e) {
+	    throw new UncheckedWrapperException(e);
+	}
     }
 
     public int getExitValue () {
         return m_exitValue;
     }
 
-    public void loadSQLPlusScript (String scriptFilename)
-        throws ClassNotFoundException,
-               SQLException,
-               ParseException,
-               FileNotFoundException,
-               IllegalAccessException,
-               NoSuchMethodException {
+    public void loadSQLPlusScript (String scriptFilename) {
         /*
         if (System.getProperty("sql.verbose") != null  &&
             System.getProperty("sql.verbose").equals("true")) {
@@ -114,74 +112,86 @@ public class LoadSQLPlusScript {
         loadScript(scriptFilename);
     }
 
-    public void loadSQLPlusScript (String scriptFilename,
-                                   boolean echoSQLStatement,
-                                   boolean onErrorContinue)
-        throws ClassNotFoundException, SQLException,
-               ParseException, FileNotFoundException,
-               IllegalAccessException, NoSuchMethodException {
+    public void loadSQLPlusScript(String scriptFilename,
+				  boolean echoSQLStatement,
+				  boolean onErrorContinue) {
         m_echoSQLStatement = echoSQLStatement;
         m_onErrorContinue = onErrorContinue;
         loadScript (scriptFilename);
     }
 
-    protected void loadScript (String scriptFilename)
-        throws ClassNotFoundException, SQLException,
-               ParseException, FileNotFoundException,
-               IllegalAccessException, NoSuchMethodException {
-
-        if (m_database.equals("postgres")) {
-            Class.forName("org.postgresql.Driver");
-        } else {
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-        }
-
-        s_log.warn("Using database " + m_database);
+    protected void loadScript(String scriptFilename) {
         // Parse SQL script and feed JDBC with one statement at the time
-        s_log.warn ("Trying to open: '" + scriptFilename + "'");
-        SimpleSQLParser parser = new SimpleSQLParser(scriptFilename);
-
-        // iterate over parser.SQLStamentList();
-
-        m_stmt = m_con.createStatement();
-
-        try {
-            parser.useSQLStatement(this, "executeOneStatement");
-        } catch (InvocationTargetException e) {
-        }
-
-        m_stmt.close();
-        m_con.commit();
-        m_con.close();
-
+        s_log.warn ("Loading: '" + scriptFilename + "'");
+	try {
+	    m_stmt = m_con.createStatement();
+	    load(scriptFilename);
+	    m_stmt.close();
+	    m_con.commit();
+	} catch (SQLException e) {
+	    throw new UncheckedWrapperException(e);
+	}
     }
 
+    private void load(final String filename) {
+	try {
+	    StatementParser sp = new StatementParser
+		(filename, new FileReader(filename),
+		 new StatementParser.Switch() {
+		     public void onStatement(String sql) {
+			 executeStatement(sql);
+		     }
+		     public void onInclude(String include) {
+			 include(filename, include);
+		     }
+		 });
+	    sp.parse();
+	} catch (ParseException e) {
+	    throw new UncheckedWrapperException(e);
+	} catch (FileNotFoundException e) {
+	    throw new UncheckedWrapperException(e);
+	}
+    }
 
-    /**
-     *  This is a method which will be passed to the database SQL parser to
-     *  be executed for each parsed statement.
-     *  It must accept single String argument.
-     *  It must be public (because it will be called by other
-     *  classes.)
-     */
+    private void include(String including, String included) {
+	File includedFile = new File(included);
+	if (includedFile.isAbsolute()) {
+	    s_log.warn("Absolute path found: '" + included + "'");
+	} else {
+	    s_log.warn("Relative path found: '" + included + "'");
+	    //  Well make it absolute then.
+	    includedFile =
+		new File(new File(including).getAbsoluteFile()
+			 .getParentFile(), included).getAbsoluteFile();
+	}
+	s_log.warn("Recursively including: '" + includedFile + "'");
+	load(includedFile.toString());
+    }
 
-    public void executeOneStatement (String sqlString)
-        throws SQLException {
+    private void executeStatement (String sql) {
         m_stmtCount++;
         s_log.info ("Statement count: " + m_stmtCount);
         if (m_echoSQLStatement) {
-            s_log.info (sqlString);
+            s_log.info (sql);
         }
 
         try {
-            int rowsAffected = m_stmt.executeUpdate(sqlString);
+            int rowsAffected = m_stmt.executeUpdate(sql);
             s_log.warn ("  " + rowsAffected + " row(s) affected");
+	    m_con.commit();
         } catch (SQLException e) {
+	    try {
+		m_con.rollback();
+	    } catch (SQLException se) {
+		throw new UncheckedWrapperException(se);
+	    }
             m_exitValue = 1;
-            s_log.warn (" -- FAILED: " + e.getMessage());
+            s_log.warn(" -- FAILED: " + e.getMessage());
+	    s_log.warn("SQL: " + sql);
             if (!m_onErrorContinue) {
-                throw e;
+                throw new UncheckedWrapperException(e);
             }
         }
     }
+
 }

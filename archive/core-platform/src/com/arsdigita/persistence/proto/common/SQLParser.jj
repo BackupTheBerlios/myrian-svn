@@ -1,0 +1,399 @@
+options {
+    STATIC = false;
+    DEBUG_PARSER = false;
+}
+
+PARSER_BEGIN(SQLParser)
+
+package com.arsdigita.persistence.proto.common;
+
+import java.util.*;
+import java.io.*;
+
+/**
+ * SQLParser
+ *
+ * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
+ * @version $Revision: #1 $ $Date: 2003/05/12 $
+ */
+
+public class SQLParser {
+
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/common/SQLParser.jj#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+
+    public static interface Mapper {
+        Path map(Path path);
+    }
+
+    private SQL m_sql = new SQL();
+    private StringBuffer m_image = new StringBuffer();
+    private ArrayList m_assigns = new ArrayList();
+    private Mapper m_mapper = new Mapper() {
+            public Path map(Path path) {
+                return path;
+            }
+        };
+
+    public SQLParser(Reader r, Mapper mapper) {
+        this(r);
+        m_mapper = mapper;
+    }
+
+    public class Assign {
+
+        private SQLToken m_begin;
+        private SQLToken m_end;
+
+        public Assign(SQLToken begin, SQLToken end) {
+            m_begin = begin;
+            m_end = end;
+        }
+
+        public SQLToken getBegin() {
+            return m_begin;
+        }
+
+        public SQLToken getEnd() {
+            return m_end;
+        }
+
+    }
+
+    public SQL getSQL() {
+        return m_sql;
+    }
+
+    public Collection getAssigns() {
+        return m_assigns;
+    }
+
+    private void appendSpecial(Token t) {
+        Token sp = t;
+        while (sp.specialToken != null) { sp = sp.specialToken; }
+        if (sp == t) { return; }
+        while (sp != null) {
+            m_image.append(sp.image);
+            sp = sp.next;
+        }
+    }
+
+    private void append(Token t) {
+        appendSpecial(t);
+        m_image.append(t.image);
+    }
+
+    private void token() {
+        token(null);
+    }
+
+    private void token(SQLToken.Type type) {
+        if (m_image.length() > 0) {
+            m_sql.append(new SQLToken(m_image.toString(), type));
+            m_image.setLength(0);
+        }
+    }
+
+}
+
+PARSER_END(SQLParser)
+
+<DEFAULT,BEGIN> SPECIAL_TOKEN:
+{
+    " "
+  | "\t"
+  | "\n"
+  | "\r"
+  | "\f"
+}
+
+TOKEN:
+{
+    <STRING_LITERAL: "'" ( ~["'"] | "''" )* "'">
+  | <#DIGIT: ["0" - "9"]>
+  | <INTEGER_LITERAL: ( "+" | "-" )? (<DIGIT>)+>
+  | <NUMBER_LITERAL: ( "+" | "-" )? (<DIGIT>)* ( "." (<DIGIT>)+ )?
+                     ( "E" | "e" ) ( "+" | "-" ) (<DIGIT>)+>
+  | <QUOTED_ID: "\"" ( ~["\""] | "\"\"" )* "\"">
+}
+
+TOKEN:
+{
+    <BINDVAR: ":" ( <ID> | <INTEGER_LITERAL> )>
+}
+
+TOKEN:
+{
+    <LPAREN: "(">
+  | <RPAREN: ")">
+  | <COMMA: ",">
+  | <PERIOD: ".">
+  | <SEMI: ";">
+  | <MUL: "*">
+  | <POS: "+">
+  | <NEG: "-">
+  | <DIV: "/">
+  | <CONCAT: "||"> 
+  | <EQ: "=">
+  | <NE: ( "!=" | "^=" | "<>" )>
+  | <GT: ">">
+  | <LT: "<">
+  | <LE: "<=">
+  | <PUT: "=>">
+  | <GE: ">=">
+  | <BEGIN_HINT: "/*+">
+  | <END_HINT: "*/">
+}
+
+TOKEN [IGNORE_CASE]:
+{
+    <#WS: ([" ", "\t", "\n", "\r", "\f"])+>
+  | <NULL: "null">
+  | <IS_NULL: "is" <WS> "null">
+  | <IS_NOT_NULL: "is" <WS> "not" <WS> "null">
+  | <LIKE: "like">
+  | <BETWEEN: "between">
+  | <IN: "in">
+  | <NOT: "not"> 
+  | <AND: "and">
+  | <OR: "or"> 
+  | <ANY: "any">
+  | <SOME: "some">
+  | <EXISTS: "exists">
+  | <UNION: "union">
+  | <UNION_ALL: "union" <WS> "all">
+  | <INTERSECT: "intersect">
+  | <MINUS: "minus">
+  | <PRIOR: "prior">
+  | <LIMIT: "limit">
+  | <OFFSET: "offset">
+  | <ASC: "asc">
+  | <DESC: "desc">
+  | <CASE: "case">
+  | <WHEN: "when">
+  | <THEN: "then">
+  | <ELSE: "else">
+  | <END: "end">
+  | <AS: "as">
+// allowed functions
+  | <UPPER: "upper">
+  | <LOWER: "lower">
+// Clause beginnings
+  | <SELECT: "select">
+  | <INSERT_INTO: "insert" <WS> "into">
+  | <UPDATE: "update">
+  | <DELETE_FROM: "delete" <WS> "from">
+  | <FROM: "from">
+  | <WHERE: "where">
+  | <WITH: "with">
+  | <START_WITH: "start" <WS> "with">
+  | <CONNECT_BY: "connect" <WS> "by">
+  | <GROUP_BY: "group" <WS> "by">
+  | <ORDER_BY: "order" <WS> "by">
+  | <FOR_UPDATE: "for" <WS> "update">
+  | <VALUES: "values">
+  | <SET: "set">
+}
+
+TOKEN: {
+    <ID: <CH>(<CH>|<DIGIT>)*>
+  | <#CH: ["a" - "z", "A" - "Z", "_"]>
+}
+
+// TODO: Add support for multi-line comments.
+
+SPECIAL_TOKEN:
+{
+    <COMMENT: "--" (~["\n", "\r"])* ("\n"|"\r"|"\r\n")>
+}
+
+void sql() :
+{}
+{
+ [ ( statement() | unstructuredElement()
+     ( ( unstructuredElement() | clauseStart() ) )* ) ] <EOF>
+     { token(); }
+}
+
+void statement() :
+{}
+{
+    ( clause() )+
+}
+
+void literal() :
+{
+    Token t;
+}
+{
+ (  t = <STRING_LITERAL>
+  | t = <INTEGER_LITERAL>
+  | t = <NUMBER_LITERAL> )
+    { append(t); }
+}
+
+void symbol() :
+{
+    Token t;
+}
+{
+ (
+    t = <PERIOD>
+  | t = <SEMI>
+  | t = <MUL>
+  | t = <POS>
+  | t = <NEG>
+  | t = <DIV>
+  | t = <CONCAT> 
+  | t = <EQ>
+  | t = <NE>
+  | t = <GT>
+  | t = <LT>
+  | t = <LE>
+  | t = <PUT>
+  | t = <GE>
+  | t = <BEGIN_HINT>
+  | t = <END_HINT>
+  | t = <NULL>
+  | t = <IS_NULL>
+  | t = <IS_NOT_NULL>
+  | t = <LIKE>
+  | t = <BETWEEN>
+  | t = <IN>
+  | t = <NOT>
+  | t = <AND>
+  | t = <OR>
+  | t = <ANY>
+  | t = <SOME>
+  | t = <EXISTS>
+  | t = <UNION>
+  | t = <UNION_ALL>
+  | t = <INTERSECT>
+  | t = <LIMIT>
+  | t = <OFFSET>
+  | t = <ASC>
+  | t = <DESC>
+  | t = <CASE>
+  | t = <WHEN>
+  | t = <THEN>
+  | t = <ELSE>
+  | t = <END>
+  | t = <AS>
+  | t = <MINUS>
+  | t = <PRIOR>
+  | t = <UPPER>
+  | t = <LOWER>
+  | t = <QUOTED_ID> )
+    { append(t); }
+}
+
+void clauseStart() :
+{
+    Token t;
+}
+{
+ (
+    t = <SELECT>
+  | t = <INSERT_INTO>
+  | t = <UPDATE>
+  | t = <DELETE_FROM>
+  | t = <FROM>
+  | t = <WHERE>
+  | t = <WITH>
+  | t = <START_WITH>
+  | t = <CONNECT_BY>
+  | t = <GROUP_BY>
+  | t = <ORDER_BY>
+  | t = <FOR_UPDATE>
+  | t = <VALUES>
+  | t = <SET> )
+    { append(t); }
+}
+
+void parens() :
+{
+    Token t;
+}
+{
+ ( LOOKAHEAD(2) t = <LPAREN> { append(t); } statement() t = <RPAREN>
+     { append(t); }
+  | t = <LPAREN> { append(t); } ( unstructuredElement() )* t = <RPAREN>
+     { append(t); } )
+}
+
+void identifier() :
+{
+    Token t;
+    boolean bind = false;
+    StringBuffer buf = new StringBuffer();
+}
+{
+    ( t = <BINDVAR> { bind = true; } | t = <ID>  )
+        { buf.append(t.image); appendSpecial(t); token(); }
+        ( LOOKAHEAD(2) <PERIOD> t = <ID>
+            { buf.append('.'); buf.append(t.image);
+        } )*
+    {
+        if (bind) {
+            m_image.append(buf);
+            token(SQLToken.BIND);
+        } else {
+            m_image.append(m_mapper.map(Path.get(buf.toString())).getPath());
+            token(SQLToken.PATH);
+        }
+    }
+}
+
+void unstructuredElementNoComma() :
+{}
+{
+  (   literal()
+    | symbol()
+    | parens()
+    | identifier()
+     )
+}
+
+void unstructuredElement() :
+{
+    Token t;
+}
+{
+  (  t = <COMMA> { append(t); }
+   | unstructuredElementNoComma()
+    )
+}
+
+void unstructuredSQL() :
+{}
+{
+    ( unstructuredElement() )*
+}
+
+void clause() :
+{}
+{
+ ( LOOKAHEAD(1) setClause() | clauseStart() unstructuredSQL() )
+}
+
+void setClause() :
+{
+    Token t;
+}
+{
+    t = <SET> { append(t); } assign() ( t = <COMMA> { append(t); } assign() )*
+}
+
+void assign() :
+{
+    Token t;
+    SQLToken begin;
+}
+{
+
+    { token(); begin = m_sql.getLast(); }
+    identifier() t = <EQ> { append(t); } ( unstructuredElementNoComma() )+
+    {
+        token();
+        m_assigns.add(new Assign(begin.getNext(), m_sql.getLast()));
+    }
+}

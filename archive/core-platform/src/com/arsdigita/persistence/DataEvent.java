@@ -19,28 +19,37 @@ package com.arsdigita.persistence;
  * DataEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2003/05/12 $
  **/
 
 abstract class DataEvent {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataEvent.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataEvent.java#4 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
 
-    DataObject m_object;
+    DataObjectImpl m_object;
 
-    public DataEvent(DataObject object) {
+    public DataEvent(DataObjectImpl object) {
         m_object = object;
     }
 
     protected abstract void invoke(DataObserver observer);
 
+    abstract String getName();
+
+    final void schedule() { m_object.scheduleObserver(this); }
+
+    final void fire() { m_object.fireObserver(this); }
+
+    public String toString() {
+        return "observer event: " + m_object + " " + getName();
+    }
 }
 
 abstract class PropertyEvent extends DataEvent {
 
     String m_property;
 
-    public PropertyEvent(DataObject object, String property) {
+    public PropertyEvent(DataObjectImpl object, String property) {
         super(object);
         m_property = property;
     }
@@ -52,7 +61,7 @@ class SetEvent extends PropertyEvent {
     private Object m_old;
     private Object m_new;
 
-    public SetEvent(DataObject object, String property, Object oldValue,
+    public SetEvent(DataObjectImpl object, String property, Object oldValue,
                     Object newValue) {
         super(object, property);
         m_old = oldValue;
@@ -63,13 +72,15 @@ class SetEvent extends PropertyEvent {
         observer.set(m_object, m_property, m_old, m_new);
     }
 
+
+    String getName() { return " set " + m_property; }
 }
 
 class AddEvent extends PropertyEvent {
 
     private DataObject m_value;
 
-    public AddEvent(DataObject object, String property, DataObject value) {
+    public AddEvent(DataObjectImpl object, String property, DataObject value) {
         super(object, property);
         m_value = value;
     }
@@ -78,13 +89,15 @@ class AddEvent extends PropertyEvent {
         observer.add(m_object, m_property, m_value);
     }
 
+    String getName() { return " add " + m_property; }
 }
 
 class RemoveEvent extends PropertyEvent {
 
     private DataObject m_value;
 
-    public RemoveEvent(DataObject object, String property, DataObject value) {
+    public RemoveEvent(DataObjectImpl object, String property,
+                       DataObject value) {
         super(object, property);
         m_value = value;
     }
@@ -93,11 +106,12 @@ class RemoveEvent extends PropertyEvent {
         observer.remove(m_object, m_property, m_value);
     }
 
+    String getName() { return " remove " + m_property; }
 }
 
 class ClearEvent extends PropertyEvent {
 
-    public ClearEvent(DataObject object, String property) {
+    public ClearEvent(DataObjectImpl object, String property) {
         super(object, property);
     }
 
@@ -105,52 +119,92 @@ class ClearEvent extends PropertyEvent {
         observer.clear(m_object, m_property);
     }
 
+    String getName() { return " clear " + m_property; }
 }
 
-class BeforeSaveEvent extends DataEvent {
+interface BeforeEvent {
+    // returns the corresponding after event class
+    Class getAfter();
+}
 
-    public BeforeSaveEvent(DataObject object) {
+interface AfterEvent {
+    // returns the corresponding before event class
+    Class getBefore();
+}
+
+abstract class ObjectDataEvent extends DataEvent {
+
+    public ObjectDataEvent(DataObjectImpl object) { super(object); }
+
+    public int hashCode() { return m_object.hashCode(); }
+
+    public boolean equals(Object o) {
+        if (o instanceof ObjectDataEvent) {
+            ObjectDataEvent other = (ObjectDataEvent) o;
+            return this.m_object.equals(other.m_object) &&
+                this.getClass().equals(other.getClass());
+        }
+
+        return false;
+    }
+}
+
+class BeforeSaveEvent extends ObjectDataEvent implements BeforeEvent {
+
+    public BeforeSaveEvent(DataObjectImpl object) {
         super(object);
     }
+
+    public Class getAfter() { return AfterSaveEvent.class; }
 
     protected void invoke(DataObserver observer) {
         observer.beforeSave(m_object);
     }
 
+    String getName() { return " before save"; }
 }
 
-class AfterSaveEvent extends DataEvent {
+class AfterSaveEvent extends ObjectDataEvent implements AfterEvent {
 
-    public AfterSaveEvent(DataObject object) {
+    public AfterSaveEvent(DataObjectImpl object) {
         super(object);
     }
+
+    public Class getBefore() { return BeforeSaveEvent.class; }
 
     protected void invoke(DataObserver observer) {
         observer.afterSave(m_object);
     }
 
+    String getName() { return " after save"; }
 }
 
-class BeforeDeleteEvent extends DataEvent {
+class BeforeDeleteEvent extends ObjectDataEvent implements BeforeEvent {
 
-    public BeforeDeleteEvent(DataObject object) {
+    public BeforeDeleteEvent(DataObjectImpl object) {
         super(object);
     }
+
+    public Class getAfter() { return AfterDeleteEvent.class; }
 
     protected void invoke(DataObserver observer) {
         observer.beforeDelete(m_object);
     }
 
+    String getName() { return " before delete"; }
 }
 
-class AfterDeleteEvent extends DataEvent {
+class AfterDeleteEvent extends ObjectDataEvent implements AfterEvent {
 
-    public AfterDeleteEvent(DataObject object) {
+    public AfterDeleteEvent(DataObjectImpl object) {
         super(object);
     }
+
+    public Class getBefore() { return BeforeDeleteEvent.class; }
 
     protected void invoke(DataObserver observer) {
         observer.afterDelete(m_object);
     }
 
+    String getName() { return " after delete"; }
 }

@@ -27,12 +27,12 @@ import org.apache.log4j.Logger;
  * be combined and manipulated to create complex queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2003/03/19 $
+ * @version $Revision: #10 $ $Date: 2003/05/12 $
  */
 
 abstract class FilterImpl implements Filter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterImpl.java#9 $ by $Author: rhs $, $DateTime: 2003/03/19 18:16:01 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterImpl.java#10 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
 
     private static final Logger m_log =
         Logger.getLogger(Filter.class.getName());
@@ -395,8 +395,8 @@ abstract class FilterImpl implements Filter {
 	final InFilter in = new InFilter(propertyName, null, queryName);
 
         return new FilterImpl() {
-		public String getSQL(DataQuery query) {
-		    return "not " + in.getSQL(query);
+		public String getConditions() {
+		    return "not " + in.getConditions();
 		}
 	    };
     }
@@ -424,25 +424,6 @@ abstract class FilterImpl implements Filter {
         } 
         m_bindings.put(parameterName, value);
         return this;
-    }
-
-    /**
-     *  This goes through the bind variables, one by one.  If the
-     *  value is null then it manipulates the SQL so that Oracle
-     *  can handle is.  If the value is not null, it places the
-     *  variable in the FILTER namespace.
-     */
-    static String mangleBindVars(String sql) {
-        StringTokenizer tokens = new StringTokenizer(sql, ":", true);
-        StringBuffer buffer = new StringBuffer();
-        while (tokens.hasMoreTokens()) {
-            String token = tokens.nextToken();
-            buffer.append(token);
-            if (token.equals(":")) {
-                buffer.append(Filter.FILTER);
-            }
-        }
-        return buffer.toString();
     }
 
 

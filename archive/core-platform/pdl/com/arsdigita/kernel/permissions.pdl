@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/permissions.pdl#9 $
-// $DateTime: 2003/03/20 10:27:57 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/permissions.pdl#10 $
+// $DateTime: 2003/05/12 18:19:45 $
 
 model com.arsdigita.kernel.permissions;
 
@@ -29,11 +29,13 @@ object type Permission {
     Date[1..1]       creationDate = acs_permissions.creation_date TIMESTAMP;
     String[0..1]     creationIP = acs_permissions.creation_ip VARCHAR(50);
 
-    composite ACSObject[1..1]  object =
+    // these are 0..1 to avoid persistence 1..1 checks
+    // they are actually set with the id properties above
+    composite ACSObject[0..1]  object =
                      join acs_permissions.object_id to acs_objects.object_id;
-    composite Party[1..1]      party =
+    composite Party[0..1]      party =
                      join acs_permissions.grantee_id to parties.party_id;
-    composite Privilege[1..1]  priv =
+    composite Privilege[0..1]  priv =
                      join acs_permissions.privilege
                        to acs_privileges.privilege;
     User[0..1]       creationUser =

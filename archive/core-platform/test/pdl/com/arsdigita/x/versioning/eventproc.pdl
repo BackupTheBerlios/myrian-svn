@@ -1,0 +1,79 @@
+//
+// Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/dev/test/pdl/com/arsdigita/x/versioning/eventproc.pdl#1 $ 
+// $DateTime: 2003/05/12 18:19:45 $
+
+model x.version.events.test01;
+
+versioned object type VT1 {
+    BigInteger[1..1] id = te_vt1.id INTEGER;
+    String[0..1] name = te_vt1.name VARCHAR;
+    String[0..1] content = te_vt1.content CLOB;
+    BigInteger[0..1] intAttr = te_vt1.int_attr INTEGER;
+
+    object key(id);
+}
+
+versioned object type VT2 {
+    BigInteger[1..1] id = te_vt2.id INTEGER;
+    String[0..1] name = te_vt2.name VARCHAR;
+    component C1[0..n] c1s = join te_vt2.id to te_c1.composite_id;
+    unversioned component UVCT1[0..n] uvct1s = join te_vt2.id to te_uvct1.composite_id;
+    unversioned String[1..1] unverAttr = te_vt2.unver_attr VARCHAR;
+
+    object key(id);
+}
+
+object type C1 {
+    BigInteger[1..1] id = te_c1.id INTEGER;
+    String[0..1] name = te_c1.name VARCHAR;
+
+    object key(id);
+}
+
+
+versioned object type VT3 {
+    BigInteger[1..1] id = te_vt3.id INTEGER;
+    String[0..1] name = te_vt3.name VARCHAR;
+    RT1[1..1] rt1 = join te_vt3.rt1_id to te_rt1.id;
+
+    object key(id);
+}
+
+object type RT1 {
+    BigInteger[1..1] id = te_rt1.id INTEGER;
+    String[1..1] name = te_rt1.name VARCHAR;
+    BigInteger[0..1] intAttr = te_rt1.int_attr INTEGER;
+
+    object key(id);
+}
+
+object type UVCT1 {
+        BigInteger[1..1] id = te_uvct1.id INTEGER;
+        String[0..1] name = te_uvct1.name VARCHAR;
+
+        object key(id);
+}
+
+object type UVCT2 {
+        BigInteger[1..1] id = te_uvct2.id INTEGER;
+        String[0..1] name = te_uvct2.name VARCHAR;
+
+        object key(id);
+}
+
+association {
+    unversioned component UVCT2[0..n] uvct2s = join te_vt2.id to te_uvct2.composite_id;
+    VT2[0..1] vt2 = join te_uvct2.composite_id to te_vt2.id;
+}

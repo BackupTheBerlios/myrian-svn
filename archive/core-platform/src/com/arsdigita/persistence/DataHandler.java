@@ -22,12 +22,12 @@ package com.arsdigita.persistence;
  * and turn them into soft deletes under certain circumstances.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2003/05/12 $
  **/
 
 public abstract class DataHandler {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataHandler.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataHandler.java#4 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
 
 
     /**
@@ -37,7 +37,7 @@ public abstract class DataHandler {
      **/
 
     public void doDelete(DataObject data) {
-        ((GenericDataObject) data).doDelete();
+        throw new Error("not implemented");
     }
 
 }

@@ -1,82 +1,87 @@
 package com.arsdigita.persistence;
 
-import com.arsdigita.util.*;
-import com.arsdigita.persistence.metadata.*;
+import com.arsdigita.persistence.proto.common.*;
+import com.arsdigita.persistence.proto.metadata.*;
+import com.arsdigita.db.DbHelper;
+
 import java.util.*;
+
+import org.apache.log4j.Logger;
 
 /**
  * InFilter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/04/23 $
+ * @version $Revision: #3 $ $Date: 2003/05/12 $
  **/
 
 class InFilter extends FilterImpl implements Filter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/InFilter.java#2 $ by $Author: ashah $, $DateTime: 2003/04/23 17:42:01 $";
+    private static Logger s_log = Logger.getLogger(InFilter.class);
+
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/InFilter.java#3 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
 
     private String m_prop;
     private String m_subProp;
     private String m_query;
 
     InFilter(String property, String subqueryProperty, String query) {
-	m_prop = property;
-	m_subProp = subqueryProperty;
-	m_query = query;
+        m_prop = property;
+        m_subProp = subqueryProperty;
+        m_query = query;
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("InFilter: " + property + " - " + subqueryProperty + " - " + query);
+        }
     }
 
-    private Operation getOperation(String query) {
-	QueryType qt = MetadataRoot.getMetadataRoot().getQueryType(query);
-	Event ev = qt.getEvent();
-	return (Operation) ev.getOperations().next();
+    private SQLBlock getBlock(String query) {
+	Root root = Root.getRoot();
+	ObjectType ot = root.getObjectType(query);
+	return root.getObjectMap(ot).getRetrieveAll();
     }
 
-    private String getColumn(String property, Operation op) {
-        return getColumn(StringUtils.split(property, '.'), op);
-    }
-
-    private String getColumn(String[] path, Operation op) {
-	Mapping m = op.getMapping(path);
-	if (m != null) {
-	    return m.getColumn();
-	} else {
-	    throw new IllegalArgumentException
-		("no such property (" + StringUtils.join(path, ".")
-                 + ") in operation: " + op);
-	}
-    }
-
-    public String getSQL(DataQuery query) {
-        DataQueryImpl dqi = (DataQueryImpl) query;
-	String[] path = StringUtils.split(m_prop, '.');
-	String col = getColumn(dqi.unalias(path), dqi.getOperation());
-	Operation op = getOperation(m_query);
-
-	String subProp;
+    public String getConditions() {
+	SQLBlock block = getBlock(m_query);
+	Path subProp;
 	if (m_subProp == null) {
-	    Iterator mappings = op.getMappings();
-	    if (mappings.hasNext()) {
-		subProp = StringUtils.join
-		    (((Mapping) mappings.next()).getPath(), '.');
+	    Iterator paths = block.getPaths().iterator();
+	    if (paths.hasNext()) {
+		subProp = (Path) paths.next();
 	    } else {
-		return mangleBindVars(col + " in (" + op.getSQL() + ")");
+		return m_prop + " in (" + m_query + ")";
 	    }
 
-	    if (mappings.hasNext()) {
+	    if (paths.hasNext()) {
 		throw new PersistenceException
 		    ("subquery has more than one mapping");
 	    }
 	} else {
-	    subProp = m_subProp;
+	    subProp = Path.get(m_subProp);
 	}
 
-	String subcol = getColumn(subProp, op);
+	Path subcol = block.getMapping(subProp);
+	if (subcol == null) {
+	    throw new MetadataException(block, "no such path: " + subProp);
+	}
 
-	String sql = "exists ( select " + subcol +
-	    " from (" + op.getSQL() + ") insub where insub." + subcol +
-	    " = " + col + ")";
+        String col;
+        switch (DbHelper.getDatabase()) {
+        case DbHelper.DB_ORACLE:
+            col = subcol.getPath().toUpperCase();
+            break;
+        case DbHelper.DB_POSTGRES:
+            col = subcol.getPath().toLowerCase();
+            break;
+        default:
+            DbHelper.unsupportedDatabaseError("in filter");
+            col = null;
+            break;
+        }
 
-	return mangleBindVars(sql);
+	return "exists ( select \"subquery_id\" from (select \"" +
+            col + "\" as \"subquery_id\" from (" +
+            m_query + ") \"insub1\" ) \"insub2\" where " +
+            "\"insub2\".\"subquery_id\" = " + m_prop + ")";
     }
 
 }

@@ -20,12 +20,12 @@ package com.arsdigita.persistence;
  * FilterFactoryImpl actually hands out the requested filters
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/22 $
+ * @version $Revision: #5 $ $Date: 2003/05/12 $
  */
 
 class FilterFactoryImpl implements FilterFactory {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterFactoryImpl.java#4 $ by $Author: jorris $, $DateTime: 2002/08/22 10:38:41 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterFactoryImpl.java#5 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
 
 
     /**

@@ -29,11 +29,11 @@ import com.arsdigita.db.DbHelper;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2003/04/28 $
+ * @version $Revision: #13 $ $Date: 2003/05/12 $
  */
 public class DataOperationTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataOperationTest.java#12 $ by $Author: jorris $, $DateTime: 2003/04/28 08:59:24 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataOperationTest.java#13 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
 
     public DataOperationTest(String name) {
         super(name);
@@ -118,11 +118,7 @@ public class DataOperationTest extends PersistenceTestCase {
         query.setParameter("priority", new BigDecimal(29999));
         query.setParameter("description", "wrote");
 
-        try {
-            assertTrue(query.size() == 0);
-        } catch (PersistenceException e) {
-            // this is the correct behavior
-        }
+	assertTrue(query.size() == 0);
 
 
         // this should succeed
@@ -133,7 +129,8 @@ public class DataOperationTest extends PersistenceTestCase {
         query.setParameter("priority", new BigDecimal(29999));
 
         try {
-            assertTrue(query.size() > 0);
+            query.size();
+	    fail("should have generated an unbound variable exception");
         } catch (PersistenceException e) {
             // this is the correct behavior
         }
@@ -300,6 +297,7 @@ public class DataOperationTest extends PersistenceTestCase {
             operationQuery.next();
             operationQuery.close();
         } else {
+            fail("ORACLE???");
             operation = getSession().retrieveDataOperation
                 ("examples.DataOperationProcWithDates");
             operation.setParameter("idToUpdate", return_integer);

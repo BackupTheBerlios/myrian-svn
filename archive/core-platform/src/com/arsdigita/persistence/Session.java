@@ -11,13 +11,42 @@
  * implied. See the License for the specific language governing
  * rights and limitations under the License.
  *
- */
+ **/
 
 package com.arsdigita.persistence;
 
+import com.arsdigita.db.ConnectionManager;
+import com.arsdigita.db.DbHelper;
+import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
+import com.arsdigita.persistence.proto.common.Path;
+import com.arsdigita.persistence.proto.Adapter;
+import com.arsdigita.persistence.proto.Signature;
+import com.arsdigita.persistence.proto.Query;
+import com.arsdigita.persistence.proto.PropertyMap;
+import com.arsdigita.persistence.proto.EventProcessor;
+import com.arsdigita.persistence.proto.Event;
+import com.arsdigita.persistence.proto.CreateEvent;
+import com.arsdigita.persistence.proto.DeleteEvent;
+import com.arsdigita.persistence.proto.ObjectEvent;
+import com.arsdigita.persistence.proto.PropertyEvent;
+import com.arsdigita.persistence.proto.metadata.Root;
+import com.arsdigita.persistence.proto.metadata.Property;
+import com.arsdigita.persistence.proto.engine.MemoryEngine;
+import com.arsdigita.persistence.proto.engine.rdbms.RDBMSEngine;
+import com.arsdigita.persistence.proto.engine.rdbms.RDBMSQuerySource;
+import com.arsdigita.persistence.proto.engine.rdbms.ConnectionSource;
+import com.arsdigita.persistence.proto.engine.rdbms.OracleWriter;
+import com.arsdigita.persistence.proto.engine.rdbms.PostgresWriter;
+
+import java.lang.ref.WeakReference;
+import java.util.*;
 
 import java.sql.Connection;
+import java.sql.SQLException;
+import org.apache.log4j.Logger;
+
+import org.apache.log4j.Logger;
 
 /**
  * <p>All persistence operations take place within the context of a session.
@@ -30,22 +59,270 @@ import java.sql.Connection;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2002/10/16 $
+ * @version $Revision: #11 $ $Date: 2003/05/12 $
  * @see com.arsdigita.persistence.SessionManager
- */
-public interface Session {
+ **/
+public class Session {
 
-   /**
-     *  - Sets the connection
-     * info for the specified schema.
-     *
-     * @param schema The name of the schema.
-     * @param url The JDBC URL.
-     * @param username The db username.
-     * @param password The db password.
-     **/
-    void setSchemaConnectionInfo(String schema, String url,
-                                        String username, String password);
+    private static final Logger LOG = Logger.getLogger(Session.class);
+
+    private List m_dataObjects = new ArrayList();
+    FlushEventProcessor m_beforeFP;
+    FlushEventProcessor m_afterFP;
+
+    private void addDataObject(DataObject obj) {
+        m_dataObjects.add(new WeakReference(obj));
+    }
+
+    // This is just a temporary way to get an adapter registered.
+    static {
+        Adapter ad = new Adapter() {
+                public void setSession(Object obj, com.arsdigita.persistence.proto.Session ssn) {
+                    DataObjectImpl dobj = (DataObjectImpl) obj;
+                    dobj.setSession(ssn);
+                    getSessionFromProto(ssn).addDataObject(dobj);
+                }
+
+                public Object getObject(com.arsdigita.persistence.proto.metadata.ObjectType type,
+                                        PropertyMap props) {
+		    if (!type.isKeyed()) {
+                        return props;
+                    }
+
+                    ObjectType ot = C.fromType(type);
+                    OID oid = new OID(ot);
+                    for (Iterator it = props.entrySet().iterator();
+                         it.hasNext(); ) {
+                        Map.Entry me = (Map.Entry) it.next();
+                        Property prop = (Property) me.getKey();
+                        oid.set(prop.getName(), me.getValue());
+                    }
+                    return new DataObjectImpl(oid);
+                }
+
+                public PropertyMap getProperties(Object obj) {
+                    if (obj instanceof PropertyMap) {
+                        return (PropertyMap) obj;
+                    }
+
+                    OID oid = ((DataObjectImpl) obj).getOID();
+                    PropertyMap result = new PropertyMap(getObjectType(obj));
+                    for (Iterator it =
+                             oid.getProperties().entrySet().iterator();
+                         it.hasNext(); ) {
+                        Map.Entry me = (Map.Entry) it.next();
+                        result.put(getObjectType(obj).getProperty((String) me.getKey()), me.getValue());
+                    }
+                    return result;
+                }
+
+                public com.arsdigita.persistence.proto.metadata.ObjectType
+                getObjectType(Object obj) {
+                    if (obj instanceof PropertyMap) {
+                        return ((PropertyMap) obj).getObjectType();
+                    }
+                    return C.type(((DataObjectImpl) obj).getObjectType());
+                }
+            };
+        Adapter.addAdapter(DataObjectImpl.class, ad);
+        Adapter.addAdapter(PropertyMap.class, ad);
+	Adapter.addAdapter(null, ad);
+    }
+
+    private ConnectionSource m_cs = new ConnectionSource() {
+            public Connection acquire() {
+                return Session.this.getConnection();
+            }
+
+            public void release(Connection conn) {
+		if (m_ctx.getAggressiveClose()) {
+		    if (LOG.isDebugEnabled()) {
+			LOG.debug("connectionUserCountHitZero returning " +
+				  "connection " + conn +
+				  " to pool because no " +
+				  "data modification was done",
+				  new Throwable("Stack trace"));
+		    }
+		    Session.this.freeConnection(conn);
+		}
+	    }
+        };
+    private final RDBMSQuerySource m_qs = new RDBMSQuerySource();
+    private final RDBMSEngine m_engine;
+
+    {
+        switch (DbHelper.getDatabase()) {
+        case DbHelper.DB_ORACLE:
+            m_engine = new RDBMSEngine(m_cs, new OracleWriter());
+            break;
+        case DbHelper.DB_POSTGRES:
+            m_engine = new RDBMSEngine(m_cs, new PostgresWriter());
+            break;
+        default:
+            DbHelper.unsupportedDatabaseError("persistence");
+            m_engine = null;
+            break;
+        }
+    }
+
+    private class PSession extends com.arsdigita.persistence.proto.Session {
+        PSession() { super(Session.this.m_engine, Session.this.m_qs); }
+        private Session getOldSession() { return Session.this; }
+    }
+
+    private PSession m_ssn = this.new PSession();
+
+    static Session getSessionFromProto(
+        com.arsdigita.persistence.proto.Session ssn) {
+        try {
+            return ((PSession) ssn).getOldSession();
+        } catch (ClassCastException cce) {
+            return null;
+        }
+    }
+
+    private TransactionContext m_ctx = new TransactionContext(this);
+    private MetadataRoot m_root = MetadataRoot.getMetadataRoot();
+
+    {
+        m_ssn.addAfterActivate(new EventProcessor() {
+            public void write(Event ev) {
+                if (!(ev.getObject() instanceof DataObjectImpl)) { return; }
+
+                if (ev instanceof PropertyEvent) {
+                    PropertyEvent pe = (PropertyEvent) ev;
+                    if (pe.getProperty().getName().charAt(0) == '~') {
+                        return;
+                    }
+                }
+
+                ev.dispatch(new Event.Switch() {
+                    public void onCreate(CreateEvent e) { }
+
+                    public void onDelete(DeleteEvent e) { }
+
+                    public void onSet(
+                        com.arsdigita.persistence.proto.SetEvent e) {
+                        new SetEvent((DataObjectImpl) e.getObject(),
+                                     e.getProperty().getName(),
+                                     e.getPreviousValue(),
+                                     e.getArgument()).fire();
+                    }
+
+                    public void onAdd(
+                        com.arsdigita.persistence.proto.AddEvent e) {
+                        new AddEvent((DataObjectImpl) e.getObject(),
+                                     e.getProperty().getName(),
+                                     (DataObjectImpl) e.getArgument()).fire();
+                    }
+
+                    public void onRemove(
+                        com.arsdigita.persistence.proto.RemoveEvent e) {
+                        new RemoveEvent((DataObjectImpl) e.getObject(),
+                                        e.getProperty().getName(),
+                                        (DataObjectImpl) e.getArgument()).fire();
+                    }
+                });
+            }
+
+            public void flush() { }
+        });
+
+        m_beforeFP = new FlushEventProcessor(true);
+        m_afterFP = new FlushEventProcessor(false);
+        m_ssn.addBeforeFlush(m_beforeFP);
+        m_ssn.addAfterFlush(m_afterFP);
+    }
+
+    static class FlushEventProcessor extends EventProcessor {
+        final private boolean m_before;
+        private List m_events = new ArrayList();
+        private List m_toFire = new LinkedList();
+
+        FlushEventProcessor(boolean before) { m_before = before; }
+
+        void clear() {
+            if (m_events.size() > 0) {
+                LOG.error("events left over: " + m_events);
+            }
+            m_events.clear();
+            if (m_toFire.size() > 0) {
+                LOG.error("data events left over: " + m_toFire);
+            }
+            m_toFire.clear();
+        }
+
+        public void write(Event e) {
+            if (e.getObject() instanceof DataObjectImpl) {
+                if (e instanceof PropertyEvent
+                    && ((PropertyEvent) e).getProperty().getName().charAt(0)
+                        == '~') {
+                    return;
+                }
+                m_events.add(e);
+            }
+        }
+
+        public void flush() {
+            Set objs = new HashSet();
+            List events = new LinkedList();
+            for (int i = m_events.size() - 1; i >= 0; i--) {
+                Event e = (Event) m_events.get(i);
+                DataObjectImpl obj = (DataObjectImpl) e.getObject();
+
+                if (!objs.contains(obj)) {
+                    objs.add(obj);
+                    DataEvent toFire;
+                    if (e instanceof DeleteEvent) {
+                        if (m_before) {
+                            toFire = new BeforeDeleteEvent(obj);
+                        } else {
+                            toFire = new AfterDeleteEvent(obj);
+                        }
+                    } else {
+                        if (m_before) {
+                            toFire = new BeforeSaveEvent(obj);
+                        } else {
+                            toFire = new AfterSaveEvent(obj);
+                        }
+                    }
+
+                    events.add(0, toFire);
+                }
+            }
+
+            m_events.clear();
+
+            if (LOG.isInfoEnabled()) {
+                LOG.info((m_before ? "before flush:" : "after flush: ") + events);
+            }
+
+            m_toFire.addAll(events);
+
+            for (Iterator it = events.iterator(); it.hasNext(); ) {
+                DataEvent e = (DataEvent) it.next();
+                e.schedule();
+            }
+
+            for (Iterator it = events.iterator(); it.hasNext(); ) {
+                DataEvent e = (DataEvent) it.next();
+                if (m_toFire.remove(e)) { e.fire(); }
+            }
+        }
+
+        void fireNow(DataEvent e) {
+            m_toFire.remove(e);
+            e.fire();
+        }
+    }
+
+    com.arsdigita.persistence.proto.Session getProtoSession() {
+        return m_ssn;
+    }
+
+    RDBMSEngine getEngine() {
+        return m_engine;
+    }
 
     /**
      * Retrieves the {@link TransactionContext}
@@ -97,14 +374,47 @@ public interface Session {
      *
      * @return The transaction context for this Session.
      **/
-    TransactionContext getTransactionContext();
+
+    public TransactionContext getTransactionContext() {
+        return m_ctx;
+    }
+
 
     /**
      * Returns the JDBC connection associated with this session.
      *
      * @return The JDBC connection used by this Session object.
      **/
-    Connection getConnection();
+
+    public Connection getConnection() {
+        try {
+            Connection conn = ConnectionManager.getCurrentThreadConnection();
+            if (conn == null) {
+                conn = ConnectionManager.getConnection();
+                ConnectionManager.setCurrentThreadConnection(conn);
+                conn.setAutoCommit(false);
+            }
+            return conn;
+        } catch (SQLException e) {
+            throw new Error(e.getMessage());
+        }
+    }
+
+    void freeConnection() {
+	Connection conn = ConnectionManager.getCurrentThreadConnection();
+	if (conn != null) {
+	    freeConnection(conn);
+	}
+    }
+
+    void freeConnection(Connection conn) {
+	try {
+	    conn.close();
+	    ConnectionManager.setCurrentThreadConnection(null);
+	} catch (SQLException e) {
+	    throw new PersistenceException(e);
+	}
+    }
 
     /**
      * Creates and returns a DataObject of the given type. All fields of
@@ -121,8 +431,17 @@ public interface Session {
      * @return A persistent object of the specified type.
      * @see #create(String)
      * @see GenericDataObjectFactory
-     */
-    DataObject create(ObjectType type);
+     **/
+    public DataObject create(ObjectType type) {
+	if (type == null) {
+	    throw new IllegalArgumentException
+		("type must be non null");
+	}
+        DataObjectImpl result = new DataObjectImpl(type);
+        result.setSession(m_ssn);
+        return result;
+    }
+
 
     /**
      * Creates and returns an empty DataObject of the given type. The
@@ -151,8 +470,16 @@ public interface Session {
      * @return A persistent object of the type identified by
      * <i>typeName</i>.
      **/
-    DataObject create(String typeName)
-        throws PersistenceException;
+
+    public DataObject create(String typeName) {
+	ObjectType type = m_root.getObjectType(typeName);
+	if (type == null) {
+	    throw new PersistenceException
+		("no such type: " + typeName);
+	}
+        return create(type);
+    }
+
 
     /**
      * Creates a new DataObject with the type of the given oid and initializes
@@ -162,7 +489,12 @@ public interface Session {
      *        the resulting DataObject.
      **/
 
-    DataObject create(OID oid);
+    public DataObject create(OID oid) {
+        DataObject result = new DataObjectImpl(oid);
+        m_ssn.create(result);
+        return result;
+    }
+
 
     /**
      * Retrieves the DataObject specified by <i>oid</i>.  If there is
@@ -175,19 +507,28 @@ public interface Session {
      *
      * @return A persistent object of the type specified by the oid.
      **/
-    DataObject retrieve(OID oid)
-        throws PersistenceException;
+
+    public DataObject retrieve(OID oid) {
+        return (DataObject) m_ssn.retrieve(C.pmap(oid));
+    }
+
 
     /**
-     *  - Deletes the
-     * persistent object of the given type with the given oid.  This method
-     * is not yet implemented.
+     *  Deletes the persistent object of the given type with the given oid.
      *
      * @param oid The id of the object to be deleted.
      *
      * @return True of an object was deleted, false otherwise.
      **/
-    boolean delete(OID oid);
+
+    public boolean delete(OID oid) {
+        DataObject dobj = retrieve(oid);
+        boolean result = m_ssn.delete(dobj);
+        m_ssn.flush();
+        m_ssn.assertFlushed(dobj);
+        return result;
+    }
+
 
     /**
      * Retrieves a collection of objects of the specified objectType.
@@ -199,7 +540,12 @@ public interface Session {
      * @return A DataCollection of the specified type.
      * @see Session#retrieve(String)
      **/
-    DataCollection retrieve(ObjectType type);
+
+    public DataCollection retrieve(ObjectType type) {
+        Query q = m_qs.getQuery(C.type(type));
+        return new DataCollectionImpl(this, m_ssn.retrieve(q));
+    }
+
 
     /**
      * <p>Retrieves a collection of objects of the specified objectType.
@@ -242,8 +588,11 @@ public interface Session {
      * <code>retrieveAll</code> event..
      * @see Session#retrieve(ObjectType)
      **/
-    DataCollection retrieve(String typeName)
-        throws PersistenceException;
+
+    public DataCollection retrieve(String typeName) {
+        return retrieve(m_root.getObjectType(typeName));
+    }
+
 
     /**
      * <p>Retrieves a persistent query object based on the named query.
@@ -286,8 +635,12 @@ public interface Session {
      *
      * @param name The name of the query.
      * @return A new DataQuery object.
-     */
-    DataQuery retrieveQuery(String name) throws PersistenceException;
+     **/
+
+    public DataQuery retrieveQuery(String name) {
+        Query q = m_qs.getQuery(Root.getRoot().getObjectType(name));
+        return new DataQueryImpl(this, m_ssn.retrieve(q));
+    }
 
     /**
      * <p>
@@ -318,64 +671,13 @@ public interface Session {
      * @return A DataOperation object corresponding to the definition
      * in the PDL.
      *
-     */
-    DataOperation retrieveDataOperation(String name)
-        throws PersistenceException;
+     **/
 
-    /**
-     *   - This retrieves the
-     *  factory that is used to create the filters for this DataQuery.
-     */
-    FilterFactory getFilterFactory();
+    public DataOperation retrieveDataOperation(String name) {
+        return new DataOperation
+            (this, Root.getRoot().getDataOperation(Path.get(name)).getSQL());
+    }
 
-
-    /**
-     *  - This allows
-     * developers to push messages on to the stack.  When a PersistenceError
-     * is created, it automatically reads all of the messages off of the
-     * stack and prints them as part of the error message.  Every call to
-     * <code>pushMessage</code> should have a corresponding call to
-     * {@link Session#popMessage()}.
-     *  <p>
-     *  For instance, when saving an object in GenericDataObject,
-     *  the code could look something like
-     *  <pre>
-     *  <code>
-     *  public void save() {
-     *  session.pushMessage("Saving object " + getOID());
-     *  &lt;do the save stuff here&gt;
-     *  session.popMessage();
-     *  </code>
-     *  </pre>
-     *
-     *  @param message The message to push on to the stack
-     *  @see Session#getStackTrace
-     */
-    void pushMessage(String message);
-
-    /**
-     *  - This allows developers
-     *  to pop message off of the stack.  This
-     *  should be used after an action has been completed successfully
-     *  and should have a corresponding call to
-     * {@link Session#pushMessage(String message)}.
-     *  <p>
-     *  For instance, when saving an object in GenericDataObject,
-     *  the code could look something like
-     *  <pre>
-     *  <code>
-     *  public void save() {
-     *  session.pushMessage("Saving object " + getOID());
-     *  &lt;do the save stuff here&gt;
-     *  session.popMessage();
-     *  </code>
-     *  </pre>
-     *
-     *  @return This returns the message that was popped off of the stack
-     *          If the stack was empty then "null" is returned.
-     *  @see Session
-     */
-    String popMessage();
 
     /**
      *   - Returns the
@@ -385,5 +687,24 @@ public interface Session {
      *  by the list of items.  If the stack is empty, this returns the
      *  empty string.  Calling this clears the stack.
      *
-     */
-    String getStackTrace();}
+     **/
+
+    public String getStackTrace() {
+        // XXX
+        return "";
+    }
+
+    void invalidateDataObjects(boolean connectedOnly) {
+        m_beforeFP.clear();
+        m_afterFP.clear();
+        for (Iterator it = m_dataObjects.iterator(); it.hasNext(); ) {
+            WeakReference ref = (WeakReference) it.next();
+            DataObjectImpl obj = (DataObjectImpl) ref.get();
+            if (obj != null) {
+                obj.invalidate(connectedOnly);
+            }
+        }
+
+        m_dataObjects.clear();
+    }
+}

@@ -25,12 +25,12 @@ import java.sql.SQLException;
  * Test
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2003/01/07 $
+ * @version $Revision: #10 $ $Date: 2003/05/12 $
  */
 
 public abstract class OrderTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OrderTest.java#9 $ by $Author: dennis $, $DateTime: 2003/01/07 14:51:38 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OrderTest.java#10 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
 
     public OrderTest(String name) {
         super(name);
@@ -160,7 +160,7 @@ public abstract class OrderTest extends PersistenceTestCase {
               com.arsdigita.db.DbHelper.DB_POSTGRES &&
               "dynamic".equals(m_testType))) {
             try {
-                GenericDataObject orders = (GenericDataObject)object.get("order");
+                DataObject orders = (DataObject)object.get("order");
                 object.set("order", null);
                 object.save();
                 if (!"dynamic".equals(m_testType)) {

@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/oracle-se-create.sql#22 $
--- $DateTime: 2003/05/05 15:56:50 $
+-- $Id: //core-platform/dev/sql/oracle-se-create.sql#23 $
+-- $DateTime: 2003/05/12 18:19:45 $
 
 @@ oracle-se/function-currentDate.sql
 

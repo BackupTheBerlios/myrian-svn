@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/postgres-create.sql#20 $
--- $DateTime: 2003/05/05 15:56:50 $
+-- $Id: //core-platform/dev/sql/postgres-create.sql#21 $
+-- $DateTime: 2003/05/12 18:19:45 $
 
 begin;
 

@@ -18,7 +18,6 @@ package com.arsdigita.persistence;
 import com.arsdigita.db.DbHelper;
 import com.arsdigita.initializer.Configuration;
 import com.arsdigita.initializer.InitializationException;
-import com.arsdigita.persistence.metadata.MDSQLGeneratorFactory;
 import com.arsdigita.util.ResourceManager;
 import com.arsdigita.persistence.metadata.CompoundType;
 import com.arsdigita.persistence.metadata.MetadataRoot;
@@ -36,7 +35,7 @@ import org.apache.log4j.Level;
  * the SessionManager of them.
  *
  * @author Archit Shah 
- * @version $Revision: #14 $ $Date: 2002/12/11 $
+ * @version $Revision: #15 $ $Date: 2003/05/12 $
  **/
 
 public class Initializer
@@ -70,11 +69,6 @@ public class Initializer
                              "there are no users when connection has not " +
                              "been used to modify data",
                              Boolean.class);
-        m_conf.initParameter(OPTIMIZE_BY_DEFAULT,
-                             "Use the optimizing query generator by default.",
-                             Boolean.class,
-                             ObjectType.getOptimizeDefault() ?
-                             Boolean.TRUE : Boolean.FALSE);
         m_conf.initParameter("useFirstRowsByDefault",
                              "Use the FIRST_ROWS hint in queries on which " +
                              "setRange() has been called",
@@ -89,8 +83,8 @@ public class Initializer
 
         m_conf.initParameter(SESSION_FACTORY,
                              "Class name of the Session factory to use",
-                             String.class,
-                             DefaultSessionFactory.class.getName());
+                             String.class/*,
+                                           DefaultSessionFactory.class.getName()*/);
     }
 
     public Configuration getConfiguration() {
@@ -117,23 +111,10 @@ public class Initializer
             DbHelper.unsupportedDatabaseError("SQL Utilities");
         }
 
-        ObjectType.setOptimizeDefault(
-            m_conf.getParameter(OPTIMIZE_BY_DEFAULT).equals(Boolean.TRUE)
-        );
 
-        CompoundType.setFirstRowsDefault
-            (Boolean.TRUE.equals
-             (m_conf.getParameter("useFirstRowsByDefault")));
-
-        if (database == DbHelper.DB_ORACLE) {
-            MDSQLGeneratorFactory.setMDSQLGenerator
-                (MDSQLGeneratorFactory.ORACLE_GENERATOR);
-        } else if (database == DbHelper.DB_POSTGRES) {
-            MDSQLGeneratorFactory.setMDSQLGenerator
-                (MDSQLGeneratorFactory.POSTGRES_GENERATOR);
-        } else {
-            DbHelper.unsupportedDatabaseError("MDSQL generator");
-        }
+        //CompoundType.setFirstRowsDefault
+        //    (Boolean.TRUE.equals
+        //     (m_conf.getParameter("useFirstRowsByDefault")));
 
         String pdlDir = (String)m_conf.getParameter(PDL_DIRECTORY);
 
@@ -145,23 +126,23 @@ public class Initializer
         }
 
         SessionManager.setSchemaConnectionInfo( "",  "", "", "");
-        final SessionFactory factory = getSessionFactory();
-        SessionManager.setSessionFactory(factory);
-
 
         Boolean aggressiveClose =
             (Boolean)m_conf.getParameter(AGGRESSIVE_CONNECTION_CLOSE);
-        if (aggressiveClose != null && aggressiveClose.booleanValue()) {
-            if (s_log.isInfoEnabled()) {
-                s_log.info("Using aggressive connection closing");
-            }
-            factory.setAggressiveConnectionClose(true);
-        } else {
-            if (s_log.isInfoEnabled()) {
-                s_log.info("Not using aggressive connection closing " +
-                           "[aggressiveConnectionClose parameter]");
-            }
-        }
+        if (aggressiveClose != null) {
+	    if (aggressiveClose.booleanValue()) {
+		if (s_log.isInfoEnabled()) {
+		    s_log.info("Using aggressive connection closing");
+		}
+		TransactionContext.setAggressiveClose(true);
+	    } else {
+		if (s_log.isInfoEnabled()) {
+		    s_log.info("Not using aggressive connection closing " +
+			       "[aggressiveConnectionClose parameter]");
+		}
+		TransactionContext.setAggressiveClose(false);
+	    }
+	}
 
         //SessionManager.setSessionFactory();
         PDL.loadPDLFiles(new File(pdlDir));
@@ -238,14 +219,14 @@ public class Initializer
                 ("Persistence Initialization error while trying to " +
                  "compile the PDL files: " + e.getMessage());
         } catch (Exception e2) {
-            if (txn != null) {
+            if (txn != null && txn.inTxn()) {
                 txn.abortTxn();
             }
             throw new InitializationException(e2);
         }
     }
 
-    private SessionFactory getSessionFactory() {
+/*    private SessionFactory getSessionFactory() {
         SessionFactory factory;
         final String factoryClassName = (String) m_conf.getParameter(SESSION_FACTORY);
         try {
@@ -261,7 +242,7 @@ public class Initializer
                                               " due to private constructor! ", ia);
         }
         return factory;
-    }
+        }*/
 
 
     public void shutdown() {}

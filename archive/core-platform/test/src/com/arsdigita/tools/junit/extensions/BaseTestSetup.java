@@ -145,13 +145,11 @@ public class BaseTestSetup extends TestDecorator {
     }
 
     private void runScripts(List scripts) throws Exception {
+	LoadSQLPlusScript loader = new LoadSQLPlusScript();
+	loader.setConnection(ConnectionManager.getConnection());
         for (Iterator iterator = scripts.iterator(); iterator.hasNext();) {
             String script = (String) iterator.next();
-            LoadSQLPlusScript loader = new LoadSQLPlusScript();
-            loader.setConnection ( ConnectionManager.getConnection() );
-            loader.setDatabase(DbHelper.getDatabaseDirectory());
-            loader.loadSQLPlusScript ( script );
-
+            loader.loadSQLPlusScript(script, false, true);
         }
     }
 

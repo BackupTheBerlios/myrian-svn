@@ -22,8 +22,8 @@ import java.util.List;
  * href="http://mathworld.wolfram.com/Graph.html">graphs</a> of objects.
  *
  * @author Archit Shah (ashah@mit.edu)
- * @author Vadim Nasardinov (vadidmn@redhat.com)
- * @version $Date: 2003/01/22 $
+ * @author Vadim Nasardinov (vadimn@redhat.com)
+ * @version $Date: 2003/05/12 $
  * @since   2003-01-22
  **/
 public interface Graph {
@@ -85,6 +85,11 @@ public interface Graph {
     List getNodes();
 
     /**
+     * Removes all nodes and edges.
+     **/
+    void removeAll();
+
+    /**
      * Returns a list of outgoing edges leaving this node.
      **/
     List getOutgoingEdges(Object node);
@@ -98,12 +103,12 @@ public interface Graph {
     int outgoingEdgeCount(Object node);
 
     /**
-     * @see #outgoingEdgeCount(node)
+     * @see #outgoingEdgeCount(Object)
      **/
     int incomingEdgeCount(Object node);
 
     /**
-     * @see #getOutgoingEdges(node)
+     * @see #getOutgoingEdges(Object)
      **/
     List getIncomingEdges(Object node);
 

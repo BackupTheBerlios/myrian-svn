@@ -15,41 +15,62 @@
 
 package com.arsdigita.persistence;
 
-import com.arsdigita.persistence.metadata.MetadataRoot;
-import com.arsdigita.persistence.metadata.QueryType;
-import com.arsdigita.persistence.metadata.Property;
-import com.arsdigita.persistence.metadata.Operation;
-import com.arsdigita.persistence.metadata.Mapping;
+import com.arsdigita.persistence.proto.common.*;
+import com.arsdigita.persistence.proto.metadata.*;
+import com.arsdigita.persistence.proto.Cursor;
+import com.arsdigita.persistence.proto.Query;
+import com.arsdigita.persistence.proto.RecordSet;
+import com.arsdigita.persistence.proto.Signature;
+
+import java.io.StringReader;
 
 /**
  * GenericDataQuery
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/11/26 $
+ * @version $Revision: #7 $ $Date: 2003/05/12 $
  */
 
 public class GenericDataQuery extends DataQueryImpl {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataQuery.java#6 $ by $Author: vadim $, $DateTime: 2002/11/26 18:30:20 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataQuery.java#7 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
 
-    // FIXME: the parameter s is passed in but never used.  -- 2002-11-26
+    private SQLBlock m_block;
+
     public GenericDataQuery(Session s, String sql, String[] columns) {
-        super(
-              new QueryType(
-                            "<generic>",
-                            new com.arsdigita.persistence.metadata.Event()
-                            ),
-              new Operation(sql)
-              );
+        super(s, makeQuery(sql, columns));
+	SQLParser p = new SQLParser(new StringReader(sql));
+	try {
+	    p.sql();
+	} catch (ParseException e) {
+	    throw new PersistenceException(e);
+	}
+	m_block = new SQLBlock(p.getSQL());
+	for (int i = 0; i < columns.length; i++) {
+	    Path path = Path.get(columns[i]);
+	    m_block.addMapping(path, path);
+	}
+    }
 
-        Operation op = getOperation();
-        for (int i = 0; i < columns.length; i++) {
-            m_type.addProperty(new Property(columns[i],
-                                            MetadataRoot.OBJECT));
-            op.addMapping(
-                          new Mapping(new String[] {columns[i]}, null, columns[i])
-                          );
-        }
+    private static final Query makeQuery(String sql, String[] paths) {
+	ObjectType propType = Root.getRoot().getObjectType("global.Object");
+	ObjectType type = new ObjectType(Model.getInstance("gdq"), sql, null);
+	Signature sig = new Signature(type);
+	for (int i = 0; i < paths.length; i++) {
+	    type.addProperty
+		(new Role(paths[i], propType, false, false, true));
+	    sig.addPath(Path.get(paths[i]));
+	}
+	return new Query(sig, null);
+    }
+
+    protected Cursor execute(final Query query) {
+	return new Cursor(getSession().getProtoSession(), query) {
+		protected RecordSet execute() {
+		    return GenericDataQuery.this.getSession().getEngine()
+			.execute(query, m_block);
+		}
+	    };
     }
 
 }
