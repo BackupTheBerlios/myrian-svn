@@ -6,7 +6,7 @@ import java.util.*;
  * Group
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/06/25 $
+ * @version $Revision: #3 $ $Date: 2004/06/28 $
  **/
 public class Group extends Party {
     private String name;
@@ -29,9 +29,5 @@ public class Group extends Party {
 
     public Collection getUsers() {
         return users;
-    }
-
-    public String toString() {
-        return getName();
     }
 }
