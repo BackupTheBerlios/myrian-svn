@@ -39,7 +39,7 @@ import org.apache.log4j.Logger;
  * the SessionManager of them.
  *
  * @author Archit Shah (ashah@arsdigita.com)
- * @version $Revision: #6 $ $Date: 2002/08/14 $
+ * @version $Revision: #7 $ $Date: 2002/08/22 $
  **/
 
 public class Initializer
@@ -58,6 +58,8 @@ public class Initializer
         "optimizeByDefault";
     public static final String METADATA_XML_FILE_NAMES =
         "metadataXmlFileNames";
+
+    public static final String SESSION_FACTORY = "sessionFactory";
 
     public Initializer() throws InitializationException {
         m_conf.initParameter(PDL_DIRECTORY,
@@ -82,6 +84,11 @@ public class Initializer
                              "The names of the xml file defining the " +
                              "persistence metadata. This file must be in " +
                              "your classpath", List.class);
+
+        m_conf.initParameter(SESSION_FACTORY,
+                             "Class name of the Session factory to use",
+                             String.class,
+                            DefaultSessionFactory.class.getName());
     }
 
     public Configuration getConfiguration() {
@@ -102,9 +109,9 @@ public class Initializer
 
         // Set the utilities
         if (database == DbHelper.DB_ORACLE) {
-            Session.setSQLUtilities(new OracleSQLUtilities());
+            SessionManager.setSQLUtilities(new OracleSQLUtilities());
         } else if (database == DbHelper.DB_POSTGRES) {
-            Session.setSQLUtilities(new PostgresSQLUtilities());
+            SessionManager.setSQLUtilities(new PostgresSQLUtilities());
         } else {
             DbHelper.unsupportedDatabaseError("SQL Utilities");
         }
@@ -133,18 +140,23 @@ public class Initializer
                                               "metadataXmlFileNames with pdlDirectory.");
         }
 
+
+        SessionManager.setSchemaConnectionInfo( "",  "", "", "");
+        final SessionFactory factory = getSessionFactory();
+        SessionManager.setSessionFactory(factory);
+
+
         Boolean aggressiveClose =
             (Boolean)m_conf.getParameter(AGGRESSIVE_CONNECTION_CLOSE);
         if (aggressiveClose != null && aggressiveClose.booleanValue()) {
             s_log.info("Using aggressive connection closing");
-            TransactionContext.setAggressiveClose(true);
+            factory.setAggressiveConnectionClose(true);
         } else {
             s_log.info("Not using aggressive connection closing " +
                        "[aggressiveConnectionClose parameter]");
         }
 
-        SessionManager.setSchemaConnectionInfo( "",  "", "", "");
-
+        //SessionManager.setSessionFactory();
         // Load the default pdl files
         String defaultDir = DbHelper.getDatabaseDirectory(DbHelper.DB_DEFAULT);
         PDL.loadPDLFiles(new File(pdlDir + "/" + defaultDir));
@@ -222,6 +234,24 @@ public class Initializer
                 ("Persistence Initialization error while trying to " +
                  "compile the PDL files: " + e.getMessage());
         }
+    }
+
+    private SessionFactory getSessionFactory() {
+        SessionFactory factory;
+        final String factoryClassName = (String) m_conf.getParameter(SESSION_FACTORY);
+        try {
+            factory = (SessionFactory) Class.forName(factoryClassName).newInstance();
+
+        } catch(ClassNotFoundException cne) {
+            throw new InitializationException("No such SessionFactory implementation: " + factoryClassName, cne);
+        } catch(InstantiationException ie) {
+            throw new InitializationException("Could not instantiate SessionFactory " + factoryClassName +
+                    " reason: " + ie.getMessage(), ie);
+        } catch(IllegalAccessException ia) {
+            throw new InitializationException("Could not instantiate SessionFactory " + factoryClassName +
+                    " due to private constructor! ", ia);
+        }
+        return factory;
     }
 
 

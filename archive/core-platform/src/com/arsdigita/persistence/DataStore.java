@@ -66,12 +66,12 @@ import org.apache.log4j.Logger;
  * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2002/08/15 $
+ * @version $Revision: #11 $ $Date: 2002/08/22 $
  */
 
-public class DataStore {
+class DataStore {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataStore.java#10 $ by $Author: jorris $, $DateTime: 2002/08/15 14:01:26 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataStore.java#11 $ by $Author: jorris $, $DateTime: 2002/08/22 10:38:41 $";
 
     private static final Logger log =
         Logger.getLogger(DataStore.class.getName());
@@ -83,8 +83,8 @@ public class DataStore {
     /**
      *  Creates a new DataStore
      */
-    public DataStore() {
-        m_txnCtx = new TransactionContext();
+    DataStore(TransactionContext ctx) {
+        m_txnCtx = ctx;
     }
 
 
@@ -102,7 +102,7 @@ public class DataStore {
      *  @return the Connection for the DataStore
      */
     public Connection getConnection() {
-        return m_txnCtx.getConnection();
+        return SessionManager.getSession().getConnection();
     }
 
     public boolean fireEvent(Event event, DataContainer source,

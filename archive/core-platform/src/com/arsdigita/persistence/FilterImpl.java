@@ -31,12 +31,12 @@ import org.apache.log4j.Logger;
  * be combined and manipulated to create complex queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/21 $
+ * @version $Revision: #6 $ $Date: 2002/08/22 $
  */
 
 class FilterImpl implements Filter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterImpl.java#5 $ by $Author: randyg $, $DateTime: 2002/08/21 12:44:58 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterImpl.java#6 $ by $Author: jorris $, $DateTime: 2002/08/22 10:38:41 $";
 
     private static final Logger m_log =
         Logger.getLogger(Filter.class.getName());
@@ -44,7 +44,7 @@ class FilterImpl implements Filter {
     private String m_conditions;
     private Map m_bindings = new HashMap();
     private static SQLUtilities m_util =
-        SessionManager.getSession().getSQLUtilities();
+        SessionManager.getSQLUtilities();
 
     /**
      *  Creates a new filter with no conditions.  This is only meant

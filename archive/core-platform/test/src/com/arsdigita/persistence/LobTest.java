@@ -33,12 +33,12 @@ import org.apache.log4j.Logger;
  * LobTest - for testing Blob and Clob datatype.
  *
  * @author Jeff Teeters (teeters@arsdigita.com)
- * @version $Revision: #8 $ $Date: 2002/08/15 $
+ * @version $Revision: #9 $ $Date: 2002/08/22 $
  */
 
 public class LobTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LobTest.java#8 $ by $Author: jorris $, $DateTime: 2002/08/15 14:01:26 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LobTest.java#9 $ by $Author: jorris $, $DateTime: 2002/08/22 10:38:41 $";
 
     private Logger s_cat =
         Logger.getLogger(LobTest.class);
@@ -318,8 +318,7 @@ public class LobTest extends PersistenceTestCase {
             }
             String testString = new String(testBytes);
 
-            Connection conn = getSession().getTransactionContext()
-                .getConnection();
+            Connection conn = getSession().getConnection();
 
             if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
                 executePostgresUpdate(conn, testString);

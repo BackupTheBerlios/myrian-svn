@@ -27,12 +27,12 @@ import java.lang.reflect.Constructor;
  * Company:     ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/08/22 $
  */
 
 public class GenericDataObjectFactory {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObjectFactory.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObjectFactory.java#4 $ by $Author: jorris $, $DateTime: 2002/08/22 10:38:41 $";
 
 
     /**
@@ -62,7 +62,7 @@ public class GenericDataObjectFactory {
             result.setObjectType(type);
             result.setNew(isNew);
             result.setSession(session);
-            session.addDataObject(result);
+            SessionManager.getInternalSession().addDataObject(result);
 
             return result;
         } catch (Exception e) {

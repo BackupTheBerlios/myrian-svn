@@ -31,11 +31,11 @@ import org.apache.log4j.Logger;
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
  * @since 4.5
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#4 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#5 $
  */
 public class DataOperation extends AbstractDataOperation {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#5 $ by $Author: jorris $, $DateTime: 2002/08/22 10:38:41 $";
 
     private Session m_session;
     private DataOperationType m_type;
@@ -54,7 +54,7 @@ public class DataOperation extends AbstractDataOperation {
      *             the "set" methods are also protected.
      * @param session the session to get a connection from
      */
-    public DataOperation(Session session, DataOperationType type) {
+    DataOperation(Session session, DataOperationType type) {
         m_session = session;
         m_type = type;
     }
@@ -68,7 +68,7 @@ public class DataOperation extends AbstractDataOperation {
      * only available for the last one.
      */
     public void execute() {
-        DataStore dataStore = m_session.getDataStore();
+        DataStore dataStore = SessionManager.getInternalSession().getDataStore();
         for (Iterator it = m_type.getEvent().getOperations(); it.hasNext(); ) {
             Operation op = (Operation) it.next();
             variables = new ArrayList();

@@ -20,12 +20,12 @@ package com.arsdigita.persistence;
  * FilterFactoryImpl actually hands out the requested filters
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/08/22 $
  */
 
 class FilterFactoryImpl implements FilterFactory {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterFactoryImpl.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterFactoryImpl.java#4 $ by $Author: jorris $, $DateTime: 2002/08/22 10:38:41 $";
 
 
     /**
@@ -258,7 +258,7 @@ class FilterFactoryImpl implements FilterFactory {
     public Filter compare(String expressionOne, int comparator,
                           String expressionTwo) {
         String stringComparator = null;
-        SQLUtilities util = SessionManager.getSession().getSQLUtilities();
+        SQLUtilities util = SessionManager.getSQLUtilities();
         boolean notEqualsValue = false;
 
         switch (comparator) {

@@ -28,17 +28,19 @@ import org.apache.log4j.Logger;
  *
  * @see Initializer
  * @author Archit Shah (ashah@arsdigita.com)
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/08/22 $
  */
 
 public class SessionManager {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SessionManager.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SessionManager.java#5 $ by $Author: jorris $, $DateTime: 2002/08/22 10:38:41 $";
 
     private static String s_url = null;           // the jdbc URL
     private static String s_username = null;      // the database username
     private static String s_password = null;      // the database password
     private static ThreadLocal s_session;  // the session
+    private static SQLUtilities s_sqlUtil;
+    private static SessionFactory s_factory;
 
     private static final Logger s_cat =
         Logger.getLogger(SessionManager.class.getName());
@@ -65,8 +67,11 @@ public class SessionManager {
         return (Session) s_session.get();
     }
 
+    static InternalSession getInternalSession() {
+        return (InternalSession) s_session.get();
+    }
 
-    /**
+     /**
      *  This sets the connection info for this session manager
      *
      *  @param schema The schema to use.  Right now, Session only
@@ -85,6 +90,9 @@ public class SessionManager {
         s_password = password;
     }
 
+    static synchronized void setSessionFactory(SessionFactory factory) {
+        s_factory = factory;
+    }
 
     /**
      *  This resets the connection info by "forgetting" the schema, url,
@@ -111,10 +119,28 @@ public class SessionManager {
                                                         "not been initialized: " +
                                                         sb.toString());
                     }
-                    Session s = new Session(getMetadataRoot());
-                    s.setSchemaConnectionInfo("", s_url, s_username, s_password);
+                    Session s = s_factory.newSession("", s_url, s_username, s_password);
+                    //s.setSchemaConnectionInfo("", s_url, s_username, s_password);
                     return s;
                 }
             };
     }
+
+    /**
+     *  <b><font color="red">Experimental</font></b> - This retrieves the
+     *  factory that is used to create the filters for this DataQuery.
+     */
+    public static SQLUtilities getSQLUtilities() {
+        return s_sqlUtil;
+    }
+
+
+    /**
+       *  This sets the SQLUtilities for the system.
+       */
+    public static void setSQLUtilities(SQLUtilities util) {
+          s_sqlUtil = util;
+    }
+
+
 }

@@ -63,7 +63,7 @@ import org.apache.log4j.Logger;
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@arsdigita.com">randyg@arsdigita.com</a>
  * @author <a href="mailto:deison@arsdigita.com">deison@arsdigita.com</a>
- * @version $Revision: #10 $ $Date: 2002/08/14 $
+ * @version $Revision: #11 $ $Date: 2002/08/22 $
  */
 // NOTE if we ever support anything other than forward-only,
 // we'll need to shut off the auto-closing functionality
@@ -71,7 +71,7 @@ import org.apache.log4j.Logger;
 // results and general confusion.
 class DataQueryImpl extends AbstractDataOperation implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#10 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#11 $ by $Author: jorris $, $DateTime: 2002/08/22 10:38:41 $";
 
     private static final Logger log =
         Logger.getLogger(DataQueryImpl.class);
@@ -521,8 +521,7 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
     }
 
     private void populate() {
-        SessionManager.getSession().getDataStore().populate(m_data, m_op,
-                                                            m_rs);
+        getDataStore().populate(m_data, m_op, m_rs);
     }
 
 
@@ -991,8 +990,7 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
         }
 
         Operation operation = processOperation(count);
-        ResultSet rs = SessionManager.getSession().getDataStore()
-            .fireOperation(operation, m_source);
+        ResultSet rs = getDataStore().fireOperation(operation, m_source);
         if (rs == null) {
             throw new PersistenceException
                 ("Error executing query: Result Set is Null. " +
@@ -1382,4 +1380,7 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
         return Arrays.asList(array).toString();
     }
 
+    private final DataStore getDataStore() {
+        return SessionManager.getInternalSession().getDataStore();
+    }
 }
