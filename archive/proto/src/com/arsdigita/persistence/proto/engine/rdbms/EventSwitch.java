@@ -12,12 +12,12 @@ import java.util.*;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #21 $ $Date: 2003/04/02 $
+ * @version $Revision: #22 $ $Date: 2003/04/04 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#21 $ by $Author: rhs $, $DateTime: 2003/04/02 15:54:27 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#22 $ by $Author: rhs $, $DateTime: 2003/04/04 09:30:02 $";
 
     private static final Logger LOG = Logger.getLogger(EventSwitch.class);
 
@@ -384,11 +384,12 @@ class EventSwitch extends Event.Switch {
         set(toEnv, prop.getType(), to, null);
 
         Path path = Path.get(prop.getName());
-        Environment env = new SpliceEnvironment(fromEnv, path, toEnv);
+        Environment env = new SpliceEnvironment
+	    (fromEnv, Path.get(":" + path.getPath()), toEnv);
         Role role = (Role) prop;
         if (role.isReversable()) {
             env = new SpliceEnvironment
-                (env, Path.get(role.getReverse().getName()), fromEnv);
+                (env, Path.get(":" + role.getReverse().getName()), fromEnv);
         }
 
         for (Iterator it = blocks.iterator(); it.hasNext(); ) {
@@ -401,7 +402,7 @@ class EventSwitch extends Event.Switch {
     private void set(Environment env, ObjectType type, Object obj,
                      Path path) {
         if (!type.hasKey()) {
-            env.set(path, obj);
+            env.set(Path.get(":" + path.getPath()), obj);
             return;
         }
 

@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #53 $ $Date: 2003/04/02 $
+ * @version $Revision: #54 $ $Date: 2003/04/04 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#53 $ by $Author: ashah $, $DateTime: 2003/04/02 17:08:07 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#54 $ by $Author: rhs $, $DateTime: 2003/04/04 09:30:02 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -374,8 +374,8 @@ public class Session {
             if (LOG.isInfoEnabled()) {
                 LOG.info("nulled not null property datas: " + m_violations);
             }
-            throw new ProtoException("all events not flushed for: " + obj,
-                                     false);
+            throw new FlushException("all events not flushed for obj: " + obj +
+				     "\nviolations: " + m_violations);
         }
     }
 

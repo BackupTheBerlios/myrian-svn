@@ -9,12 +9,12 @@ import java.util.*;
  * PropertyEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #14 $ $Date: 2003/04/01 $
+ * @version $Revision: #15 $ $Date: 2003/04/04 $
  **/
 
 public abstract class PropertyEvent extends Event {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyEvent.java#14 $ by $Author: ashah $, $DateTime: 2003/04/01 18:05:32 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyEvent.java#15 $ by $Author: rhs $, $DateTime: 2003/04/04 09:30:02 $";
 
     final private Property m_prop;
     final private Object m_arg;
@@ -36,7 +36,7 @@ public abstract class PropertyEvent extends Event {
             ObjectType expected = prop.getType();
             ObjectType actual = getSession().getObjectType(arg);
             if (!actual.isSubtypeOf(expected)) {
-                throw new TypeException();
+                throw new TypeException(ProtoException.VALUE);
             }
         }
 

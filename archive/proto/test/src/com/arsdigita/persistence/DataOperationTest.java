@@ -29,11 +29,11 @@ import com.arsdigita.db.DbHelper;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/04/04 $
  */
 public class DataOperationTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/DataOperationTest.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/DataOperationTest.java#2 $ by $Author: rhs $, $DateTime: 2003/04/04 09:30:02 $";
 
     public DataOperationTest(String name) {
         super(name);
@@ -118,11 +118,7 @@ public class DataOperationTest extends PersistenceTestCase {
         query.setParameter("priority", new BigDecimal(29999));
         query.setParameter("description", "wrote");
 
-        try {
-            assertTrue(query.size() == 0);
-        } catch (PersistenceException e) {
-            // this is the correct behavior
-        }
+	assertTrue(query.size() == 0);
 
 
         // this should succeed
@@ -133,7 +129,8 @@ public class DataOperationTest extends PersistenceTestCase {
         query.setParameter("priority", new BigDecimal(29999));
 
         try {
-            assertTrue(query.size() > 0);
+            query.size();
+	    fail("should have generated an unbound variable exception");
         } catch (PersistenceException e) {
             // this is the correct behavior
         }

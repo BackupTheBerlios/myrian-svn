@@ -16,6 +16,7 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.proto.common.*;
+import com.arsdigita.persistence.proto.engine.rdbms.*;
 import com.arsdigita.persistence.proto.metadata.SQLBlock;
 import java.util.*;
 import org.apache.log4j.Logger;
@@ -27,11 +28,11 @@ import org.apache.log4j.Logger;
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
  * @since 4.5
- * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/DataOperation.java#4 $
+ * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/DataOperation.java#5 $
  */
 public class DataOperation {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataOperation.java#4 $ by $Author: rhs $, $DateTime: 2003/03/14 15:06:51 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataOperation.java#5 $ by $Author: rhs $, $DateTime: 2003/04/04 09:30:02 $";
 
     private static final Logger s_cat =
         Logger.getLogger(DataOperation.class);
@@ -62,7 +63,11 @@ public class DataOperation {
      * only available for the last one.
      */
     public void execute() {
-        m_session.getEngine().execute(m_sql, m_parameters);
+	try {
+	    m_session.getEngine().execute(m_sql, m_parameters);
+	} catch (UnboundParameterException e) {
+	    throw new PersistenceException(e);
+	}
     }
 
 
@@ -103,7 +108,7 @@ public class DataOperation {
      * @param value The value to assign to the parameter
      */
     public void setParameter(String parameterName, Object value) {
-        m_parameters.put(Path.get(parameterName), value);
+        m_parameters.put(Path.get(":" + parameterName), value);
     }
 
 
@@ -117,7 +122,7 @@ public class DataOperation {
      * has not yet been set.
      */
     public Object getParameter(String parameterName) {
-        return m_parameters.get(Path.get(parameterName));
+        return m_parameters.get(Path.get(":" + parameterName));
     }
 
     public String toString() {

@@ -9,7 +9,25 @@ package com.arsdigita.persistence.proto;
  * UncheckedWrapperExceptions so that they will not be caught as persistence
  * exceptions.
  **/
-public class ProtoException extends RuntimeException {
+public abstract class ProtoException extends RuntimeException {
+
+    public static class Role {
+
+	private String m_name;
+
+	Role(String name) {
+	    m_name = name;
+	}
+
+	public String toString() {
+	    return m_name;
+	}
+
+    }
+
+    public static final Role OBJECT = new Role("object");
+    public static final Role PROPERTY = new Role("property");
+    public static final Role VALUE = new Role("value");
 
     // internal or external exception
     private boolean m_internal = true;

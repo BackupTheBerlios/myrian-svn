@@ -1,8 +1,22 @@
 package com.arsdigita.persistence.proto;
 
+/**
+ * TypeException
+ *
+ * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
+ * @version $Revision: #2 $ $Date: 2003/04/04 $
+ **/
+
 public class TypeException extends ProtoException {
 
-    TypeException() { super(); }
+    private Role m_role;
 
-    TypeException(String msg) { super(msg); }
+    TypeException(Role role) {
+	m_role = role;
+    }
+
+    public Role getRole() {
+	return m_role;
+    }
+
 }

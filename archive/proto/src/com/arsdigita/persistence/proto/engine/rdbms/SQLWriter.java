@@ -11,12 +11,12 @@ import java.sql.*;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2003/03/31 $
+ * @version $Revision: #11 $ $Date: 2003/04/04 $
  **/
 
 abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#10 $ by $Author: rhs $, $DateTime: 2003/03/31 10:58:30 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#11 $ by $Author: rhs $, $DateTime: 2003/04/04 09:30:02 $";
 
     private Operation m_op = null;
     private StringBuffer m_sql = new StringBuffer();
@@ -64,8 +64,7 @@ abstract class SQLWriter {
 
         if (m_op.isParameter(path)) {
 	    if (!m_op.contains(path)) {
-		throw new IllegalStateException
-		    ("unbound variable: " + path);
+		throw new UnboundParameterException(path);
 	    }
             Object value = m_op.get(path);
             if (value instanceof Collection) {
@@ -347,7 +346,9 @@ class ANSIWriter extends SQLWriter {
 
     public void write(StaticJoin join) {
         write("(");
-        write(join.getStaticOperation());
+        // XXX: this is a hack, for binding to work properly we need to call
+        // the Operation version of write.
+        write((Operation) join.getStaticOperation());
         write(") as ");
         write(join.getAlias());
     }

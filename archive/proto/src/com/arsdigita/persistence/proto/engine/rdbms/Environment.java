@@ -8,12 +8,12 @@ import java.util.*;
  * Environment
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/03/31 $
+ * @version $Revision: #5 $ $Date: 2003/04/04 $
  **/
 
 class Environment {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Environment.java#4 $ by $Author: rhs $, $DateTime: 2003/03/31 10:58:30 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Environment.java#5 $ by $Author: rhs $, $DateTime: 2003/04/04 09:30:02 $";
 
     private HashMap m_values = new HashMap();
 
@@ -47,9 +47,13 @@ class SpliceEnvironment extends Environment {
         m_splice = splice;
     }
 
+    private Path unsplice(Path path) {
+	return Path.get(":" + m_path.getRelative(path).getPath());
+    }
+
     public boolean contains(Path path) {
         if (m_path.isAncestor(path)) {
-            return m_splice.contains(m_path.getRelative(path));
+            return m_splice.contains(unsplice(path));
         } else {
             return m_base.contains(path);
         }
@@ -57,7 +61,7 @@ class SpliceEnvironment extends Environment {
 
     public void set(Path parameter, Object value) {
         if (m_path.isAncestor(parameter)) {
-	    m_splice.set(m_path.getRelative(parameter), value);
+	    m_splice.set(unsplice(parameter), value);
 	} else {
 	    m_base.set(parameter, value);
 	}
@@ -65,7 +69,7 @@ class SpliceEnvironment extends Environment {
 
     public Object get(Path parameter) {
         if (m_path.isAncestor(parameter)) {
-            return m_splice.get(m_path.getRelative(parameter));
+            return m_splice.get(unsplice(parameter));
         } else {
             return m_base.get(parameter);
         }

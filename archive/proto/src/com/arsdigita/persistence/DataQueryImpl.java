@@ -2,6 +2,7 @@ package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.*;
 import com.arsdigita.persistence.proto.common.Path;
+import com.arsdigita.persistence.proto.engine.rdbms.UnboundParameterException;
 import com.arsdigita.persistence.proto.PersistentCollection;
 import com.arsdigita.persistence.proto.DataSet;
 import com.arsdigita.persistence.proto.Cursor;
@@ -18,12 +19,12 @@ import java.util.*;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #15 $ $Date: 2003/03/31 $
+ * @version $Revision: #16 $ $Date: 2003/04/04 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#15 $ by $Author: rhs $, $DateTime: 2003/03/31 10:58:30 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#16 $ by $Author: rhs $, $DateTime: 2003/04/04 09:30:02 $";
 
     private static final FilterFactory FACTORY = new FilterFactoryImpl();
 
@@ -68,7 +69,11 @@ class DataQueryImpl implements DataQuery {
     }
 
     public boolean isEmpty() {
-        return m_pssn.retrieve(makeQuery()).getDataSet().isEmpty();
+	try {
+	    return m_pssn.retrieve(makeQuery()).getDataSet().isEmpty();
+	} catch (UnboundParameterException e) {
+	    throw new PersistenceException(e);
+	}
     }
 
 
@@ -292,12 +297,12 @@ class DataQueryImpl implements DataQuery {
 
 
     public void setParameter(String parameterName, Object value) {
-	m_bindings.put(parameterName, value);
+	m_bindings.put(":" + parameterName, value);
     }
 
 
     public Object getParameter(String parameterName) {
-	return m_bindings.get(parameterName);
+	return m_bindings.get(":" + parameterName);
     }
 
 
@@ -383,7 +388,14 @@ class DataQueryImpl implements DataQuery {
 	    q = new Query(m_query, new PassthroughFilter(conditions));
 	}
 
-	m_bindings.putAll(m_filter.getBindings());
+	Map filterBindings = m_filter.getBindings();
+	for (Iterator it = filterBindings.entrySet().iterator();
+	     it.hasNext(); ) {
+	    Map.Entry me = (Map.Entry) it.next();
+	    String key = (String) me.getKey();
+	    setParameter(key, me.getValue());
+	}
+
 	for (Iterator it = m_bindings.entrySet().iterator(); it.hasNext(); ) {
 	    Map.Entry me = (Map.Entry) it.next();
 	    String key = (String) me.getKey();
@@ -395,7 +407,12 @@ class DataQueryImpl implements DataQuery {
 
     private void checkCursor() {
         if (m_cursor == null) {
-            m_cursor = m_pssn.retrieve(makeQuery()).getDataSet().getCursor();
+	    try {
+		m_cursor = m_pssn.retrieve(makeQuery())
+		    .getDataSet().getCursor();
+	    } catch (UnboundParameterException e) {
+		throw new PersistenceException(e);
+	    }
         }
     }
 
@@ -421,7 +438,11 @@ class DataQueryImpl implements DataQuery {
     }
 
     public long size() {
-        return m_pssn.retrieve(makeQuery()).getDataSet().size();
+	try {
+	    return m_pssn.retrieve(makeQuery()).getDataSet().size();
+	} catch (UnboundParameterException e) {
+	    throw new PersistenceException(e);
+	}
     }
 
 }

@@ -13,12 +13,12 @@ import java.io.*;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #19 $ $Date: 2003/03/31 $
+ * @version $Revision: #20 $ $Date: 2003/04/04 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#19 $ by $Author: rhs $, $DateTime: 2003/03/31 10:58:30 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#20 $ by $Author: rhs $, $DateTime: 2003/04/04 09:30:02 $";
 
     private static final HashMap SOURCES = new HashMap();
     private static final HashMap BLOCKS = new HashMap();
@@ -146,7 +146,8 @@ class QGen {
 		} else {
 		    alias = Path.get(src.getPath() + "__static");
 		}
-                j = new StaticJoin(new StaticOperation(block, env), alias);
+                j = new StaticJoin(new StaticOperation(block, env, false),
+				   alias);
             } else {
                 ObjectMap map =
                     Root.getRoot().getObjectMap(src.getObjectType());
@@ -314,20 +315,38 @@ class QGen {
         return alias;
     }
 
-    private void genPath(final Path path) {
+    private void genPath(Path path) {
+	if (!m_query.getSignature().exists(path)) {
+	    throw new IllegalArgumentException
+		("no such path: " + path);
+	}
+
+	if (!genPathRecursive(path)) {
+	    throw new IllegalStateException
+		("unable to generate sql for path: " + path);
+	}
+    }
+
+    private boolean genPathRecursive(final Path path) {
         Path[] cols = getColumns(path);
         if (cols != null) {
-            return;
+            return true;
         }
 
         Parameter p = m_query.getSignature().getParameter(path);
         if (p != null) {
             setColumns(path, RDBMSEngine.getKeyPaths
                        (p.getObjectType(), p.getPath()));
-            return;
+            return true;
         }
 
-        genPath(path.getParent());
+	if (path == null) {
+	    return false;
+	}
+
+        if (!genPathRecursive(path.getParent())) {
+	    return false;
+	}
 
         Property prop = m_query.getSignature().getProperty(path);
         ObjectMap map = Root.getRoot().getObjectMap(prop.getContainer());
@@ -363,6 +382,8 @@ class QGen {
                         ("no mapping for: " + m.getPath());
                 }
             });
+
+	return true;
     }
 
     private Condition filter(Filter filter) {
