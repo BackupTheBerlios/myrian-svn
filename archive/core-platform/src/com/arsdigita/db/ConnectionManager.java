@@ -26,14 +26,14 @@ import org.apache.log4j.Logger;
  * Central location for obtaining database connection.
  *
  * @author David Dao
- * @version $Revision: #17 $ $Date: 2003/08/19 $
+ * @version $Revision: #18 $ $Date: 2003/08/28 $
  * @since 4.5
  *
  */
 
 public class ConnectionManager {
 
-    public static final String versionId = "$Author: bche $ - $Date: 2003/08/19 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#17 $";
+    public static final String versionId = "$Author: jorris $ - $Date: 2003/08/28 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#18 $";
 
     private static final Logger LOG =
         Logger.getLogger(ConnectionManager.class);
@@ -139,7 +139,7 @@ public class ConnectionManager {
             // possibly overload the listener.
             java.sql.Connection conn = pool.getConnection();
             if (conn != null) {
-                returnConnection(conn);                
+                returnConnection(conn);
             }
         } catch (SQLException e) {
             SQLException wrapped = SQLExceptionHandler.wrap(e);
@@ -336,18 +336,18 @@ public class ConnectionManager {
         return MANAGER.gimmeConnection();
     }
 
-    
+
     static void closeConnections() {
         if (MANAGER != null &&
             MANAGER.m_pool != null) {
             MANAGER.m_pool.closeConnections();
         }
     }
-    
+
     /**
      * Returns a connection to the connection pool.  Anytime code calls getConnection(),
      * it needs to call this method when it is done with the connection
-     * 
+     *
      * @param conn the connection to return
      * @throws java.sql.SQLException
      */
@@ -355,6 +355,7 @@ public class ConnectionManager {
 		throws java.sql.SQLException {
 		if (conn != null) {
 			if (MANAGER != null && MANAGER.m_pool != null) {
+                conn.rollback();
 				MANAGER.m_pool.returnToPool(conn);
 			} else {
 				conn.close();
