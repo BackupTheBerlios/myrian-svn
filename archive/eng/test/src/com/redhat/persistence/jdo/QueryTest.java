@@ -167,4 +167,58 @@ public class QueryTest extends AbstractCase {
         c = (Collection) q.execute();
         assertEquals(1, c.size());
     }
+
+    public void testClose() {
+        Collection c[] = new Collection[2];
+        Query q;
+        Iterator it[][] = new Iterator[c.length][2];
+
+        q = pm().newQuery(Employee.class);
+
+        for (int i = 0; i < c.length; i++) {
+            c[i] = (Collection) q.execute();
+        }
+
+        for (int i = 0; i < c.length; i++) {
+            for (int j = 0; j < it[i].length; j++) {
+                it[i][j] = c[i].iterator();
+                it[i][j].next();
+            }
+        }
+
+        q.close(c[0]);
+
+        for (int j = 0; j < it[0].length; j++) {
+            assertFalse(it[0][j].hasNext());
+            try {
+                it[0][j].next();
+            } catch (NoSuchElementException nsee) {
+                continue;
+            }
+            fail("next succeeded after close");
+        }
+
+        for (int j = 0; j < it[1].length; j++) {
+            assertTrue(it[1][j].hasNext());
+            it[1][j].next();
+        }
+
+        q.close(c[1]);
+
+        for (int j = 0; j < it[0].length; j++) {
+            it[0][j] = c[0].iterator();
+        }
+
+        for (int i = 0; i < c.length; i++) {
+            for (int j = 0; j < it[i].length; j++) {
+                assertFalse(it[i][j].hasNext());
+                try {
+                    it[i][j].next();
+                } catch (NoSuchElementException nsee) {
+                    continue;
+                }
+                fail("next succeeded after close");
+            }
+        }
+    }
 }

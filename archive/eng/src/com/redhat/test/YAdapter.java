@@ -1,6 +1,7 @@
 package com.redhat.test;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashSet;
@@ -134,10 +135,41 @@ public final class YAdapter {
                 return dispatchToExposable(method);
             }
 
-            Object canonicalResult = method.invoke(m_canonical, args);
-            Object testedResult = method.invoke(m_tested, args);
+            Throwable canonicalThrowable = null;
+            Object canonicalResult = null;
+            Throwable testedThrowable = null;
+            Object testedResult = null;
+            try {
+                canonicalResult = method.invoke(m_canonical, args);
+            } catch (InvocationTargetException ite) {
+                canonicalThrowable = ite.getTargetException();
+            }
+            try {
+                testedResult = method.invoke(m_tested, args);
+            } catch (InvocationTargetException ite) {
+                testedThrowable = ite.getTargetException();
+            }
 
-            if (m_adaptableIfaces.contains(method.getReturnType())) {
+            if (canonicalThrowable != null ^ testedThrowable != null) {
+                if (canonicalThrowable == null) {
+                    throw new AssertionFailedError
+                        ("unequal: obj1: " + canonicalResult
+                         + " exc2: " + testedThrowable);
+                } else {
+                    throw new AssertionFailedError
+                        ("unequal: exc1: " + canonicalThrowable
+                         + " obj2: " + testedThrowable);
+                }
+            } else if (canonicalThrowable != null && testedThrowable != null) {
+                if (canonicalThrowable.getClass().equals
+                    (testedThrowable.getClass())) {
+                    throw testedThrowable;
+                } else {
+                    throw new AssertionFailedError
+                        ("unequal: exc1: " + canonicalThrowable
+                         + " exc2: " + testedThrowable);
+                }
+            } else if (m_adaptableIfaces.contains(method.getReturnType())) {
                 YAdapter adapter = new YAdapter(method.getReturnType());
                 adapter.addInterfaces(m_adaptableIfaces);
                 return adapter.newAdapter(canonicalResult, testedResult);

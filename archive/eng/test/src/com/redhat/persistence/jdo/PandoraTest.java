@@ -39,7 +39,7 @@ import org.apache.log4j.Logger;
  * PandoraTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2004/07/13 $
+ * @version $Revision: #11 $ $Date: 2004/08/23 $
  **/
 
 public class PandoraTest extends WithTxnCase {
@@ -258,6 +258,18 @@ public class PandoraTest extends WithTxnCase {
         aux.add("two@asdf.com");
         aux.add("fdsa@asdf.com");
 
+        for (Iterator it = aux.iterator(); it.hasNext(); ) {
+            it.next();
+            if (!it.hasNext()) {
+                try {
+                    it.next();
+                } catch (NoSuchElementException nsme) {
+                    // expected behavior
+                    break;
+                }
+            }
+        }
+
         aux.indexOf("fdsa@asdf.com");
         aux.lastIndexOf("fdsa@asdf.com");
         aux.indexOf("asdf");
@@ -303,6 +315,14 @@ public class PandoraTest extends WithTxnCase {
             it.nextIndex();
             it.previousIndex();
             it.next();
+            if (!it.hasNext()) {
+                try {
+                   it.next();
+                } catch (NoSuchElementException nsme) {
+                    // expected behavior
+                    break;
+                }
+            }
         }
 
         for (int i = 0; i < 10; i++) {
