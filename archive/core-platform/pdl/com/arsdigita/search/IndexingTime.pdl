@@ -37,11 +37,14 @@ object type IndexingTime {
   retrieve {
       do {
 	 select
-            search_indexing.job_number() as job_num
+            search_indexing.job_number() as job_num,
+            search_indexing.get_status() as job_status
          from dual
       } map {
          jobNum = job_num;
+         jobStatus = job_status;
       }
+
       do {
 	 select
             time_queued,
