@@ -1,20 +1,24 @@
 package com.redhat.persistence.oql;
 
+// XXX: dependency on c.a.db.DbHelper
+import com.arsdigita.db.DbHelper;
 import com.redhat.persistence.*;
 import com.redhat.persistence.metadata.*;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
  * Literal
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2004/02/24 $
+ * @version $Revision: #12 $ $Date: 2004/02/26 $
  **/
 
 public class Literal extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Literal.java#11 $ by $Author: rhs $, $DateTime: 2004/02/24 21:30:52 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Literal.java#12 $ by $Author: ashah $, $DateTime: 2004/02/26 13:03:49 $";
 
     private Object m_value;
 
@@ -39,6 +43,26 @@ public class Literal extends Expression {
         return gen.getFrame(this).emit();
     }
 
+    private static DateFormat[] s_dateFormats;
+    static {
+        s_dateFormats = new DateFormat[DbHelper.DB_MAX + 1];
+        for (int i = 0; i < s_dateFormats.length; i++) {
+            switch(i) {
+            case DbHelper.DB_ORACLE:
+                s_dateFormats[i] = new SimpleDateFormat
+                    ("'to_date('" +"''yyyy.MM.dd HH:mm:ss''"
+                     +", '''YYYY.MM.DD HH24:MI:SS''')");
+                break;
+            case DbHelper.DB_POSTGRES:
+                s_dateFormats[i] = new SimpleDateFormat
+                    ("'timestamp' ''yyyy-MM-dd HH:mm:ss''");
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
     private static void convert(Object value, List result, Root root) {
         if (value == null) {
             result.add("null");
@@ -50,6 +74,11 @@ public class Literal extends Expression {
             }
         } else if (value instanceof Number) {
             result.add(value.toString());
+        } else if (value instanceof Date) {
+            DateFormat df = s_dateFormats[DbHelper.getDatabase()];
+            if (df != null) {
+                result.add(df.format((Date) value));
+            }
         } else if (value instanceof Collection) {
             Collection c = (Collection) value;
             StringBuffer sb = new StringBuffer("(");
