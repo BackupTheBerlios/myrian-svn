@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
  * CRPList
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2004/07/21 $
+ * @version $Revision: #11 $ $Date: 2004/07/21 $
  **/
 
 class CRPList implements List {
@@ -24,9 +24,14 @@ class CRPList implements List {
     private final static Integer NOT_FOUND = new Integer(-1);
 
     private Map elements;
+    private transient String m_fieldName;
 
     CRPList() {
         elements = new HashMap();
+    }
+
+    void setFieldName(String fieldName) {
+        m_fieldName = C.concat(fieldName, "$elements$entries");
     }
 
     private PersistenceManagerImpl getPMI() {
@@ -40,7 +45,9 @@ class CRPList implements List {
     private Integer m_indexOf(Object element) {
         Query query = getPMI().newQuery
             ("oql",
-             "limit(sort(filter($1.auxiliaryEmails$elements$entries, value == $2), key), 1)");
+             C.concat("limit(sort(filter($1.",
+                      m_fieldName,
+                      ", value == $2), key), 1)"));
         Collection coll = (Collection) query.execute(elements, element);
         Iterator it = coll.iterator();
         if (it.hasNext()) {
@@ -143,7 +150,9 @@ class CRPList implements List {
         // XXX: there is no syntax for specifying sort order in OQL
         Query query = getPMI().newQuery
             ("oql",
-             "sort(filter($1.auxiliaryEmails$elements$entries, value == $2), key)");
+             C.concat("sort(filter($1.",
+                      m_fieldName,
+                      ", value == $2), key)"));
         Collection coll = (Collection) query.execute(elements, element);
         Iterator it = coll.iterator();
 

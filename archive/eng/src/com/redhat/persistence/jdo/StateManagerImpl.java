@@ -117,7 +117,11 @@ class StateManagerImpl extends AbstractStateManager {
                 } else if (klass.equals(Map.class)) {
                     klass = CRPMap.class;
                 }
+
                 Object obj = m_pmi.newPC(m_pmap, klass, name + "$");
+                if (klass.equals(CRPList.class)) {
+                    ((CRPList) obj).setFieldName(name);
+                }
                 m_components.put(name, obj);
                 return obj;
             }

@@ -13,6 +13,55 @@ import org.apache.log4j.Logger;
 class C {
     private final static Logger s_log = Logger.getLogger(C.class);
 
+
+    // In Java 5.0, this family of concat methods can be replaced with a single
+    // method that uses varargs.
+    public static String concat(Object obj1, Object obj2) {
+        return cat(obj1, obj2).toString();
+    }
+
+    public static String concat(Object obj1, Object obj2, Object obj3) {
+        return cat(obj1, obj2).append(obj3).toString();
+    }
+
+    public static String concat(Object obj1, Object obj2, Object obj3,
+                                Object obj4) {
+
+        return cat(obj1, obj2)
+            .append(String.valueOf(obj3))
+            .append(String.valueOf(obj4))
+            .toString();
+    }
+
+    public static String concat(Object obj1, Object obj2, Object obj3,
+                                Object obj4, Object obj5) {
+
+        return cat(obj1, obj2)
+            .append(String.valueOf(obj3))
+            .append(String.valueOf(obj4))
+            .append(String.valueOf(obj5))
+            .toString();
+    }
+
+    public static String concat(Object obj1, Object obj2, Object obj3,
+                                Object obj4, Object obj5, Object obj6) {
+
+        return cat(obj1, obj2)
+            .append(String.valueOf(obj3))
+            .append(String.valueOf(obj4))
+            .append(String.valueOf(obj5))
+            .append(String.valueOf(obj6))
+            .toString();
+    }
+
+    private static StringBuffer cat(Object obj1, Object obj2) {
+        return new StringBuffer()
+            .append(String.valueOf(obj1))
+            .append(String.valueOf(obj2));
+    }
+
+
+
     /*
      * XXX: This mapping needs to be computed at startup and cached.
      **/
