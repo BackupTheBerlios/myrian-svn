@@ -30,12 +30,12 @@ import java.sql.Types;
  * StringAd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/07/09 $
+ * @version $Revision: #3 $ $Date: 2004/08/19 $
  **/
 
 public class StringAd extends SimpleAdapter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/adapters/StringAd.java#2 $ by $Author: vadim $, $DateTime: 2004/07/09 13:33:10 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/adapters/StringAd.java#3 $ by $Author: bche $, $DateTime: 2004/08/19 16:40:31 $";
 
     public StringAd() {
 	super("global.String", Types.VARCHAR);
@@ -48,8 +48,11 @@ public class StringAd extends SimpleAdapter {
 
     public Object fetch(ResultSet rs, String column) throws SQLException {
         ResultSetMetaData md = rs.getMetaData();
-        if (md.getColumnType(rs.findColumn(column)) == Types.CLOB &&
-            DbHelper.getDatabase(rs) != DbHelper.DB_POSTGRES) {
+        // Performance hack: check the db type first and then
+        // the column type.  The postgresql driver is slow at 
+        // getting the column type
+        if (DbHelper.getDatabase(rs) != DbHelper.DB_POSTGRES && 
+            md.getColumnType(rs.findColumn(column)) == Types.CLOB) {
             Clob clob = rs.getClob(column);
             if (clob == null) {
                 return null;
