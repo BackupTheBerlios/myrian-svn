@@ -1,0 +1,212 @@
+<html>
+<!--
+  Author:  Vadim Nasardinov (vadimn@redhat.com)
+  Since:   2004-08-18
+  Version: $Id: //eng/persistence/dev/doc/connection-management.html#1 $
+-->
+<head>
+    <title>Connection Management</title>
+
+<style type="text/css">
+.notimplemented {
+    background-color: LightGray;
+    text-align: center;
+    color: DimGray;
+    font-style: italic;
+}
+
+.implemented {
+    font-style: italic;
+    color: DimGray;
+    text-align: center;
+    background-color: PaleGreen;
+}
+
+.soon {
+    text-align: center;
+    background-color: LightGoldenrodYellow;
+}
+
+.later {
+    text-align: center;
+    background-color: MistyRose;
+}
+
+
+.axis {
+    background-color: AliceBlue;
+}
+
+.comment {
+    text-align: center;
+    font-style: italic;
+    color: DimGray;
+}
+
+dt {
+    color: DimGray;
+    font-weight: bold;
+}
+
+</style>
+</head>
+<body>
+
+<h1>Connection Management</h1>
+
+<h2>Three axes</h2>
+
+<p>The JDO spec seems slightly incoherent on the subject of connection
+management.  I think this is largely attributable to their unspoken assumption
+that implementors are well familiar with EJB app servers.</p>
+
+<p>As far as I can tell, connection management is classified along the following
+three <em>orthogonal</em> axes.</p>
+
+
+<dl>
+  <dt>Pooled / not pooled.</dt>
+
+  <dd>Whether or not connections are pooled.  The pool can be managed by the
+    application server or by the JDO implementation itself.  In the latter case,
+    the JDO implementation may rely on a third-party library, such as the <a
+    href="http://jakarta.apache.org/commons/dbcp/">Apache DBCP</a> component.
+    The key interface here is <a
+    href="http://java.sun.com/j2ee/sdk_1.3/techdocs/api/javax/sql/DataSource.html">javax.sql.DataSource</a>.
+  </dd>
+
+
+  <dt>Managed / non-managed</dt>
+
+  <dd><p>Whether or not the JDO implementation relies on the app server for
+   transaction demarcation.  See <a href="#kelle">an article by Kevin Kelle</a>
+   for an example of how to use JCA in a non-managed environment.</p>
+
+   <p>If your application calls <a
+     href="http://java.sun.com/j2ee/sdk_1.3/techdocs/api/javax/resource/spi/ManagedConnectionFactory.html#createConnectionFactory%28%29"><code>ManagedConnectionFactory()#createConnectionFactory()</code></a>,
+     then you're running in a non-managed environment, using a default
+     connection manager supplied by the resource adapter.
+   </p>
+
+   <p>A variant of this method that passes a <a
+     href="http://java.sun.com/j2ee/sdk_1.3/techdocs/api/javax/resource/spi/ConnectionManager.html"><code>ConnectionManager</code></a>
+     to <a
+     href="http://java.sun.com/j2ee/sdk_1.3/techdocs/api/javax/resource/spi/ManagedConnectionFactory.html#createConnectionFactory%28javax.resource.spi.ConnectionManager%29">ManagedConnectionFactory#createConnectionFactory(ConnectionManager)</a>
+     would typically be used by an application server.  In this case, you're
+     running in a managed environment.
+   </p>
+  </dd>
+
+  <dt>Distributed / non-distributed</dt>
+
+  <dd>Whether or not the JDO implementation supports distributed transaction processing.
+
+    The cornerstone interface here is
+    <a href="http://java.sun.com/j2ee/sdk_1.3/techdocs/api/javax/transaction/xa/XAResource.html"><code>javax.transaction.xa.XAResource</code></a>
+
+  </dd>
+
+  <dt>JNDI / no JNDI</dt>
+
+  <dd>
+    <p>Whether or not the connection factory or data source is looked by name in
+     a naming service or passed in as an object reference.
+    </p>
+
+    <p>(I think JCA mandates the use of JNDI, at least according to Kelle.)
+    </p>
+  </dd>
+
+</dl>
+
+
+<h2>The Plan</h2>
+
+<div align="center">
+  <table border="1" cellpadding="2" cellspacing="0" width="50%">
+    <tr align="center">
+      <td width="12%">&nbsp;</td>
+      <td width="44%" class="axis">Non-Managed</td>
+      <td width="44%"  colspan="2" class="axis">Managed</td>
+    </tr>
+    <tr>
+       <td style="padding-top: 1em; padding-bottom: 1em" class="axis">Distributed</td>
+       <td class="notimplemented">unsupported</td>
+       <td colspan="2" class="notimplemented">unsupported</td>
+    </tr>
+    <tr>
+       <td style="padding-top: 1em; padding-bottom: 1em" class="axis">Non-distributed</td>
+       <td class="implemented">support javax.sql.DataSource?</td>
+       <td width="22%" class="soon">Native <span class="comment">(coming soon)</span></td>
+       <td width="22%" class="later">Non-native<br><span class="comment">(coming later)</span></td>
+    </tr>
+  </table>
+</div>
+
+<h2>Resources</h2>
+
+<ul>
+  <li><p>Connection Pooling</p>
+    <ul>
+      <li><a href="http://www.jpox.org/docs/faq.html#datasource_pools">JPOX FAQ:
+        Datasource pooling</a></li>
+      <li><a href="http://jakarta.apache.org/commons/dbcp/">Apache DBCP</a></li>
+      <li><a
+        href="http://java.sun.com/j2ee/sdk_1.3/techdocs/api/javax/sql/DataSource.html"><code>javax.sql.DataSource</code></a>
+      </li>
+
+    </ul>
+  </li>
+
+  <li><p>Java Connection Architecture (JCA)</p>
+    <ul>
+      <li><a href="http://java.sun.com/j2ee/connector/index.jsp"><em>2EE
+        Connector Architecture</em></a> (the JCA Spec: <a
+        href="http://java.sun.com/j2ee/connector/download.html">j2ee_connector-1_5-fr-spec.pdf</a>,
+        490 pages!!!)
+      </li>
+      <li><em><a
+        href="http://java.sun.com/developer/technicalArticles/J2EE/connectorclient/resourceadapter.html">The
+        J2EE Connector Architecture's Resource Adapter</a></em> by By Jennifer
+        Rodoni (December 2001)
+      </li>
+      <li><em>Designing Enterprise Applications with the J2EE Platform</em>, <a
+        href="http://java.sun.com/blueprints/guidelines/designing_enterprise_applications_2e/transactions/transactions9.html">8.8
+        J2EE Resource Manager Types</a>.
+      </li>
+      <li><em>J2EE Blueprints</em>, <a
+        href="http://java.sun.com/blueprints/guidelines/designing_enterprise_applications/transaction_management/platform/index.html">8.2
+        J2EE Platform Transactions</a>
+      </li>
+      <li id="kelle"><a
+        href="http://www-106.ibm.com/developerworks/websphere/library/techarticles/0109_kelle/0109_kelle.html"><em>Using
+        J2EE Resource Adapters in a Non-managed Environment</em></a> by Kevin
+        Kelle (6 September 2001)
+      </li>
+      <li><a
+        href="http://e-docs.bea.com/wls/docs70/jconnector/rarguide.html"><em>Writing
+        J2EE Connector Architecture-Compliant Resource Adapters</em></a> by BEA.
+      </li>
+      <li><a
+        href="http://www.oracle.com/technology/tech/java/oc4j/htdocs/how-to-j2c-connector.html"><em>How-To:
+        J2EE Connectors</em></a> by Oracle (12/01/01).
+      </li>
+    </ul>
+  </li>
+
+  <li><p>Distributed Transaction Processing (DTP)</p>
+
+    <ul>
+      <li><a href="http://java.sun.com/j2ee/sdk_1.3/techdocs/api/javax/transaction/xa/XAResource.html"><code>javax.transaction.xa.XAResource</code></a>
+      </li>
+
+      <li><a
+        href="http://www.opengroup.org/public/pubs/catalog/c193.htm"><em>Distributed
+        TP: The XA Specification</em></a> by Open Group (Feb 1992).
+      </li>
+    </ul>
+  </li>
+</ul>
+
+</body>
+</html>
