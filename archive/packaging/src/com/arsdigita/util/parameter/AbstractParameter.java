@@ -24,13 +24,13 @@ import org.apache.commons.beanutils.converters.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#9 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#10 $
  */
 public abstract class AbstractParameter implements Parameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#9 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#10 $" +
         "$Author: rhs $" +
-        "$DateTime: 2003/10/17 15:34:34 $";
+        "$DateTime: 2003/10/17 15:40:04 $";
 
     private final String m_name;
     private final Class m_type;
@@ -90,7 +90,7 @@ public abstract class AbstractParameter implements Parameter {
         final String string = reader.read(this, errors);
 
         if (string == null) {
-            return getDefaultValue();
+            return null;
         } else {
             return unmarshal(string, errors);
         }
