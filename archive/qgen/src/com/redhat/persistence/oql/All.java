@@ -8,12 +8,12 @@ import java.util.*;
  * All
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/02/25 $
+ * @version $Revision: #9 $ $Date: 2004/03/03 $
  **/
 
 public class All extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/All.java#8 $ by $Author: rhs $, $DateTime: 2004/02/25 09:07:03 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/All.java#9 $ by $Author: ashah $, $DateTime: 2004/03/03 17:26:17 $";
 
     private String m_type;
     private Map m_bindings;
@@ -34,7 +34,7 @@ public class All extends Expression {
     }
 
     void frame(Generator gen) {
-        ObjectType type = gen.getType(m_type);
+        final ObjectType type = gen.getType(m_type);
         ObjectMap map = type.getRoot().getObjectMap(type);
         SQLBlock block = map.getRetrieveAll();
         String[] columns = Code.columns(type, null);
@@ -45,13 +45,16 @@ public class All extends Expression {
             frame.setValues(columns);
         } else if (m_substitute) {
             Static all = new Static
-                (block.getSQL(), null, null, false, m_bindings);
+                (block.getSQL(), null, false, m_bindings);
             all.frame(gen);
             gen.setSubstitute(this, all);
         } else {
             QFrame frame = gen.frame(this, type);
             Static all = new Static
-                (block.getSQL(), m_type, columns, false, m_bindings);
+                (block.getSQL(), columns, false, m_bindings) {
+                protected ObjectType getType() { return type; }
+                protected boolean hasType() { return true; }
+            };
             all.frame(gen);
             QFrame child = gen.getFrame(all);
             frame.addChild(child);

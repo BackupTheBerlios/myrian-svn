@@ -13,15 +13,14 @@ import java.util.*;
  * Static
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2004/02/25 $
+ * @version $Revision: #10 $ $Date: 2004/03/03 $
  **/
 
 public class Static extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Static.java#9 $ by $Author: rhs $, $DateTime: 2004/02/25 09:07:03 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Static.java#10 $ by $Author: ashah $, $DateTime: 2004/03/03 17:26:17 $";
 
     private SQL m_sql;
-    private String m_type;
     private String[] m_columns;
     private boolean m_map;
     private Map m_bindings;
@@ -55,12 +54,11 @@ public class Static extends Expression {
     }
 
     public Static(String sql, Map bindings) {
-        this(parse(sql), null, null, true, bindings);
+        this(parse(sql), null, true, bindings);
     }
 
-    Static(SQL sql, String type, String[] columns, boolean map, Map bindings) {
+    public Static(SQL sql, String[] columns, boolean map, Map bindings) {
         m_sql = sql;
-        m_type = type;
         m_columns = columns;
         m_map = map;
         m_bindings = bindings;
@@ -148,14 +146,18 @@ public class Static extends Expression {
         return size;
     }
 
+    protected ObjectType getType() { return null; }
+    protected boolean hasType() { return false; }
+
     void frame(Generator gen) {
         for (Iterator it = m_expressions.iterator(); it.hasNext(); ) {
             Expression e = (Expression) it.next();
             e.frame(gen);
             gen.addUses(this, gen.getUses(e));
         }
-        if (m_type != null) {
-            QFrame frame = gen.frame(this, gen.getType(m_type));
+        if (hasType()) {
+            ObjectType type = getType();
+            QFrame frame = gen.frame(this, type);
             frame.setValues(m_columns);
             frame.setTable(this);
         } else if (m_expressions.size() == 1 && size(m_sql) == 1) {
@@ -170,13 +172,13 @@ public class Static extends Expression {
     }
 
     String emit(Generator gen) {
-        if (m_type == null && gen.hasFrame(this)) {
+        if (!hasType() && gen.hasFrame(this)) {
             return gen.getFrame(this).emit();
         }
 
         StringBuffer buf = new StringBuffer();
         int index = 0;
-        if (m_type != null) { buf.append("("); }
+        if (hasType()) { buf.append("("); }
         for (SQLToken t = m_sql.getFirst(); t != null; t = t.getNext()) {
             if (isExpression(t)) {
                 Expression e = (Expression) m_expressions.get(index++);
@@ -189,7 +191,7 @@ public class Static extends Expression {
                 buf.append(t.getImage());
             }
         }
-        if (m_type != null) { buf.append(")"); }
+        if (hasType()) { buf.append(")"); }
         return buf.toString();
     }
 
