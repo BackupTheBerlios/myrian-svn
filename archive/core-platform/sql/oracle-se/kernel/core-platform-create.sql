@@ -19,7 +19,7 @@
 --
 -- @author Bryan Quinn (bquinn@arsdigita.com) 
 -- @creation-date May 16, 2001 20:16:43
--- @version $Id: //core-platform/dev/sql/oracle-se/kernel/core-platform-create.sql#2 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/kernel/core-platform-create.sql#3 $
 --
 
 @@ ../globalization/g11n-create.sql
@@ -42,5 +42,4 @@
 @@ ../workflow/workflow-create.sql
 @@ ../formbuilder/formbuilder-create.sql
 @@ ../addresses/us-addresses-create.sql
-@@ ../../../../cms/sql/oracle-se/content-section/cms-create.sql
 @@ ../persistence/persistence-create.sql
