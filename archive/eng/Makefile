@@ -17,15 +17,19 @@ ifndef JJTREE
 JJTREE=sh javacc-3.2/bin/jjtree
 endif
 
+ifndef JAVAC_OPTS
+JAVAC_OPTS=-g
+endif
+
 SOURCES:=src test/src cap/src cap/test/src
-###SOURCES:=src test/src cap/src cap/test/src \
-###	tck/src tck/datastore/tests tck/application-identity/tests
+LIBS:=lib
 
 CONF   := conf
 
 SOURCEPATH:=$(subst $(space),:,$(SOURCES:%=$(BUILD)/%))
 
-CLASSPATH:=$(CLASSPATH):$(subst $(space),:,$(wildcard lib/*.jar))
+LIB_JARS:=$(foreach dir,$(LIBS),$(wildcard $(dir)/*.jar))
+CLASSPATH:=$(CLASSPATH):$(subst $(space),:,$(LIB_JARS))
 ###CLASSPATH:=$(CLASSPATH):jdori/jdori.jar:jdori/jdori-enhancer.jar
 CLASSPATH:=$(CLASSPATH):$(subst $(space),:,$(wildcard lib/*.zip))
 CLASSPATH:=$(CLASSPATH):$(SOURCEPATH):$(CONF)
@@ -83,7 +87,7 @@ $(BUILD)/%.jmake: %
 	@echo "	@mkdir -p \$$(BUILD)/$<" >> $@
 # javac
 	@echo "	@echo building $<" >> $@
-	@echo -n "	@javac -classpath \$$(CLASSPATH)" >> $@
+	@echo -n "	@javac \$$(JAVAC_OPTS) -classpath \$$(CLASSPATH)" >> $@
 	@echo -n " -sourcepath \$$(SOURCEPATH) -d \$$(BUILD)/$< " >> $@
 	@echo "\$$(filter %.java,\$$(JDO_MODIFIED))" >> $@
 # JDO enhancer
