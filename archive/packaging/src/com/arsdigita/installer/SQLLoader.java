@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
  * SQLLoader
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/09/26 $
+ * @version $Revision: #4 $ $Date: 2003/09/28 $
  **/
 
 public abstract class SQLLoader {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/installer/SQLLoader.java#3 $ by $Author: rhs $, $DateTime: 2003/09/26 15:07:47 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/installer/SQLLoader.java#4 $ by $Author: justin $, $DateTime: 2003/09/28 23:15:43 $";
 
     private static final Logger s_log = Logger.getLogger(SQLLoader.class);
 
@@ -43,6 +43,10 @@ public abstract class SQLLoader {
 
     private void load(final Statement stmt, final String base,
                       final String name) {
+	if (s_log.isInfoEnabled()) {
+	    s_log.info("Loading " + name + " using base " + base);
+	}
+
         try {
             Reader reader = open(name);
             if (reader == null) {
@@ -86,8 +90,8 @@ public abstract class SQLLoader {
     }
 
     private void include(Statement stmt, String base, String included) {
-        if (s_log.isInfoEnabled()) {
-            s_log.info("Resolving include: '" + included + "'");
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("Resolving include: '" + included + "'");
         }
 
         String front = parent(base);
@@ -104,22 +108,22 @@ public abstract class SQLLoader {
             resolved = front + "/" + back;
         }
 
-        if (s_log.isInfoEnabled()) {
-            s_log.info("Recursively including: '" + resolved + "'");
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("Recursively including: '" + resolved + "'");
         }
 
         load(stmt, base, resolved);
     }
 
     private void execute(Statement stmt, String sql) {
-        if (s_log.isInfoEnabled()) {
-            s_log.info(sql);
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("Executing SQL " + sql);
         }
 
         try {
             int rowsAffected = stmt.executeUpdate(sql);
-            if (s_log.isInfoEnabled()) {
-                s_log.info("  " + rowsAffected + " row(s) affected");
+            if (s_log.isDebugEnabled()) {
+                s_log.debug("  " + rowsAffected + " row(s) affected");
             }
         } catch (SQLException e) {
             throw new UncheckedWrapperException(sql, e);
