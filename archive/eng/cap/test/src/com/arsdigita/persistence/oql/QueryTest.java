@@ -20,6 +20,7 @@ import com.redhat.persistence.common.*;
 import com.redhat.persistence.oql.*;
 import com.redhat.persistence.metadata.*;
 import com.redhat.persistence.engine.rdbms.*;
+import com.redhat.persistence.Session;
 import com.arsdigita.util.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -30,12 +31,12 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/18 $
  **/
 
 public class QueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/oql/QueryTest.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/oql/QueryTest.java#2 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
     private static final Logger s_log =
         Logger.getLogger(QueryTest.class);
@@ -61,9 +62,9 @@ public class QueryTest extends PersistenceTestCase {
     }
 
     private void doTest(String name, Signature sig, Expression expr) {
-        Query query = sig.makeQuery(expr);
-        String sql =
-            query.generate(getSession().getMetadataRoot().getRoot()).getSQL();
+        Session ssn = getProtoSession();
+        Query query = sig.makeQuery(ssn, expr);
+        String sql = query.generate(ssn).getSQL();
 
         // XXX need to test db specific syntaxes
 

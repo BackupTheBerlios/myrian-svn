@@ -18,6 +18,7 @@ import com.redhat.persistence.common.Path;
 import com.redhat.persistence.metadata.Adapter;
 import com.redhat.persistence.metadata.Alias;
 import com.redhat.persistence.metadata.Link;
+import com.redhat.persistence.metadata.Mapping;
 import com.redhat.persistence.metadata.MetadataException;
 import com.redhat.persistence.metadata.ObjectMap;
 import com.redhat.persistence.metadata.ObjectType;
@@ -50,12 +51,12 @@ import org.apache.commons.collections.map.ReferenceIdentityMap;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #13 $ $Date: 2004/08/09 $
+ * @version $Revision: #14 $ $Date: 2004/08/18 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#13 $ by $Author: ashah $, $DateTime: 2004/08/09 14:54:25 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#14 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -229,10 +230,7 @@ public class Session {
     public DataSet getDataSet(Object obj) {
         ObjectType type = getObjectType(obj);
         Signature sig = new Signature(type);
-        Expression objs = new Define(new All(type.getQualifiedName()), "this");
-        Expression filter = new Equals(new Variable("this"), new Literal(obj));
-        Expression expr = new Get(new Filter(objs, filter), "this");
-        // XXX: Expression expr = new Literal(obj);
+        Expression expr = new Literal(obj);
         return new DataSet(this, sig, expr);
     }
 
@@ -540,6 +538,12 @@ public class Session {
 
     Adapter getAdapter(Object obj) {
         return m_root.getAdapter(obj.getClass());
+    }
+
+    public boolean hasObjectMap(Object obj) {
+        ObjectData odata = getObjectData(obj);
+        if (odata == null) { return false; }
+        return odata.getObjectMap() != null;
     }
 
     public ObjectMap getObjectMap(Object obj) {
@@ -1035,7 +1039,10 @@ public class Session {
                 }
             }
 
-            if (prop.getType().isKeyed()) {
+            ObjectMap map = od.getObjectMap();
+            Mapping mapping = map.getMapping(prop);
+
+            if (mapping.isCompound()) {
 		if (values == null) {
 		    load(obj, prop, null);
 		} else {
@@ -1235,10 +1242,15 @@ public class Session {
         } else {
             Class klass = obj.getClass();
             if (String.class.isAssignableFrom(klass)
-                || Number.class.isAssignableFrom(klass)) {
+                || Number.class.isAssignableFrom(klass)
+                || Event.class.isAssignableFrom(klass)
+                || Property.class.isAssignableFrom(klass)
+                || ObjectType.class.isAssignableFrom(klass)
+                || ObjectMap.class.isAssignableFrom(klass)) {
                 return obj.toString();
             } else {
-                return klass + "@" + System.identityHashCode(obj);
+                return klass + "@" +
+                    Integer.toHexString(System.identityHashCode(obj));
             }
         }
     }

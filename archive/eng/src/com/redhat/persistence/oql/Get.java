@@ -27,12 +27,12 @@ import org.apache.log4j.Logger;
  * Get
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/08/05 $
+ * @version $Revision: #4 $ $Date: 2004/08/18 $
  **/
 
 public class Get extends Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Get.java#3 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Get.java#4 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
     private static final Logger s_log = Logger.getLogger(Get.class);
 
@@ -50,7 +50,8 @@ public class Get extends Expression {
         QFrame frame = frame(gen, expr, m_name, this);
         frame.addChild(0, expr);
         Property prop = expr.getType().getProperty(m_name);
-        if (!prop.isCollection()) {
+        // prop is null for container mappings
+        if (prop == null || !prop.isCollection()) {
             List children = frame.getChildren();
             for (int i = 1; i < children.size(); i++) {
                 QFrame child = (QFrame) children.get(i);
@@ -77,52 +78,50 @@ public class Get extends Expression {
 
     static QFrame frame(Generator gen, QFrame expr, String name,
                         Expression result) {
-        ObjectType type = expr.getType();
-        Property prop = type.getProperty(name);
-        if (prop == null) {
-            throw new IllegalStateException
-                ("no such property: " + name + " in " + type);
-        }
         ObjectMap map = expr.getMap();
+        ObjectType type = map.getObjectType();
         Mapping mapping = map.getMapping(Path.get(name));
+        if (mapping == null) {
+            throw new IllegalStateException
+                ("no such mapping '" + name + "' in expression " +
+                 expr.getExpression());
+        }
         QFrame frame = gen.frame(result, mapping.getMap());
 
         // Handle qualii
-        if (prop.getRoot() != null) {
-            if (mapping instanceof Qualias) {
-                Qualias q = (Qualias) mapping;
-                String query = q.getQuery();
-                OQLParser p = (OQLParser) s_parsers.get();
-                p.ReInit(new StringReader(query));
-                // XXX: namespace
-                Expression e;
-                try {
-                    e = p.expression();
-                } catch (ParseException pe) {
-                    throw new IllegalStateException(pe.getMessage());
-                }
-                gen.level++;
-                This ths = new This(expr);
-                ths.frame(gen);
-                gen.push(expr);
-                gen.push(gen.getFrame(ths));
-                try {
-                    e.frame(gen);
-                    QFrame qualias = gen.getFrame(e);
-                    frame.addChild(qualias);
-                    frame.setValues(qualias.getValues());
-                    gen.addUses(result, frame.getValues());
-                    return frame;
-                } finally {
-                    gen.level--;
-                    gen.pop();
-                    gen.pop();
-                }
+        if (mapping instanceof Qualias) {
+            Qualias q = (Qualias) mapping;
+            String query = q.getQuery();
+            OQLParser p = (OQLParser) s_parsers.get();
+            p.ReInit(new StringReader(query));
+            // XXX: namespace
+            Expression e;
+            try {
+                e = p.expression();
+            } catch (ParseException pe) {
+                throw new IllegalStateException(pe.getMessage());
+            }
+            gen.level++;
+            This ths = new This(expr);
+            ths.frame(gen);
+            gen.push(expr);
+            gen.push(gen.getFrame(ths));
+            try {
+                e.frame(gen);
+                QFrame qualias = gen.getFrame(e);
+                frame.addChild(qualias);
+                frame.setValues(qualias.getValues());
+                gen.addUses(result, frame.getValues());
+                return frame;
+            } finally {
+                gen.level--;
+                gen.pop();
+                gen.pop();
             }
         }
 
         if (expr.hasMappings()) {
-            Path path = Path.get(prop.getName());
+            Path path = mapping.getPath();
             for (Iterator it = expr.getMappings().entrySet().iterator();
                  it.hasNext(); ) {
                 Map.Entry me = (Map.Entry) it.next();
@@ -134,15 +133,17 @@ public class Get extends Expression {
             }
         }
 
-        Collection props = Code.properties(prop.getContainer());
-        if (mapping.isNested() && mapping.isCompound()) {
+        Collection keys = map.getKeyMappings();
+        if (mapping.isNested() && mapping.isCompound() &&
+            ((mapping instanceof Static) || mapping instanceof Nested)) {
             frame.setValues(expr.getValues());
-        } else if (!props.contains(prop) || (prop.getRoot() != null &&
-                                             !prop.getContainer().isKeyed())) {
+        } else if (!keys.contains(mapping)) {
             String[] columns = null;
             String table = null;
             if (expr.hasMappings()) {
-                columns = Code.columns(prop, expr);
+                columns = Code.columns
+                    (mapping.getMap().getObjectType(), expr,
+                     mapping.getPath());
             }
             if (columns == null) {
                 columns = Code.columns(mapping, (String) null);
@@ -161,8 +162,8 @@ public class Get extends Expression {
                     (table, columns, mapping.getMap());
                 tall.frame(gen);
                 QFrame tbl = gen.getFrame(tall);
-                PropertyCondition cond =
-                    new PropertyCondition(expr, prop, tbl);
+                MappingCondition cond =
+                    new MappingCondition(expr, mapping, tbl);
                 cond.frame(gen);
                 tbl.setCondition(cond);
                 frame.addChild(tbl);
@@ -170,15 +171,15 @@ public class Get extends Expression {
             }
         } else {
             int lower = 0;
-            for (Iterator it = props.iterator(); it.hasNext(); ) {
-                Property p = (Property) it.next();
-                if (p.equals(prop)) {
+            for (Iterator it = keys.iterator(); it.hasNext(); ) {
+                Mapping m = (Mapping) it.next();
+                if (m.equals(mapping)) {
                     break;
                 }
-                lower += Code.span(p.getType());
+                lower += Code.span(m.getMap());
             }
             List values = expr.getValues();
-            int upper = lower + Code.span(prop.getType());
+            int upper = lower + Code.span(mapping.getMap());
             frame.setValues(values.subList(lower, upper));
         }
 
@@ -187,17 +188,17 @@ public class Get extends Expression {
         return frame;
     }
 
-    private static class PropertyCondition extends Condition {
+    private static class MappingCondition extends Condition {
 
         private QFrame m_expr;
-        private Property m_property;
+        private Mapping m_mapping;
         private QFrame m_frame;
         private This m_this;
         private Key m_key = null;
 
-        PropertyCondition(QFrame expr, Property property, QFrame frame) {
+        MappingCondition(QFrame expr, Mapping mapping, QFrame frame) {
             m_expr = expr;
-            m_property = property;
+            m_mapping = mapping;
             m_frame = frame;
             m_this = new This(m_expr);
             conditions();
@@ -236,40 +237,40 @@ public class Get extends Expression {
         }
 
         private Code emitStatic() {
-            Mapping m = m_expr.getMap().getMapping(m_property);
             List values = m_expr.getValues();
-            String[] from = new String[values.size()];
+            Code[] from = new Code[values.size()];
             for (int i = 0; i < from.length; i++) {
-                from[i] = "" + values.get(i);
+                QValue qv = (QValue) values.get(i);
+                from[i] =  qv.emit();
             }
 
             Path[] paths = Code.paths
-                (m_property.getType(), Path.get(m_property.getName()));
-            String[] cols = Code.columns(paths, m.getRetrieve());
+                (m_mapping.getMap().getObjectType(), m_mapping.getPath());
+            String[] cols = Code.columns(paths, m_mapping.getRetrieve());
             Map bindings = Code.map
-                (Code.paths(m_property.getContainer(), null), from);
-            String[] to = Code.columns(m.getMap(), m_frame.alias());
+                (Code.paths(m_mapping.getObjectMap().getObjectType(), null),
+                 from);
+            String[] to = Code.columns(m_mapping.getMap(), m_frame.alias());
 
-            StringBuffer in = new StringBuffer();
-            in.append("(");
+            Code result = new Code("(");
             for (int i = 0; i < to.length; i++) {
-                in.append(to[i]);
+                result = result.add(to[i]);
                 if (i < to.length - 1) {
-                    in.append(", ");
+                    result = result.add(", ");
                 }
             }
-            in.append(") in (");
-            in(m.getRetrieve().getSQL(), cols, bindings, in);
-            in.append(")");
-            return new Code(in.toString());
+            result = result.add(") in (");
+            result = in(m_mapping.getRetrieve().getSQL(), cols, bindings,
+                        result);
+            result = result.add(")");
+            return result;
         }
 
         static boolean is(SQLToken t, String image) {
             return t.getImage().trim().equalsIgnoreCase(image);
         }
 
-        static void in(SQL sql, String[] columns, Map values,
-                       StringBuffer buf) {
+        static Code in(SQL sql, String[] columns, Map values, Code buf) {
             SQLToken t;
             boolean select = false;
             int depth = 0;
@@ -320,46 +321,46 @@ public class Get extends Expression {
                 }
             }
 
-            buf.append("select ");
+            buf = buf.add("select ");
             for (int i = 0; i < columns.length; i++) {
                 String sel = (String) selections.get(columns[i]);
                 if (sel == null) {
                     if (prefix != null) {
-                        buf.append(prefix);
-                        buf.append(".");
+                        buf = buf.add(prefix).add(".");
                     }
-                    buf.append(columns[i]);
+                    buf = buf.add(columns[i]);
                 } else {
-                    buf.append(sel);
+                    buf = buf.add(sel);
                 }
                 if (i < columns.length - 1) {
-                    buf.append(", ");
+                    buf = buf.add(", ");
                 }
             }
-            buf.append(" ");
+            buf = buf.add(" ");
 
             for (; t != null; t = t.getNext()) {
                 if (t.isBind()) {
                     Path key = Path.get(t.getImage().substring(1));
-                    String value = (String) values.get(key);
+                    Code value = (Code) values.get(key);
                     if (value == null) {
                         throw new IllegalStateException
                             ("no value for: " + key + " in " + values);
                     }
-                    buf.append(value);
+                    buf = buf.add(value);
                 } else {
-                    buf.append(t.getImage());
+                    buf = buf.add(t.getImage());
                 }
             }
+
+            return buf;
         }
 
         private void conditions() {
-            Mapping m = m_expr.getMap().getMapping(m_property);
-            if (m.getRetrieve() != null) {
+            if (m_mapping.getRetrieve() != null) {
                 return;
             }
 
-            m.dispatch(new Mapping.Switch() {
+            m_mapping.dispatch(new Mapping.Switch() {
                 public void onValue(Value v) {
                     conditions(v.getTable().getPrimaryKey());
                 }
@@ -439,6 +440,9 @@ public class Get extends Expression {
             QFrame ths =
                 gen.frame(this, Define.define("this", m_frame.getMap()));
             ths.setValues(m_frame.getValues());
+            Expression expr = m_frame.getExpression();
+            gen.addNulls(this, gen.getNull(expr));
+            gen.addNonNulls(this, gen.getNonNull(expr));
         }
 
         Code emit(Generator gen) {
@@ -451,6 +455,10 @@ public class Get extends Expression {
 
         String summary() {
             return "this";
+        }
+
+        public String toString() {
+            return "this(" + m_frame.getExpression() + ")";
         }
 
     }

@@ -14,6 +14,7 @@
  */
 package com.redhat.persistence.oql;
 
+import com.redhat.persistence.Session;
 import com.redhat.persistence.common.*;
 import com.redhat.persistence.metadata.*;
 import java.util.*;
@@ -25,12 +26,12 @@ import org.apache.log4j.Logger;
  * Generator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/08/05 $
+ * @version $Revision: #4 $ $Date: 2004/08/18 $
  **/
 
 class Generator {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Generator.java#3 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Generator.java#4 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
     private static final Logger s_log = Logger.getLogger(Generator.class);
 
@@ -90,14 +91,22 @@ class Generator {
         }
     }
 
-    private Root m_root;
+    private Session m_ssn;
     private List m_frames;
 
     Generator() {}
 
-    void init(Root root) {
-        m_root = root;
+    void init(Session ssn) {
+        if (m_ssn != null) {
+            throw new IllegalStateException("reentrent query generation");
+        }
+        m_ssn = ssn;
         m_frames = m_framepool.subList(0, 0);
+    }
+
+    void clear() {
+        m_ssn = null;
+        m_frames = null;
 
         m_queries.clear();
         m_stack.clear();
@@ -118,8 +127,12 @@ class Generator {
         level = 0;
     }
 
+    Session getSession() {
+        return m_ssn;
+    }
+
     Root getRoot() {
-        return m_root;
+        return m_ssn.getRoot();
     }
 
     CharList getHash() {
@@ -186,6 +199,14 @@ class Generator {
         appendHash(Integer.toString(System.identityHashCode(type.getRoot())));
         terminal();
         appendHash(type.getQualifiedName());
+        terminal();
+    }
+
+    void hash(ObjectMap map) {
+        appendHash("m");
+        appendHash(Integer.toString(System.identityHashCode(map.getRoot())));
+        terminal();
+        appendHash(Integer.toString(System.identityHashCode(map)));
         terminal();
     }
 
@@ -287,7 +308,7 @@ class Generator {
     QFrame resolve(String name) {
         for (Iterator it = m_stack.iterator(); it.hasNext(); ) {
             QFrame frame = (QFrame) it.next();
-            if (frame.getType().hasProperty(name)) {
+            if (frame.getMap().hasMapping(Path.get(name))) {
                 return frame;
             }
         }
@@ -309,11 +330,11 @@ class Generator {
     }
 
     boolean hasType(String name) {
-        return m_root.getObjectType(name) != null;
+        return getRoot().getObjectType(name) != null;
     }
 
     ObjectType getType(String name) {
-        ObjectType result = m_root.getObjectType(name);
+        ObjectType result = getRoot().getObjectType(name);
         if (result == null) {
             throw new IllegalArgumentException
                 ("unable to resolve type: " + name);
@@ -486,7 +507,7 @@ class Generator {
     }
 
     boolean isConstrained(String table, Collection columns) {
-        Table t = m_root.getTable(table);
+        Table t = getRoot().getTable(table);
         if (t == null) { return false; }
         outer: for (Iterator it = t.getConstraints().iterator();
                     it.hasNext(); ) {

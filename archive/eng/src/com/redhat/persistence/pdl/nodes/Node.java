@@ -26,12 +26,12 @@ import java.util.List;
  * Node
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/08/05 $
+ * @version $Revision: #3 $ $Date: 2004/08/18 $
  **/
 
 public abstract class Node {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/nodes/Node.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/nodes/Node.java#3 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
 
     /**
@@ -151,6 +151,7 @@ public abstract class Node {
 
         public void onStatement(StatementNd st) {}
         public void onProperty(PropertyNd prop) {}
+        public void onNestedMap(NestedMapNd nd) {}
         public void onNestedMapping(NestedMappingNd nd) {}
         public void onAggressiveLoad(AggressiveLoadNd al) {}
         public void onReferenceKey(ReferenceKeyNd key) {}
@@ -292,6 +293,15 @@ public abstract class Node {
 
     public int getIndex() {
         return ((List) getParent().get(getField())).indexOf(this);
+    }
+
+    public boolean isFirst() {
+        return getIndex() == 0;
+    }
+
+    public boolean isLast() {
+        List children = (List) getParent().get(getField());
+        return getIndex() == children.size() - 1;
     }
 
     private void check(Node child) {

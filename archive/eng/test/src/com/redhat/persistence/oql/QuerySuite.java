@@ -39,12 +39,12 @@ import java.util.*;
  * QuerySuite
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/06/17 $
+ * @version $Revision: #3 $ $Date: 2004/08/18 $
  **/
 
 public class QuerySuite extends TestSuite {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/oql/QuerySuite.java#2 $ by $Author: vadim $, $DateTime: 2004/06/17 13:28:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/oql/QuerySuite.java#3 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
     public QuerySuite() {}
 
@@ -58,9 +58,14 @@ public class QuerySuite extends TestSuite {
 
     private Root m_root = null;
     private Connection m_conn = null;
+    private Session m_ssn = null;
 
     public Root getRoot() {
         return m_root;
+    }
+
+    public Session getSession() {
+        return m_ssn;
     }
 
     public Connection getConnection() {
@@ -92,12 +97,12 @@ public class QuerySuite extends TestSuite {
             public void release(Connection conn) {}
         };
         Engine engine = new RDBMSEngine(src, new PostgresWriter());
-        Session ssn = new Session(m_root, engine, new QuerySource());
+        m_ssn = new Session(m_root, engine, new QuerySource());
 
-        DataLoader loader = new DataLoader(ssn);
+        DataLoader loader = new DataLoader(m_ssn);
         XML.parseResource("com/redhat/persistence/oql/test.dat", loader);
         XML.parseResource("com/redhat/persistence/oql/parties.dat", loader);
-        ssn.flush();
+        m_ssn.flush();
     }
 
     private boolean commit = false;

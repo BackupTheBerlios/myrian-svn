@@ -15,6 +15,7 @@
 package com.redhat.persistence;
 
 import com.redhat.persistence.common.Path;
+import com.redhat.persistence.metadata.Mapping;
 import com.redhat.persistence.metadata.Model;
 import com.redhat.persistence.metadata.ObjectMap;
 import com.redhat.persistence.metadata.ObjectType;
@@ -28,18 +29,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import org.apache.log4j.Logger;
 
 /**
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/07/13 $
+ * @version $Revision: #4 $ $Date: 2004/08/18 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Signature.java#3 $ by $Author: ashah $, $DateTime: 2004/07/13 17:03:42 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Signature.java#4 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
     private static final Logger s_log = Logger.getLogger(Signature.class);
 
@@ -61,8 +63,21 @@ public class Signature {
         addSource(type, null);
     }
 
-    public Query makeQuery(Expression expr) {
-        addDefaultProperties();
+    public Query makeQuery(Session ssn, Expression expr) {
+        ObjectMap map = expr.getMap(ssn);
+
+        // XXX: this can be called multiple times, need to make the
+        // second use of m_paths here that contains the expaneded list
+        // into a local variable.
+        ArrayList added = new ArrayList(m_paths);
+        m_paths.clear();
+        for (int i = 0; i < added.size(); i++) {
+            Path path = (Path) added.get(i);
+            makePathLoadable(map, path);
+            addDefaultProperties(map, path);
+        }
+
+        addDefaultProperties(map);
 
         if (m_paths.size() == 0) {
             throw new IllegalStateException(this + "\n");
@@ -126,10 +141,6 @@ public class Signature {
         return getSource(null).getObjectType();
     }
 
-    public boolean hasPath(Path p) {
-        return m_paths.contains(p);
-    }
-
     public void addPath(String path) {
         addPath(Path.get(path));
     }
@@ -137,24 +148,30 @@ public class Signature {
     /**
      * Add all leaves of key property hierarchy
      */
-    private void addPathImmediates(Path path) {
-	ObjectType type = getType(path);
-        Collection props = type.getImmediateProperties();
+    private void addPathImmediates(ObjectMap map, Path path) {
+        ObjectMap om = path == null ? map : map.getMapping(path).getMap();
+        List mappings = om.getKeyMappings();
         // all props for unkeyed, immediate only for keyed
 
-        if (props.size() == 0) {
+        // prevent redundent fetches of $container paths
+        if (!isSource(path) && om.isNested() && om.isCompound()) {
+            mappings = mappings.subList(1, mappings.size());
+        }
+
+        if (mappings.isEmpty()) {
             if (!m_paths.contains(path)) {
                 m_paths.add(path);
             }
         } else {
-            for (Iterator it = props.iterator(); it.hasNext(); ) {
-                Property prop = (Property) it.next();
-		addPathImmediates(Path.add(path, prop.getName()));
+            for (int i = 0; i < mappings.size(); i++) {
+                Mapping m = (Mapping) mappings.get(i);
+		addPathImmediates(map, Path.add(path, m.getPath()));
             }
         }
     }
 
-    private void makePathLoadable(Path prefix, Collection paths) {
+    private void makePathLoadable(ObjectMap map, Path prefix,
+                                  Collection paths) {
         for (Iterator it = paths.iterator(); it.hasNext(); ) {
             Path p = (Path) it.next();
             Path path;
@@ -163,12 +180,12 @@ public class Signature {
             } else {
                 path = Path.add(prefix, p);
             }
-            makePathLoadable(path);
+            makePathLoadable(map, path);
         }
     }
 
-    private void makePathLoadable(Path path) {
-        addPathImmediates(path);
+    private void makePathLoadable(ObjectMap map, Path path) {
+        addPathImmediates(map, path);
         // XXX: forcing container id properties to be loaded
         // this does not need to be done here. could push to wrapper layer
         // and change RecordSet to deal with null containers by passing
@@ -176,7 +193,7 @@ public class Signature {
         if (!isSource(path)) {
             Path parent = path.getParent();
             if (!m_paths.contains(parent)) {
-                makePathLoadable(parent);
+                makePathLoadable(map, parent);
             }
         }
     }
@@ -187,9 +204,9 @@ public class Signature {
 	}
 
         if (path == null) { return; }
-
-        makePathLoadable(path);
-        addDefaultProperties(path);
+        if (!m_paths.contains(path)) {
+            m_paths.add(path);
+        }
     }
 
     public Collection getPaths() {
@@ -260,7 +277,8 @@ public class Signature {
         return m_sources;
     }
 
-    private void addPathImmediates(Path prefix, Collection paths) {
+    private void addPathImmediates(ObjectMap map, Path prefix,
+                                   Collection paths) {
         for (Iterator it = paths.iterator(); it.hasNext(); ) {
             Path p = (Path) it.next();
             Path path;
@@ -269,13 +287,13 @@ public class Signature {
             } else {
                 path = Path.add(prefix, p);
             }
-            addPathImmediates(path);
+            addPathImmediates(map, path);
         }
     }
 
-    private void addDefaultProperties(Path path) {
+    private void addDefaultProperties(ObjectMap map, Path path) {
         ObjectType type = getType(path);
-        addFetchedPaths(path, type);
+        addFetchedPaths(map, path, type);
 
         if (!isSource(path)) {
             Root root = type.getRoot();
@@ -283,40 +301,45 @@ public class Signature {
             // assume that path.getParent() is keyed
             ObjectMap container = root.getObjectMap(prop.getContainer());
             if (container != null) {
-                makePathLoadable(path.getParent(), container.getDeclaredFetchedPaths());
+                makePathLoadable(map, path.getParent(),
+                                 container.getDeclaredFetchedPaths());
             }
         }
     }
 
-    private void addFetchedPaths(Path path, ObjectType type) {
+    private void addFetchedPaths(ObjectMap map, Path path, ObjectType type) {
         Root root = type.getRoot();
         if (root == null) { return; }
         ObjectMap om = root.getObjectMap(type);
         if (om == null) { return; }
-        makePathLoadable(path, om.getFetchedPaths());
+        makePathLoadable(map, path, om.getFetchedPaths());
     }
 
-    private void addDefaultProperties() {
+    private void addDefaultProperties(ObjectMap map) {
         for (Iterator it = m_sources.iterator(); it.hasNext(); ) {
             Source source = (Source) it.next();
-            makePathLoadable(source.getPath());
-            addFetchedPaths(source.getPath(), source.getObjectType());
+            makePathLoadable(map, source.getPath());
+            addFetchedPaths(map, source.getPath(), source.getObjectType());
         }
     }
 
     public Property getProperty(Path path) {
+        Property result = null;
         Path parent = path.getParent();
         if (isSource(parent)) {
-            return getSource(parent).getObjectType().getProperty
-                (path.getName());
+            result = getSource(parent).getObjectType()
+                .getProperty(path.getName());
         } else {
             Property prop = getProperty(parent);
-            if (prop == null) {
-                throw new IllegalArgumentException
-                    ("no such property in signature: " + path);
-            } else {
-                return prop.getType().getProperty(path.getName());
+            if (prop != null) {
+                result = prop.getType().getProperty(path.getName());
             }
+        }
+        if (result == null) {
+            throw new IllegalArgumentException
+                ("no such property in signature: " + path);
+        } else {
+            return result;
         }
     }
 
@@ -344,4 +367,5 @@ public class Signature {
     public String toString() {
         return "Paths are  " + m_paths + ", sources are " + m_sources;
     }
+
 }

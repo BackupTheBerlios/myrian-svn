@@ -16,18 +16,19 @@ package com.redhat.persistence.oql;
 
 import com.redhat.persistence.common.*;
 import com.redhat.persistence.metadata.*;
+import com.redhat.persistence.metadata.Static;
 import java.util.*;
 
 /**
  * Define
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/08/05 $
+ * @version $Revision: #4 $ $Date: 2004/08/18 $
  **/
 
 public class Define extends Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Define.java#3 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Define.java#4 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
     private Expression m_expr;
     private String m_name;
@@ -83,7 +84,10 @@ public class Define extends Expression {
         Property prop = new Role(name, type, false, false, false);
         def.addProperty(prop);
         ObjectMap result = new ObjectMap(def);
-        result.addMapping(new Nested(Path.get(name), map));
+        Mapping m = new Static(Path.get(name));
+        m.setMap(map, false);
+        result.addMapping(m);
+        result.getKeyProperties().add(prop);
         return result;
     }
 

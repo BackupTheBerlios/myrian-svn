@@ -13,12 +13,12 @@ import com.redhat.persistence.pdl.nodes.*;
  * PDLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2004/08/05 $
+ * @version $Revision: #3 $ $Date: 2004/08/18 $
  */
 
 class PDLParser {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDLParser.jj#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDLParser.jj#3 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);
@@ -272,8 +272,8 @@ void simple_statement(ObjectTypeNd ot) :
 {}
 {
     (  LOOKAHEAD(property_stmt()) property_stmt(ot)
-     | nested_mapping(ot)
-     | object_key(ot)
+     | nested_mapping_stmt(ot)
+     | object_key_stmt(ot)
      | reference_key(ot)
      | unique_key(ot)
      | aggressive_load(ot)
@@ -319,6 +319,7 @@ PropertyNd property() :
     n = id() { p.add(PropertyNd.NAME, n); ln(p, n); }
     [ <EQ> n = property_mapping()
            { p.add(PropertyNd.MAPPING, n); } ]
+    [ n = nested_map() { p.add(PropertyNd.NESTED_MAP, n); } ]
     { return p; }
 }
 
@@ -363,18 +364,41 @@ QualiasNd qualias() :
     { n = new QualiasNd(q.image); ln(n, t); return n; }
 }
 
-void nested_mapping(ObjectTypeNd ot) :
+NestedMapNd nested_map() :
+{
+    NestedMapNd nm = new NestedMapNd();
+    Node n;
+}
+{
+    <LBRACE>
+        ((  n = nested_mapping() { nm.add(NestedMapNd.MAPPINGS, n); }
+          | n = object_key() { nm.add(NestedMapNd.OBJECT_KEY, n); } )
+         <SEMI>)+
+    <RBRACE>
+        { return nm; }
+}
+
+NestedMappingNd nested_mapping() :
 {
     Node n, p;
-    Node nm = new NestedMappingNd();
+    NestedMappingNd nm = new NestedMappingNd();
 }
 {
     p = path() { nm.add(NestedMappingNd.PATH, p); }
     <EQ> n = property_mapping() { nm.add(NestedMappingNd.MAPPING, n); }
-    { ln(nm, p); ot.add(ObjectTypeNd.NESTED_MAPPINGS, nm); }
+    [ n = nested_map() { nm.add(NestedMappingNd.NESTED_MAP, n); } ]
+    { ln(nm, p); return nm; }
 }
 
-void object_key(ObjectTypeNd ot) :
+void nested_mapping_stmt(ObjectTypeNd ot) :
+{
+    Node n;
+}
+{
+    n = nested_mapping() { ot.add(ObjectTypeNd.NESTED_MAPPINGS, n); }
+}
+
+ObjectKeyNd object_key() :
 {
     Token t;
     ObjectKeyNd k = new ObjectKeyNd();
@@ -386,7 +410,15 @@ void object_key(ObjectTypeNd ot) :
         n = id() { k.add(ObjectKeyNd.PROPERTIES, n); }
         ( <COMMA> n = id() { k.add(ObjectKeyNd.PROPERTIES, n); } )*
     <RPAREN>
-    { ln(k, t); ot.add(ObjectTypeNd.OBJECT_KEY, k); }
+    { ln(k, t); return k; }
+}
+
+void object_key_stmt(ObjectTypeNd ot) :
+{
+    Node n;
+}
+{
+    n = object_key() { ot.add(ObjectTypeNd.OBJECT_KEY, n); }
 }
 
 void reference_key(ObjectTypeNd ot) :

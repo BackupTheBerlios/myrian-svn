@@ -14,6 +14,7 @@
  */
 package com.redhat.persistence.oql;
 
+import com.redhat.persistence.Session;
 import com.redhat.persistence.common.Path;
 import com.redhat.persistence.common.TokenMgrError;
 import com.redhat.persistence.metadata.*;
@@ -24,12 +25,12 @@ import java.util.*;
  * Expression
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/08/05 $
+ * @version $Revision: #7 $ $Date: 2004/08/18 $
  **/
 
 public abstract class Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Expression.java#6 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Expression.java#7 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
     public static Expression valueOf(Path path) {
         if (path.getParent() == null) {
@@ -54,15 +55,19 @@ public abstract class Expression {
         }
     }
 
-    public ObjectMap getMap(Root root) {
+    public ObjectMap getMap(Session ssn) {
         Generator gen = Generator.getThreadGenerator();
-        gen.init(root);
-        frame(gen);
-        return gen.getFrame(this).getMap();
+        try {
+            gen.init(ssn);
+            frame(gen);
+            return gen.getFrame(this).getMap();
+        } finally {
+            gen.clear();
+        }
     }
 
-    public ObjectType getType(Root root) {
-        return getMap(root).getObjectType();
+    public ObjectType getType(Session ssn) {
+        return getMap(ssn).getObjectType();
     }
 
     abstract void frame(Generator generator);

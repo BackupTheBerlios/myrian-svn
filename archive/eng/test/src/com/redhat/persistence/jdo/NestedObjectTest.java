@@ -8,12 +8,53 @@ import java.util.*;
  * NestedObjectTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/08/12 $
+ * @version $Revision: #3 $ $Date: 2004/08/18 $
  **/
 
 public class NestedObjectTest extends WithTxnCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdo/NestedObjectTest.java#2 $ by $Author: ashah $, $DateTime: 2004/08/12 17:40:23 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdo/NestedObjectTest.java#3 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
+
+    private Collection query(Class klass) {
+        return (Collection) m_pm.newQuery(klass).execute();
+    }
+
+    private Collection query(String oql) {
+        return (Collection) m_pm.newQuery(Extensions.OQL, oql).execute();
+    }
+
+    private Collection query(String oql, Object o1) {
+        return (Collection) m_pm.newQuery(Extensions.OQL, oql).execute(o1);
+    }
+
+    private Collection query(String oql, Object o1, Object o2) {
+        return (Collection) m_pm.newQuery(Extensions.OQL, oql).execute(o1, o2);
+    }
+
+    private Collection query(String oql, Object o1, Object o2, Object o3) {
+        return (Collection) m_pm.newQuery(Extensions.OQL, oql)
+            .execute(o1, o2, o3);
+    }
+
+    private Object singleton(Class klass) {
+        return query(klass).iterator().next();
+    }
+
+    private Object singleton(String oql) {
+        return query(oql).iterator().next();
+    }
+
+    private Object singleton(String oql, Object o1) {
+        return query(oql, o1).iterator().next();
+    }
+
+    private Object singleton(String oql, Object o1, Object o2) {
+        return query(oql, o1, o2).iterator().next();
+    }
+
+    private Object singleton(String oql, Object o1, Object o2, Object o3) {
+        return query(oql, o1, o2, o3).iterator().next();
+    }
 
     private void assertSingleton(Object o, Collection c) {
         Iterator it = c.iterator();
@@ -39,10 +80,9 @@ public class NestedObjectTest extends WithTxnCase {
     }
 
     private Collection lukes() {
-        Collection emps = (Collection) m_pm.newQuery(Employee.class).execute();
-        Collection lukes = (Collection) m_pm.newQuery
-            (Extensions.OQL,
-             "filter($1, name == $2)").execute(emps, "Luke Skywalker");
+        Collection emps = query(Employee.class);
+        Collection lukes =
+            query("filter($1, name == $2)", emps, "Luke Skywalker");
         return lukes;
     }
 
@@ -65,8 +105,7 @@ public class NestedObjectTest extends WithTxnCase {
         assertEquals(L_STATE, a.getState());
         assertEquals(L_ZIP, a.getZip());
 
-        Collection addr = (Collection) m_pm.newQuery
-            (Extensions.OQL, "$1.address").execute(luke);
+        Collection addr = query("$1.address", luke);
 
         assertSingleton(a, addr);
     }
@@ -114,7 +153,40 @@ public class NestedObjectTest extends WithTxnCase {
         m_pm.makePersistent(r);
 
         Collection contacts = r.getContacts();
-        contacts.add(new Contact("asdf"));
+
+        Contact asdf = new Contact("asdf");
+        asdf.setNumber("1-800-ASSDEAF");
+        contacts.add(asdf);
+
+        commit();
+
+        r = (Rolodex) singleton(Rolodex.class);
+        contacts = r.getContacts();
+
+        assertEquals(1, contacts.size());
+        //assertEquals(asdf, contacts.iterator().next());
+        Contact c = (Contact) contacts.iterator().next();
+        assertEquals("asdf", c.getName());
+        assertEquals("1-800-ASSDEAF", c.getNumber());
+    }
+
+    public void testSessionKey() {
+        Rolodex r = new Rolodex();
+        m_pm.makePersistent(r);
+        Collection contacts = r.getContacts();
+        contacts.add(new Contact("one", "1"));
+        contacts.add(new Contact("two", "2"));
+
+        commit();
+
+        contacts = query("$1.m_contacts", query(Rolodex.class));
+        Contact one =
+            (Contact) singleton("filter($1, m_name == $2)", contacts, "one");
+        assertEquals("1", one.getNumber());
+        Contact two =
+            (Contact) singleton("filter($1, m_name == $2)", contacts, "two");
+        assertEquals("1", one.getNumber());
+        assertEquals("2", two.getNumber());
     }
 
 }

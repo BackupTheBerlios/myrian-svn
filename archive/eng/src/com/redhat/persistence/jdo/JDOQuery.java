@@ -271,7 +271,7 @@ class JDOQuery implements ExtendedQuery, Serializable {
 
     private Collection executeInternal(Map params) {
         final Expression expr = makeExpr(params);
-        final ObjectType type = expr.getType(m_pm.getSession().getRoot());
+        final ObjectType type = expr.getType(m_pm.getSession());
         final Signature sig = new Signature(type);
         for (Iterator it = m_addPaths.iterator(); it.hasNext(); ) {
             sig.addPath((String) it.next());

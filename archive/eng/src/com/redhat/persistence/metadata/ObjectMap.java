@@ -22,12 +22,12 @@ import java.util.*;
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/08/05 $
+ * @version $Revision: #3 $ $Date: 2004/08/18 $
  **/
 
 public class ObjectMap extends Element {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/ObjectMap.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/ObjectMap.java#3 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
     private ObjectType m_type;
     private Mist m_mappings = new Mist(this);
@@ -83,6 +83,30 @@ public class ObjectMap extends Element {
         return getParent() instanceof Mapping;
     }
 
+    public Mapping getContaining() {
+        if (isNested()) {
+            return (Mapping) getParent();
+        } else {
+            return null;
+        }
+    }
+
+    private Mapping m_container = null;
+
+    public Mapping getContainer() {
+        if (m_container == null) {
+            Object parent = getParent();
+            if (parent instanceof Mapping) {
+                Mapping m = (Mapping) parent;
+                m_container = m.reverse(Path.get("$container"));
+                addMapping(m_container);
+                m_container.setMap(m.getObjectMap(), false);
+            }
+        }
+
+        return m_container;
+    }
+
     public boolean isCompound() {
         return m_type.isCompound();
     }
@@ -92,16 +116,7 @@ public class ObjectMap extends Element {
     }
 
     public boolean hasMapping(Path p) {
-        if (m_mappings.containsKey(p)) {
-            return true;
-        } else {
-            ObjectMap sm = getSuperMap();
-            if (sm == null) {
-                return false;
-            } else {
-                return sm.hasMapping(p);
-            }
-        }
+        return getMapping(p) != null;
     }
 
     public Mapping getMapping(Property p) {
@@ -166,6 +181,20 @@ public class ObjectMap extends Element {
             return m_key;
         } else {
             return sm.getKeyProperties();
+        }
+    }
+
+    public List getKeyMappings() {
+        ObjectMap sm = getSuperMap();
+        if (sm == null) {
+            List result = new ArrayList();
+            if (isNested() && isCompound()) { result.add(getContainer()); }
+            for (int i = 0; i < m_key.size(); i++) {
+                result.add(getMapping((Property) m_key.get(i)));
+            }
+            return result;
+        } else {
+            return sm.getKeyMappings();
         }
     }
 
@@ -249,7 +278,31 @@ public class ObjectMap extends Element {
     public Table getTable() {
         Object parent = getParent();
         if (m_table == null && parent instanceof Mapping) {
-            return ((Mapping) parent).getObjectMap().getTable();
+            final Table[] result = { null };
+            ((Mapping) parent).dispatch(new Mapping.Switch() {
+                public void onValue(Value v) {
+                    result[0] = v.getColumn().getTable();
+                }
+                public void onStatic(Static s) {
+                    result[0] = s.getObjectMap().getTable();
+                }
+                public void onNested(Nested n) {
+                    result[0] = n.getObjectMap().getTable();
+                }
+                public void onJoinTo(JoinTo j) {
+                    result[0] = j.getKey().getUniqueKey().getTable();
+                }
+                public void onJoinFrom(JoinFrom j) {
+                    result[0] = j.getKey().getTable();
+                }
+                public void onJoinThrough(JoinThrough j) {
+                    throw new Error("i dunno");
+                }
+                public void onQualias(Qualias q) {
+                    throw new IllegalStateException();
+                }
+            });
+            return result[0];
         } else {
             return m_table;
         }
@@ -260,14 +313,9 @@ public class ObjectMap extends Element {
     }
 
     public Collection getDeclaredTables() {
-        if (m_table == null) {
-            return Collections.EMPTY_LIST;
-        }
-
-        List result = new ArrayList(1);
-        result.add(m_table);
-
-        return result;
+        Table t = getTable();
+        return t == null ?
+            Collections.EMPTY_LIST : Collections.singletonList(t);
     }
 
     public Collection getTables() {

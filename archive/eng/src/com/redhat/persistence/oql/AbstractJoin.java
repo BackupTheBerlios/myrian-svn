@@ -22,12 +22,12 @@ import java.util.*;
  * AbstractJoin
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/08/05 $
+ * @version $Revision: #4 $ $Date: 2004/08/18 $
  **/
 
 public abstract class AbstractJoin extends Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/AbstractJoin.java#3 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/AbstractJoin.java#4 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
     private Expression m_left;
     private Expression m_right;
@@ -90,8 +90,19 @@ public abstract class AbstractJoin extends Expression {
             new ObjectMap(join(left.getObjectType(), right.getObjectType()));
         addMappings(result, left);
         addMappings(result, right);
-        // XXX: key properties
+        Collection keys = result.getKeyProperties();
+        addFrom(result, keys, left.getKeyProperties());
+        addFrom(result, keys, right.getKeyProperties());
         return result;
+    }
+
+    private static void addFrom(ObjectMap om, Collection to,
+                                Collection props) {
+        ObjectType ot = om.getObjectType();
+        for (Iterator it = props.iterator(); it.hasNext(); ) {
+            Property p = (Property) it.next();
+            to.add(ot.getProperty(p.getName()));
+        }
     }
 
     private static void addMappings(ObjectMap to, ObjectMap from) {
@@ -128,8 +139,9 @@ public abstract class AbstractJoin extends Expression {
         });
         Mapping cp = result[0];
         cp.setRetrieve(m.getRetrieve());
+        cp.setMap(m.getMap(), m.getMap().isNested());
         // don't bother copying write side static stuff
-        return result[0];
+        return cp;
     }
 
     static ObjectType join(final ObjectType left, final ObjectType right) {

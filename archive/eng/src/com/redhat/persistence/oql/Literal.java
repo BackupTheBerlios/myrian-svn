@@ -26,12 +26,12 @@ import java.util.*;
  * Literal
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/08/05 $
+ * @version $Revision: #3 $ $Date: 2004/08/18 $
  **/
 
 public class Literal extends Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Literal.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Literal.java#3 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
     private Object m_value;
 
@@ -40,29 +40,46 @@ public class Literal extends Expression {
     }
 
     private ObjectMap map(Generator gen) {
-        if (m_value == null || m_value instanceof Collection) {
+        return map(gen, m_value);
+    }
+
+    private static ObjectMap map(Generator gen, Object value) {
+        if (value == null || value instanceof Collection) {
             return null;
         } else {
-            Adapter ad = gen.getRoot().getAdapter(m_value.getClass());
-            if (ad == null) { return null; }
-            ObjectType type = ad.getObjectType(m_value);
-            Root root = gen.getRoot();
-            if (root.hasObjectMap(type)) {
-                return root.getObjectMap(type);
-            } else {
+            Adapter ad = gen.getRoot().getAdapter(value.getClass());
+            ObjectType type = ad.getObjectType(value);
+            Session ssn = gen.getSession();
+            if (ssn.hasObjectMap(value)) {
+                return ssn.getObjectMap(value);
+            } else if (type.isPrimitive()) {
                 return new ObjectMap(type);
+            } else {
+                return null;
             }
         }
     }
 
+    private Object value(ObjectMap map) {
+        if (m_value instanceof Collection) {
+            return m_value;
+        } else if (map == null) {
+            return null;
+        } else {
+            return m_value;
+        }
+    }
+
     void frame(Generator gen) {
-        QFrame frame = gen.frame(this, map(gen));
+        ObjectMap map = map(gen);
+        QFrame frame = gen.frame(this, map);
         List result = new ArrayList();
         Object key = gen.level > 0 ? null : getBindKey(gen);
-        convert(m_value, result, gen.getRoot(), key);
+        Object value = value(map);
+        convert(value, result, gen, key);
         if (result.size() == 0) {
             throw new IllegalStateException
-                ("unable to convert value: " + m_value);
+                ("unable to convert value: " + value);
         }
         List values = new ArrayList();
         for (int i = 0; i < result.size(); i++) {
@@ -83,8 +100,11 @@ public class Literal extends Expression {
     }
 
     void hash(Generator gen) {
+        ObjectMap map = map(gen);
+        if (map != null) { gen.hash(map); }
+        Object value = value(map);
         List values = new ArrayList();
-        convert(m_value, values, gen.getRoot(), getBindKey(gen));
+        convert(value, values, gen, getBindKey(gen));
         for (int i = 0; i < values.size(); i++) {
             Code c = (Code) values.get(i);
             gen.hash(c.getSQL());
@@ -97,11 +117,11 @@ public class Literal extends Expression {
         return gen.id(this);
     }
 
-    static void convert(Object value, List result, Root root, Object key) {
-        convert(value, result, root, key, 0);
+    static void convert(Object value, List result, Generator gen, Object key) {
+        convert(value, result, gen, key, 0);
     }
 
-    static int convert(Object value, List result, Root root, Object key,
+    static int convert(Object value, List result, Generator gen, Object key,
                        int bindcount) {
         if (value == null) {
             result.add(Code.NULL);
@@ -110,7 +130,7 @@ public class Literal extends Expression {
             Code sql = new Code("(");
             for (Iterator it = c.iterator(); it.hasNext(); ) {
                 List single = new ArrayList();
-                bindcount = convert(it.next(), single, root, key, bindcount);
+                bindcount = convert(it.next(), single, gen, key, bindcount);
                 if (single.size() != 1) {
                     throw new IllegalStateException
                         ("can't deal with collection of compound objects");
@@ -124,11 +144,17 @@ public class Literal extends Expression {
             }
             result.add(sql);
         } else {
-            Adapter ad = root.getAdapter(value.getClass());
-            PropertyMap pmap = ad.getProperties(value);
-            if (pmap.getObjectType().isCompound()) {
-                bindcount = convert(pmap, result, root, key, bindcount);
+            ObjectMap map = map(gen, value);
+
+            if (map.isCompound()) {
+                if (map.isNested()) {
+                    Object container = gen.getSession().getContainer(value);
+                    bindcount =
+                        convert(container, result, gen, key, bindcount);
+                }
+                bindcount = convert(map, value, result, gen, key, bindcount);
             } else {
+                Adapter ad = gen.getRoot().getAdapter(value.getClass());
                 Object k = key == null ? null :
                     new CompoundKey(key, new Integer(bindcount));
                 Code.Binding b = new Code.Binding
@@ -141,12 +167,14 @@ public class Literal extends Expression {
         return bindcount;
     }
 
-    private static int convert(PropertyMap pmap, List result, Root root,
-                               Object key, int bindcount) {
-        Collection props = Code.properties(pmap.getObjectType());
+    private static int convert(ObjectMap map, Object value, List result,
+                               Generator gen, Object key, int bindcount) {
+        Session ssn = gen.getSession();
+        Collection props = map.getKeyProperties();
         for (Iterator it = props.iterator(); it.hasNext(); ) {
             Property prop = (Property) it.next();
-            bindcount = convert(pmap.get(prop), result, root, key, bindcount);
+            Object obj = ssn.get(value, prop);
+            bindcount = convert(obj, result, gen, key, bindcount);
         }
 
         return bindcount;

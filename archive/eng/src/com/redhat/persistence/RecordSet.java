@@ -17,6 +17,7 @@ package com.redhat.persistence;
 import com.redhat.persistence.common.CompoundKey;
 import com.redhat.persistence.common.Path;
 import com.redhat.persistence.metadata.Adapter;
+import com.redhat.persistence.metadata.Mapping;
 import com.redhat.persistence.metadata.ObjectMap;
 import com.redhat.persistence.metadata.ObjectType;
 import com.redhat.persistence.metadata.Property;
@@ -31,12 +32,12 @@ import org.apache.log4j.Logger;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/08/06 $
+ * @version $Revision: #7 $ $Date: 2004/08/18 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/RecordSet.java#6 $ by $Author: rhs $, $DateTime: 2004/08/06 14:26:20 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/RecordSet.java#7 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
     private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
@@ -82,7 +83,16 @@ public abstract class RecordSet {
         Collection props = type.getImmediateProperties();
         if (map.isPrimitive()) {
             return get(path);
-        } else if (!map.isNested()) {
+        } else if (map.isNested()) {
+            Object key = path == null ?
+                key(Path.get("$container")) : key(path.getParent());
+            if (key == null) {
+                return null;
+            } else {
+                return new CompoundKey
+                    (key, map.getContaining().getPath().getName());
+            }
+        } else {
             Object key = type.getBasetype();
             for (Iterator it = props.iterator(); it.hasNext(); ) {
                 Property p = (Property) it.next();
@@ -91,20 +101,6 @@ public abstract class RecordSet {
                 key = new CompoundKey(key, subKey);
             }
             return key;
-        } else if (m_signature.isSource(path)) {
-            PropertyMap pmap = new PropertyMap(type);
-            for (Iterator it = props.iterator(); it.hasNext(); ) {
-                Property p = (Property) it.next();
-                pmap.put(p, key(Path.add(path, p.getName())));
-            }
-            return pmap;
-        } else {
-            Object key = key(path.getParent());
-            if (key == null) {
-                return null;
-            } else {
-                return new CompoundKey(key, path.getName());
-            }
         }
     }
 
@@ -114,9 +110,8 @@ public abstract class RecordSet {
         Collection props = type.getImmediateProperties();
         if (map.isPrimitive()) {
             return get(path);
-        } else if (!map.isNested()) {
-            return reify(ssn, path);
-        } else if (m_signature.isSource(path)) {
+        } else if (!map.isNested() && !type.isKeyed()
+                   && m_signature.isSource(path)) {
             PropertyMap pmap = new PropertyMap(type);
             for (Iterator it = props.iterator(); it.hasNext(); ) {
                 Property p = (Property) it.next();
@@ -133,9 +128,10 @@ public abstract class RecordSet {
         if (key == null) { return null; }
         ObjectData odata = ssn.getObjectDataByKey(key);
         if (odata == null) {
-            ObjectType type = m_signature.getType(path);
-            Collection props = type.getKeyProperties();
+            ObjectMap om = getObjectMap(path);
+            ObjectType type = om.getObjectType();
             PropertyMap pmap = new PropertyMap(type);
+            Collection props = om.getKeyProperties();
             for (Iterator it = props.iterator(); it.hasNext(); ) {
                 Property p = (Property) it.next();
                 pmap.put(p, get(ssn, Path.add(path, p.getName())));
@@ -155,21 +151,54 @@ public abstract class RecordSet {
     private Object load(Session ssn, Map values, Path path, Map loaded) {
         if (loaded.containsKey(path)) { return loaded.get(path); }
         Object value = get(ssn, path);
+        loaded.put(path, value);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("loading " + path + " = " + ssn.str(value));
+        }
+        ObjectMap map = getObjectMap(path);
         if (m_signature.isSource(path)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("loading " + path + " as cursor value (source)");
+            }
+            if (map.isNested() && map.isCompound()) {
+                Object container =
+                    load(ssn, values, Path.get("$container"), loaded);
+                Property prop = map.getContaining().getProperty();
+                if (!prop.isCollection()) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug
+                            ("loading " + path + " into session (source)");
+                    }
+                    ssn.load(container, prop, value);
+                }
+                ObjectData odata = ssn.getObjectData(value);
+                odata.setContainer(container);
+            }
             values.put(path, value);
         } else {
             Path parent = path.getParent();
             Object container = load(ssn, values, parent, loaded);
-            Property prop = m_signature.getProperty(path);
-            if (prop.isCollection()
-                || (!prop.getContainer().isKeyed()
-                    && m_signature.isSource(parent))) {
+            Mapping mapping = getObjectMap().getMapping(path);
+            Property prop = mapping.getProperty();
+            if (prop != null && (prop.isCollection()
+                                 || (!mapping.getObjectMap().isNested()
+                                     && !prop.getContainer().isKeyed()
+                                     && m_signature.isSource(parent)))) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("loading " + path + " as cursor value");
+                }
                 values.put(path, value);
-            } else {
+            } else if (prop != null) {
                 if (container != null) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("loading " + path + " into session");
+                    }
                     ssn.load(container, prop, value);
-                    ObjectMap map = getObjectMap(path);
                     if (map.isNested() && map.isCompound()) {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("setting container of " + path + " to " +
+                                      ssn.str(container));
+                        }
                         ObjectData odata = ssn.getObjectData(value);
                         odata.setContainer(container);
                     }
@@ -180,7 +209,6 @@ public abstract class RecordSet {
                 }
             }
         }
-        loaded.put(path, value);
         return value;
     }
 

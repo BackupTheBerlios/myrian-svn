@@ -27,12 +27,12 @@ import java.util.*;
  * Static
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/08/05 $
+ * @version $Revision: #3 $ $Date: 2004/08/18 $
  **/
 
 public class Static extends Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Static.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Static.java#3 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
     private SQL m_sql;
     private String[] m_columns;
@@ -245,8 +245,7 @@ public class Static extends Expression {
             String key = (String) keys.get(i);
             Object value = m_bindings.get(key);
             vals.clear();
-            Literal.convert
-                (value, vals, gen.getRoot(), new CompoundKey(id, key));
+            Literal.convert(value, vals, gen, new CompoundKey(id, key));
             gen.hash(key);
             for (int j = 0; j < vals.size(); j++) {
                 Code c = (Code) vals.get(j);

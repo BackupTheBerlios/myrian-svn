@@ -20,12 +20,12 @@ import java.util.*;
  * Equals
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/07/15 $
+ * @version $Revision: #3 $ $Date: 2004/08/18 $
  **/
 
 public class Equals extends BinaryCondition {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Equals.java#2 $ by $Author: ashah $, $DateTime: 2004/07/15 12:07:20 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Equals.java#3 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
     public Equals(Expression left, Expression right) {
         super(left, right);
@@ -50,16 +50,23 @@ public class Equals extends BinaryCondition {
         List lvals = left.getValues();
         List rvals = right.getValues();
 
-        if (lvals.size() != rvals.size()) {
-            throw new IllegalStateException
-                ("cardinality mismatch\nleft: " + lvals +
-                 "\nrvals: " + rvals +
-                 "\nleft: " + lexpr +
-                 "\nright: " + rexpr);
-        }
-
         List lnull = gen.getNull(lexpr);
         List rnull = gen.getNull(rexpr);
+
+        if (lvals.size() != rvals.size()) {
+            if (lvals.size() == 1 && lnull.containsAll(lvals)) {
+                lvals = repeat(lvals.get(0), rvals.size());
+            } else if (rvals.size() == 1 && rnull.containsAll(rvals)) {
+                rvals = repeat(rvals.get(0), lvals.size());
+            } else {
+                throw new IllegalStateException
+                    ("cardinality mismatch\nlvals: " + lvals +
+                     "\nrvals: " + rvals +
+                     "\nleft: " + lexpr +
+                     "\nright: " + rexpr);
+            }
+        }
+
         List lnonnull = gen.getNonNull(lexpr);
         List rnonnull = gen.getNonNull(rexpr);
 
@@ -84,6 +91,14 @@ public class Equals extends BinaryCondition {
         gen.addSufficient(expr);
     }
 
+    private static List repeat(Object o, int size) {
+        List l = new ArrayList(size);
+        for (int i = 0; i < size; i++) {
+            l.add(o);
+        }
+        return l;
+    }
+
     Code emit(Generator gen) {
         return emit(gen, m_left, m_right);
     }
@@ -95,9 +110,17 @@ public class Equals extends BinaryCondition {
             if (!lframe.isSelect() && !rframe.isSelect()) {
                 List lvals = lframe.getValues();
                 List rvals = rframe.getValues();
+                List lnull = gen.getNull(lexpr);
+                List rnull = gen.getNull(rexpr);
                 if (lvals.size() != rvals.size()) {
-                    throw new IllegalStateException
-                        ("signature missmatch: " + lvals + ", " + rvals);
+                    if (lvals.size() == 1 && lnull.containsAll(lvals)) {
+                        lvals = repeat(lvals.get(0), rvals.size());
+                    } else if (rvals.size() == 1 && rnull.containsAll(rvals)) {
+                        rvals = repeat(rvals.get(0), lvals.size());
+                    } else {
+                        throw new IllegalStateException
+                            ("signature missmatch: " + lvals + ", " + rvals);
+                    }
                 }
                 List conds = new ArrayList();
                 for (int i = 0; i < lvals.size(); i++) {

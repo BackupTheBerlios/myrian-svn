@@ -28,12 +28,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/08/06 $
+ * @version $Revision: #5 $ $Date: 2004/08/18 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#4 $ by $Author: rhs $, $DateTime: 2004/08/06 08:43:09 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#5 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     public static final String LINK = "@link";
@@ -332,24 +332,46 @@ public class PDL {
         }
 
         m_ast.traverse(new Node.Switch() {
-                public void onObjectType(ObjectTypeNd otn) {
-                    if (!otn.isNested()) {
-                        ObjectMap om =
-                            new ObjectMap(m_symbols.getEmitted(otn));
-                        m_root.addObjectMap(om);
-                        m_symbols.setLocation(om, otn);
+            public void onObjectType(ObjectTypeNd otn) {
+                if (!otn.isNested()) {
+                    ObjectMap om =
+                        new ObjectMap(m_symbols.getEmitted(otn));
+                    m_root.addObjectMap(om);
+                    m_symbols.setLocation(om, otn);
+                }
+            }
+            public void onAssociation(AssociationNd assn) {
+                ObjectType ot = m_symbols.getEmitted(linkName(assn));
+                if (ot != null) {
+                    ObjectMap om = new ObjectMap(ot);
+                    m_root.addObjectType(ot);
+                    m_root.addObjectMap(om);
+                    m_symbols.setLocation(om, assn);
+                }
+            }
+        });
+
+        final boolean[] modified = { false };
+        do {
+            modified[0] = false;
+            m_ast.traverse(new Node.Switch() {
+                public void onNestedMap(NestedMapNd nm) {
+                    ObjectMap om = getMap(nm);
+                    if (om == null) {
+                        ObjectMap container =
+                            getMap(nm.getParent().getParent());
+                        if (container != null) {
+                            om = new ObjectMap
+                                (container.getObjectType()
+                                 .getProperty(getPath(nm.getParent()))
+                                 .getType());
+                            emit(nm, om);
+                            modified[0] = true;
+                        }
                     }
                 }
-		public void onAssociation(AssociationNd assn) {
-		    ObjectType ot = m_symbols.getEmitted(linkName(assn));
-		    if (ot != null) {
-                        ObjectMap om = new ObjectMap(ot);
-                        m_root.addObjectType(ot);
-			m_root.addObjectMap(om);
-                        m_symbols.setLocation(om, assn);
-		    }
-		}
             });
+        } while (modified[0]);
 
         emitDDL();
 
@@ -420,56 +442,6 @@ public class PDL {
         m_errors.check();
 
         m_ast.traverse(new Node.Switch() {
-            private ObjectMap get(ObjectMap map, Path p, PathNd pn) {
-                Path parent = p.getParent();
-                if (parent == null) {
-                    Mapping m = map.getMapping(p);
-                    if (m.isNested()) {
-                        return m.getMap();
-                    } else {
-                        m_errors.fatal
-                            (pn, p + " must refer to a nested mapping");
-                        return null;
-                    }
-                } else {
-                    ObjectMap om = get(map, parent, pn);
-                    return get(om, Path.get(p.getName()), pn);
-                }
-            }
-            public void onNestedMapping(NestedMappingNd nm) {
-                ObjectType type =
-                    m_symbols.getEmitted((ObjectTypeNd) nm.getParent());
-                ObjectMap map = m_root.getObjectMap(type);
-                PathNd pn = nm.getPath();
-                Path p = pn.getPath();
-                Role prop = (Role) type.getProperty(p);
-                if (prop == null) {
-                    m_errors.fatal(pn, "no such path");
-                    return;
-                }
-                ObjectMap om = get(map, p.getParent(), pn);
-                if (om == null) { return; }
-                Node mapping = nm.getMapping();
-                if (mapping instanceof ColumnNd) {
-                    emitMapping(om, prop, (ColumnNd) mapping);
-                } else if (mapping instanceof JoinPathNd) {
-                    emitMapping(om, prop, (JoinPathNd) mapping);
-                } else {
-                    emitMapping(om, prop, (QualiasNd) mapping);
-                }
-                // XXX: copied code
-                if (!m_root.hasObjectMap(prop.getType())) {
-                    Mapping m = om.getMapping(prop);
-                    if (m != null) {
-                        m.setMap(new ObjectMap(prop.getType()));
-                    }
-                }
-            }
-        });
-
-        m_errors.check();
-
-        m_ast.traverse(new Node.Switch() {
             private void type(ObjectType type, Node mapping) {
                 if (!(mapping instanceof ColumnNd)) { return; }
                 Column col = lookup((ColumnNd) mapping);
@@ -483,8 +455,8 @@ public class PDL {
                 type(ot, pnd.getMapping());
             }
             public void onNestedMapping(NestedMappingNd nm) {
-                ObjectType container =
-                    m_symbols.getEmitted((ObjectTypeNd) nm.getParent());
+                ObjectMap map = getMap(nm.getParent());
+                ObjectType container = map.getObjectType();
                 Path p = nm.getPath().getPath();
                 Property prop = container.getProperty(p);
                 type(prop.getType(), nm.getMapping());
@@ -523,41 +495,8 @@ public class PDL {
             r.getType().addProperty(rev);
             r.setReverse(rev);
             ObjectMap map = m_root.getObjectMap(r.getType());
-            map.addMapping(reverse(m, Path.get(rev.getName())));
+            map.addMapping(m.reverse(Path.get(rev.getName())));
         }
-    }
-
-    private Mapping reverse(Mapping m, final Path p) {
-        final Mapping[] result = { null };
-        m.dispatch(new Mapping.Switch() {
-            public void onJoinTo(JoinTo j) {
-                result[0] = new JoinFrom(p, j.getKey());
-            }
-            public void onJoinFrom(JoinFrom j) {
-                result[0] = new JoinTo(p, j.getKey());
-            }
-            public void onJoinThrough(JoinThrough j) {
-                result[0] = new JoinThrough(p, j.getTo(), j.getFrom());
-            }
-            public void onQualias(Qualias q) {
-                String qname = q.getObjectMap().getObjectType()
-                    .getQualifiedName();
-                result[0] = new Qualias
-                    (p, "filter(all(" + qname +
-                     "), exists(filter(that = " + q.getPath().getPath() +
-                     ", this == that)))");
-            }
-            public void onValue(Value v) {
-                throw new IllegalArgumentException("not reversible: " + v);
-            }
-            public void onStatic(Static s) {
-                throw new IllegalArgumentException("not reversible: " + s);
-            }
-            public void onNested(Nested n) {
-                throw new IllegalArgumentException("not reversible: " + n);
-            }
-        });
-        return result[0];
     }
 
     // XXX: Commented out on this branch as this is the only
@@ -601,7 +540,7 @@ public class PDL {
 
     private void unique(Node nd, Collection ids, boolean primary) {
         final ArrayList columns = new ArrayList();
-        final Node.Traversal propertyToColumn = new Node.Traversal() {
+        final Node.Traversal firstColumn = new Node.Traversal() {
             public boolean accept(Node child) {
                 Node.Field f = child.getField();
                 if (f == PropertyNd.MAPPING) {
@@ -619,8 +558,8 @@ public class PDL {
         };
 
         if (nd instanceof ObjectKeyNd || nd instanceof UniqueKeyNd) {
-            ObjectTypeNd otn = (ObjectTypeNd) nd.getParent();
-            ObjectType ot = m_symbols.getEmitted(otn);
+            ObjectMap om = getMap(nd.getParent());
+            ObjectType ot = om.getObjectType();
             for (Iterator it = ids.iterator(); it.hasNext(); ) {
                 String id = ((IdentifierNd) it.next()).getName();
                 Property prop = (Property) ot.getProperty(id);
@@ -630,7 +569,7 @@ public class PDL {
                 }
                 PropertyNd propNd = (PropertyNd) getNode(prop);
                 int start = columns.size();
-                propNd.traverse(propertyToColumn);
+                propNd.traverse(firstColumn);
                 int end = columns.size();
                 if (start == end) {
                     m_errors.warn(nd, "no metadata for " + id);
@@ -638,7 +577,7 @@ public class PDL {
                 }
             }
         } else if (nd instanceof PropertyNd) {
-            nd.traverse(propertyToColumn);
+            nd.traverse(firstColumn);
             if (columns.size() == 0) {
                 m_errors.warn(nd, "no metadata for " +
                               ((PropertyNd) nd).getName().getName());
@@ -656,6 +595,46 @@ public class PDL {
             cols[i] = (Column) columns.get(i);
         }
         unique(nd, cols, primary);
+    }
+
+    private class NestedKeyTraversal extends Node.Traversal {
+        private ObjectKeyNd m_key = null;
+        private List m_columns = null;
+        private Set m_ids = null;
+        public void onObjectKey(ObjectKeyNd okn) {
+            m_key = okn;
+            m_columns = new ArrayList();
+            m_ids = new HashSet();
+            List ids = (List) okn.get(okn.PROPERTIES);
+            for (int i = 0; i < ids.size(); i++) {
+                IdentifierNd idn = (IdentifierNd) ids.get(i);
+                m_ids.add(idn.getName());
+            }
+            m_key.getParent().getParent().traverse(this);
+        }
+        public void onColumn(ColumnNd nd) {
+            m_columns.add(lookup(nd));
+        }
+        public boolean accept(Node child) {
+            Node.Field f = child.getField();
+            if (child instanceof ObjectKeyNd) {
+                return m_key == null;
+            } else if (f == NestedMapNd.MAPPINGS) {
+                return m_ids.contains
+                    (((NestedMappingNd) child).getPath().getPath().getPath());
+            } else if (f == JoinPathNd.JOINS) {
+                return m_columns.isEmpty() ? child.isFirst() : child.isLast();
+            } else if (f == JoinNd.FROM) {
+                return !m_columns.isEmpty();
+            } else if (f == JoinNd.TO) {
+                return m_columns.isEmpty();
+            } else {
+                return true;
+            }
+        }
+        public Column[] getColumns() {
+            return (Column[]) m_columns.toArray(new Column[m_columns.size()]);
+        }
     }
 
     private void emitDDL() {
@@ -700,33 +679,33 @@ public class PDL {
         }
 
         m_ast.traverse(new Node.Switch() {
-                public void onObjectKey(ObjectKeyNd nd) {
+            public void onObjectKey(ObjectKeyNd nd) {
+                Node parent = nd.getParent();
+                if (parent instanceof ObjectTypeNd) {
                     unique(nd, nd.getProperties(), true);
+                } else if (parent instanceof NestedMapNd) {
+                    NestedKeyTraversal nkt = new NestedKeyTraversal();
+                    nd.traverse(nkt);
+                    unique(nd, nkt.getColumns(), true);
                 }
+            }
 
-                public void onUniqueKey(UniqueKeyNd nd) {
-                    unique(nd, nd.getProperties(), false);
-                }
+            public void onUniqueKey(UniqueKeyNd nd) {
+                unique(nd, nd.getProperties(), false);
+            }
 
-                public void onReferenceKey(ReferenceKeyNd nd) {
-                    unique(nd, new Column[] { lookup(nd.getCol()) },
-                           true);
-                }
+            public void onReferenceKey(ReferenceKeyNd nd) {
+                unique(nd, new Column[] { lookup(nd.getCol()) }, true);
+            }
 
-                public void onProperty(PropertyNd nd) {
-                    if (nd.isUnique()) {
-                        ArrayList ids = new ArrayList();
-                        ids.add(nd.getName());
-                        unique(nd, ids, false);
-                    }
+            public void onProperty(PropertyNd nd) {
+                if (nd.isUnique()) {
+                    ArrayList ids = new ArrayList();
+                    ids.add(nd.getName());
+                    unique(nd, ids, false);
                 }
-            }, new Node.IncludeFilter(new Node.Field[] {
-                AST.FILES, FileNd.OBJECT_TYPES, FileNd.ASSOCIATIONS,
-                ObjectTypeNd.OBJECT_KEY, ObjectTypeNd.UNIQUE_KEYS,
-                ObjectTypeNd.REFERENCE_KEY, ObjectTypeNd.PROPERTIES,
-                AssociationNd.ROLE_ONE, AssociationNd.ROLE_TWO,
-                AssociationNd.PROPERTIES
-            }));
+            }
+        });
 
 	m_ast.traverse(new Node.Switch() {
 		public void onJoinPath(JoinPathNd jpn) {
@@ -792,20 +771,35 @@ public class PDL {
         }));
     }
 
+    private Path getPath(Node nd) {
+        if (nd instanceof NestedMappingNd) {
+            return ((NestedMappingNd) nd).getPath().getPath();
+        } else if (nd instanceof PropertyNd) {
+            return Path.get(((PropertyNd) nd).getName().getName());
+        } else {
+            throw new IllegalArgumentException
+                ("don't know how to handle: " + nd.getClass());
+        }
+    }
+
     private ObjectMap getMap(Node nd) {
-        return m_root.getObjectMap
-            (m_symbols.getEmitted((ObjectTypeNd) nd.getParent()));
+        if (nd instanceof ObjectTypeNd) {
+            return m_root.getObjectMap
+                (m_symbols.getEmitted((ObjectTypeNd) nd));
+        } else if (nd instanceof NestedMapNd) {
+            return (ObjectMap) getEmitted(nd);
+        } else {
+            throw new IllegalArgumentException
+                ("don't know how to handle node of type: " + nd.getClass());
+        }
     }
 
     private void emitMapping() {
         m_ast.traverse(new Node.Switch() {
                 public void onIdentifier(IdentifierNd id) {
-                    ObjectTypeNd ot =
-                        (ObjectTypeNd) id.getParent().getParent();
-                    ObjectMap om = m_root.getObjectMap
-			(m_symbols.getEmitted(ot));
-                    Role role = (Role) m_symbols.getEmitted(ot).getProperty
-                        (id.getName());
+                    ObjectMap om = getMap(id.getParent().getParent());
+                    ObjectType ot = om.getObjectType();
+                    Role role = (Role) ot.getProperty(id.getName());
                     if (role == null) {
                         m_errors.fatal
                             (id, "no such property: " + id.getName());
@@ -821,8 +815,10 @@ public class PDL {
                     }
                 }
             }, new Node.IncludeFilter(new Node.Field[] {
-                AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.OBJECT_KEY,
-                ObjectKeyNd.PROPERTIES
+                AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.PROPERTIES,
+                PropertyNd.NESTED_MAP, NestedMapNd.OBJECT_KEY,
+                NestedMapNd.MAPPINGS, NestedMappingNd.NESTED_MAP,
+                ObjectTypeNd.OBJECT_KEY, ObjectKeyNd.PROPERTIES
             }));
 
 	m_ast.traverse(new Node.Switch() {
@@ -886,58 +882,94 @@ public class PDL {
 	    });
 
         m_ast.traverse(new Node.Switch() {
-                public void onProperty(PropertyNd pn) {
-                    Role prop = (Role) getEmitted(pn);
-                    if (prop == null) { return; }
-
-                    ObjectMap om = m_root.getObjectMap(prop.getContainer());
-                    if (om == null) { return; }
-
-                    Object mapping = pn.getMapping();
+            public void onProperty(PropertyNd pn) {
+                emit(pn);
+                Node mapping = getMapping(pn);
+                Role prop = (Role) getEmitted(pn);
+                // auto generate reverse way for one-way composites
+                if (pn.isComposite()
+                    && pn.getParent() instanceof ObjectTypeNd) {
                     if (mapping == null) {
-                        Path p = Path.get(prop.getName());
-                        om.addMapping(new Static(p));
-                    } else if (mapping instanceof ColumnNd) {
-                        emitMapping(prop, (ColumnNd) mapping);
-                    } else if (mapping instanceof JoinPathNd) {
-                        emitMapping(prop, (JoinPathNd) mapping);
+                        m_errors.fatal
+                            (pn, "one-way composite must have metadata");
                     } else {
-                        emitMapping(prop, (QualiasNd) mapping);
-                    }
-                    if (!m_root.hasObjectMap(prop.getType())) {
-                        Mapping m = om.getMapping(prop);
-                        if (m != null) {
-                            m.setMap(new ObjectMap(prop.getType()));
-                        }
-                    }
-
-                    // auto generate reverse way for one-way composites
-                    if (pn.isComposite()
-                        && pn.getParent() instanceof ObjectTypeNd) {
-                        if (mapping == null) {
-                            m_errors.fatal
-                                (pn, "one-way composite must have metadata");
+                        Role rev = prop.getReverse();
+                        if (mapping instanceof JoinPathNd) {
+                            emitMapping(rev, (JoinPathNd) mapping, true);
                         } else {
-                            Role rev = prop.getReverse();
-                            if (mapping instanceof JoinPathNd) {
-                                emitMapping(rev, (JoinPathNd) mapping, true);
-                            } else {
-                                m_errors.fatal(pn, "must have a join path");
-                            }
+                            m_errors.fatal(pn, "must have a join path");
                         }
                     }
                 }
-            });
+            }
+            public void onNestedMapping(NestedMappingNd nm) {
+                emit(nm);
+            }
+            private Node getMapping(Node nd) {
+                if (nd instanceof PropertyNd) {
+                    return (Node) nd.get(PropertyNd.MAPPING);
+                } else if (nd instanceof NestedMappingNd) {
+                    return (Node) nd.get(NestedMappingNd.MAPPING);
+                } else {
+                    throw new IllegalArgumentException("" + nd);
+                }
+            }
+            private NestedMapNd getNestedMap(Node nd) {
+                if (nd instanceof PropertyNd) {
+                    return (NestedMapNd) nd.get(PropertyNd.NESTED_MAP);
+                } else if (nd instanceof NestedMappingNd) {
+                    return (NestedMapNd) nd.get(NestedMappingNd.NESTED_MAP);
+                } else {
+                    throw new IllegalArgumentException("" + nd);
+                }
+            }
+            private void emit(Node nd) {
+                ObjectMap om;
+                if (nd.getParent() instanceof AssociationNd) {
+                    Property p = (Property) getEmitted(nd);
+                    if (p == null) { return; }
+                    om = m_root.getObjectMap(p.getContainer());
+                } else {
+                    om = getMap(nd.getParent());
+                }
+                if (om == null) { return; }
+                Role prop = (Role) om.getObjectType().getProperty(getPath(nd));
+                if (prop == null) { return; }
+
+                Node mapping = getMapping(nd);
+                if (mapping == null) {
+                    Path p = Path.get(prop.getName());
+                    om.addMapping(new Static(p));
+                } else if (mapping instanceof ColumnNd) {
+                    emitMapping(om, prop, (ColumnNd) mapping);
+                } else if (mapping instanceof JoinPathNd) {
+                    emitMapping(om, prop, (JoinPathNd) mapping);
+                } else {
+                    emitMapping(om, prop, (QualiasNd) mapping);
+                }
+                if (!m_root.hasObjectMap(prop.getType())) {
+                    Mapping m = om.getMapping(prop);
+                    if (m != null) {
+                        NestedMapNd nm = getNestedMap(nd);
+                        if (nm == null) {
+                            m.setMap(new ObjectMap(prop.getType()));
+                        } else {
+                            m.setMap(getMap(nm));
+                        }
+                    }
+                }
+            }
+        });
 
         m_ast.traverse(new Node.Switch() {
                 public void onReferenceKey(ReferenceKeyNd rkn) {
                     Column key = lookup(rkn.getCol());
-                    ObjectMap om = getMap(rkn);
+                    ObjectMap om = getMap(rkn.getParent());
                     om.setTable(key.getTable());
                 }
 
                 public void onObjectKey(ObjectKeyNd okn) {
-                    ObjectMap om = getMap(okn);
+                    ObjectMap om = getMap(okn.getParent());
                     IdentifierNd prop =
                         (IdentifierNd) okn.getProperties().iterator().next();
                     Mapping m = om.getMapping(Path.get(prop.getName()));
@@ -950,7 +982,7 @@ public class PDL {
 	m_ast.traverse(new Node.Switch() {
 		public void onReferenceKey(ReferenceKeyNd rkn) {
 		    Column key = lookup(rkn.getCol());
-		    ObjectMap om = getMap(rkn);
+		    ObjectMap om = getMap(rkn.getParent());
 		    Column[] cols = new Column[] {key};
 		    if (key.getTable().getForeignKey(cols) == null) {
 			ObjectMap sm = om.getSuperMap();

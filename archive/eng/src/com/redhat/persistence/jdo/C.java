@@ -116,7 +116,7 @@ class C {
     public static void lock(Session ssn, Expression expr) {
         DataSet ds = new DataSet
             (ssn, new Signature() {
-                public Query makeQuery(Expression e) {
+                public Query makeQuery(Session ssn, Expression e) {
                     return new Query(e, true);
                 }
             }, expr);

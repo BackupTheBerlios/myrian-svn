@@ -27,18 +27,18 @@ import java.util.HashSet;
  * Select
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/18 $
  **/
 
 class Select extends Operation {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/Select.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/Select.java#2 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
     private Query m_query;
     private Signature m_sig ;
 
     public Select(RDBMSEngine engine, Signature sig, Expression expr) {
-        this(engine, sig.makeQuery(expr));
+        this(engine, sig.makeQuery(engine.getSession(), expr));
         m_sig = sig;
     }
 

@@ -15,6 +15,7 @@
 package com.redhat.persistence.oql;
 
 import com.arsdigita.db.DbHelper;
+import com.redhat.persistence.Session;
 import com.redhat.persistence.metadata.*;
 
 import junit.framework.*;
@@ -29,18 +30,12 @@ import org.apache.log4j.Logger;
  * QueryTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/07/27 $
+ * @version $Revision: #3 $ $Date: 2004/08/18 $
  **/
 
 public class QueryTest extends TestCase {
 
-    // We don't really need to extend TestCase, we could just
-    // implement Test exception for the reflection magic that the ant
-    // junit task does to report the test name depends on the test
-    // being an instance of TestCase. Later versions of ant don't
-    // suffer from this problem.
-
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/oql/QueryTest.java#2 $ by $Author: ashah $, $DateTime: 2004/07/27 18:02:20 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/oql/QueryTest.java#3 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
     private static final Logger s_log = Logger.getLogger(QueryTest.class);
 
@@ -54,7 +49,6 @@ public class QueryTest extends TestCase {
     private Integer m_joinCount = null;
     private Integer m_innerCount = null;
     private Integer m_outerCount = null;
-    //private static final String NL = System.getProperty("line.separator");
 
     public QueryTest(QuerySuite suite,
                      String name,
@@ -85,9 +79,9 @@ public class QueryTest extends TestCase {
                     ("query string includes multiple queries: " + m_query);
             }
             Connection conn = m_suite.getConnection();
-            Root root = m_suite.getRoot();
+            Session ssn = m_suite.getSession();
             Code sql = q.generate
-                (root, DbHelper.getDatabase(conn) == DbHelper.DB_ORACLE);
+                (ssn, DbHelper.getDatabase(conn) == DbHelper.DB_ORACLE);
             s_log.info("SQL:\n" + sql);
             PreparedStatement stmt = conn.prepareStatement(sql.getSQL());
             try {
@@ -95,7 +89,7 @@ public class QueryTest extends TestCase {
                 for (int i = 0; i < bindings.size(); i++) {
                     Code.Binding b = (Code.Binding) bindings.get(i);
                     Object value = b.getValue();
-                    Adapter ad = root.getAdapter(value.getClass());
+                    Adapter ad = ssn.getRoot().getAdapter(value.getClass());
                     ad.bind(stmt, i + 1, value, b.getType());
                 }
                 stmt.execute();

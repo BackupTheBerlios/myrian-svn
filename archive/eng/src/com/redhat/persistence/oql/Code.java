@@ -27,12 +27,12 @@ import org.apache.log4j.Logger;
  * Code
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/08/06 $
+ * @version $Revision: #4 $ $Date: 2004/08/18 $
  **/
 
 public class Code {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Code.java#3 $ by $Author: rhs $, $DateTime: 2004/08/06 11:52:43 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Code.java#4 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
     private static final Logger s_log = Logger.getLogger(Code.class);
 
@@ -235,7 +235,12 @@ public class Code {
         for (int i = m_lower; i < m_upper; i++) {
             char c = m_sql.charAt(i);
             if (!escape && c == '?') {
-                Code.Binding b = (Code.Binding) m_bindings.get(index++);
+                Code.Binding b;
+                try { b = (Code.Binding) m_bindings.get(index++); }
+                catch (IndexOutOfBoundsException e) {
+                    throw new Error
+                        ("code: " + this + ", bindings: " + bindings, e);
+                }
                 Object value;
                 int type;
                 if (b.getKey() == null) {
@@ -354,19 +359,18 @@ public class Code {
         return result[0];
     }
 
-    static String[] columns(Property prop, QFrame frame) {
+    static String[] columns(ObjectType type, QFrame frame, Path prefix) {
         List result = new ArrayList();
-        if (columns(prop, frame, null, result)) {
+        if (columns(type, frame, prefix, result)) {
             return (String[]) result.toArray(new String[result.size()]);
         } else {
             return null;
         }
     }
 
-    private static boolean columns(Property prop, QFrame frame, Path prefix,
+    private static boolean columns(ObjectType type, QFrame frame, Path prefix,
                                    List result) {
-        prefix = Path.add(prefix, prop.getName());
-        Collection props = properties(prop.getType());
+        Collection props = properties(type);
         if (props.isEmpty()) {
             if (frame.hasMapping(prefix)) {
                 result.add(frame.getMapping(prefix));
@@ -378,7 +382,8 @@ public class Code {
 
         for (Iterator it = props.iterator(); it.hasNext(); ) {
             Property p = (Property) it.next();
-            if (!columns(p, frame, prefix, result)) { return false; }
+            Path pfx = Path.add(prefix, p.getName());
+            if (!columns(p.getType(), frame, pfx, result)) { return false; }
         }
 
         return true;
@@ -495,7 +500,7 @@ public class Code {
         }
     }
 
-    static Map map(Path[] keys, String[] values) {
+    static Map map(Path[] keys, Code[] values) {
         Map result = new HashMap();
         for (int i = 0; i < keys.length; i++) {
             result.put(keys[i], values[i]);
@@ -617,15 +622,15 @@ public class Code {
         return result;
     }
 
-    static int span(ObjectType type) {
-        Collection props = properties(type);
-        if (props.isEmpty()) {
+    static int span(ObjectMap map) {
+        List key = map.getKeyMappings();
+        if (key.isEmpty()) {
             return 1;
         } else {
             int result = 0;
-            for (Iterator it = props.iterator(); it.hasNext(); ) {
-                Property prop = (Property) it.next();
-                result += span(prop.getType());
+            for (int i = 0; i < key.size(); i++) {
+                Mapping m = (Mapping) key.get(i);
+                result += span(m.getMap());
             }
             return result;
         }

@@ -22,16 +22,15 @@ import java.util.HashSet;
  * OracleWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/18 $
  **/
 
 public class OracleWriter extends ANSIWriter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/OracleWriter.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/OracleWriter.java#2 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
     public void write(Select select) {
-        write(select.getQuery().generate
-              (getEngine().getSession().getRoot(), true));
+        write(select.getQuery().generate(getEngine().getSession(), true));
     }
 
     void writeBind(Object o, int jdbcType) {

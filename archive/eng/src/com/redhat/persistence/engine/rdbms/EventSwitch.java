@@ -32,12 +32,12 @@ import org.apache.log4j.Logger;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/08/05 $
+ * @version $Revision: #3 $ $Date: 2004/08/18 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/EventSwitch.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/EventSwitch.java#3 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
     private static final Logger LOG = Logger.getLogger(EventSwitch.class);
 
@@ -213,8 +213,15 @@ class EventSwitch extends Event.Switch {
     }
 
     private void onObjectEvent(ObjectEvent e) {
+        ObjectMap map = e.getObjectMap();
+        if (map.isNested() &&
+            (map.getContainer() instanceof Static ||
+             map.getContainer() instanceof Nested)) {
+            return;
+        }
+
         Object obj = e.getObject();
-        List oms = getObjectMaps(e.getObjectMap());
+        List oms = getObjectMaps(map);
         if (e instanceof DeleteEvent) {
             Collections.reverse(oms);
         }
@@ -259,16 +266,23 @@ class EventSwitch extends Event.Switch {
     }
 
     private void onPropertyEvent(final PropertyEvent e) {
-        final Object obj = m_engine.getContainer(e.getObject());
-        final Object arg = e.getArgument();
-
         final ObjectMap om = e.getObjectMap();
-        Mapping m = om.getMapping(Path.get(e.getProperty().getName()));
-
+        Mapping m = om.getMapping(e.getProperty());
         if (m == null) {
             throw new IllegalStateException
                 ("no mapping for property: " + e.getProperty());
         }
+
+        final Object obj;
+        if (om.isNested() &&
+            (om.getContainer() instanceof Nested ||
+             om.getContainer() instanceof Static)) {
+            obj = m_engine.getContainer(e.getObject());
+        } else {
+            obj = e.getObject();
+        }
+        final Object arg = e.getArgument();
+
 
         final Role role = (Role) e.getProperty();
 

@@ -40,6 +40,13 @@
   </test>
 
   <test>
+    <query subselects="0" joins="0">
+      query(filter(this = all(test.Tuple), this == null))
+    </query>
+    <results/>
+  </test>
+
+  <test>
     <query subselects="0" joins="1" outers="1">
       query(all(test.Tuple).cee, id = id, name = name)
     </query>

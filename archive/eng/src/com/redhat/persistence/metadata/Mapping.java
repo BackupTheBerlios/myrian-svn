@@ -22,12 +22,12 @@ import java.util.*;
  * Mapping
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/08/05 $
+ * @version $Revision: #3 $ $Date: 2004/08/18 $
  **/
 
 public abstract class Mapping extends Element {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Mapping.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Mapping.java#3 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
     public static abstract class Switch {
         public abstract void onValue(Value m);
@@ -64,6 +64,10 @@ public abstract class Mapping extends Element {
         return m_path;
     }
 
+    public Property getProperty () {
+        return getObjectMap().getObjectType().getProperty(m_path);
+    }
+
     public boolean isNested() {
         return getMap().isNested();
     }
@@ -77,7 +81,11 @@ public abstract class Mapping extends Element {
     }
 
     public void setMap(ObjectMap map) {
-        if (map != null && map.getParent() == null) {
+        setMap(map, true);
+    }
+
+    public void setMap(ObjectMap map, boolean nest) {
+        if (nest && map != null && map.getParent() == null) {
             map.setParent(this);
         }
         m_map = map;
@@ -130,6 +138,40 @@ public abstract class Mapping extends Element {
             m_removes = new ArrayList();
             m_removes.addAll(removes);
         }
+    }
+
+    public Mapping reverse(final Path p) {
+        final Mapping[] result = { null };
+        dispatch(new Mapping.Switch() {
+            public void onJoinTo(JoinTo j) {
+                result[0] = new JoinFrom(p, j.getKey());
+            }
+            public void onJoinFrom(JoinFrom j) {
+                result[0] = new JoinTo(p, j.getKey());
+            }
+            public void onJoinThrough(JoinThrough j) {
+                result[0] = new JoinThrough(p, j.getTo(), j.getFrom());
+            }
+            public void onQualias(Qualias q) {
+                String qname = q.getObjectMap().getObjectType()
+                    .getQualifiedName();
+                result[0] = new Qualias
+                    (p, "filter(all(" + qname +
+                     "), exists(filter(that = " + q.getPath().getPath() +
+                     ", this == that)))");
+            }
+            public void onValue(Value v) {
+                throw new IllegalArgumentException("not reversible: " + v);
+            }
+            public void onStatic(Static s) {
+                result[0] = new Static(p);
+            }
+            public void onNested(Nested n) {
+                // XXX: kill nested
+                result[0] = new Static(p);
+            }
+        });
+        return result[0];
     }
 
     public abstract void dispatch(Switch sw);

@@ -37,12 +37,12 @@ import org.apache.log4j.Logger;
  * Aggregator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/08/05 $
+ * @version $Revision: #4 $ $Date: 2004/08/18 $
  **/
 
 class Aggregator extends Event.Switch {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/Aggregator.java#3 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/Aggregator.java#4 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
     private static final Logger LOG = Logger.getLogger(Aggregator.class);
 
@@ -304,15 +304,16 @@ class Aggregator extends Event.Switch {
         Property prop = e.getProperty();
         Object arg = e.getArgument();
 
-        Mapping m = e.getObjectMap().getMapping(prop);
+        nd.addDependency(getObjectEvent(arg));
 
-        if (m.isNested()) {
-            Event oev = getObjectEvent(arg);
-            if (oev != null) {
-                findNode(oev).addDependency(e);
+        Mapping m = e.getObjectMap().getMapping(prop);
+        if (m.isNested() && m.isCompound()) {
+            Event ovile = getViolation(arg);
+            if (ovile != null) {
+                nd = merge(findNode(ovile), nd,
+                           "violation from nested type");
+                clearViolation(arg);
             }
-        } else {
-            nd.addDependency(getObjectEvent(arg));
         }
 
         Event prev;
@@ -394,14 +395,6 @@ class Aggregator extends Event.Switch {
                 setAttributeEvent(obj, e);
             } else {
                 nd = merge(findNode(attr), nd, "attributes from set");
-            }
-        }
-
-        if (mapping.isNested() && mapping.isCompound()) {
-            Event ovile = getViolation(arg);
-            if (ovile != null) {
-                nd = merge(findNode(ovile), nd, "violation from nested type");
-                clearViolation(arg);
             }
         }
 

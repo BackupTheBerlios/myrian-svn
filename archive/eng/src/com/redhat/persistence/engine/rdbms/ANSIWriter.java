@@ -24,14 +24,14 @@ import java.util.Iterator;
  * ANSIWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/18 $
  **/
 
 
 public class ANSIWriter extends SQLWriter {
 
     public void write(Select select) {
-        write(select.getQuery().generate(getEngine().getSession().getRoot()));
+        write(select.getQuery().generate(getEngine().getSession()));
     }
 
     public void write(Insert insert) {

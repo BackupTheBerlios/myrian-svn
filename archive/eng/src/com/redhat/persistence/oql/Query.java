@@ -15,6 +15,7 @@
 package com.redhat.persistence.oql;
 
 import com.redhat.persistence.ProtoException;
+import com.redhat.persistence.Session;
 import com.redhat.persistence.metadata.*;
 import java.util.*;
 
@@ -24,12 +25,12 @@ import org.apache.log4j.Logger;
  * Query
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/07/21 $
+ * @version $Revision: #5 $ $Date: 2004/08/18 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Query.java#4 $ by $Author: rhs $, $DateTime: 2004/07/21 12:38:43 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Query.java#5 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -62,18 +63,22 @@ public class Query {
         return (Expression) m_fetched.get(name);
     }
 
-    public Code generate(Root root) {
-        return generate(root, false);
+    public Code generate(Session ssn) {
+        return generate(ssn, false);
     }
 
-    public Code generate(Root root, boolean oracle) {
+    public Code generate(Session ssn, boolean oracle) {
+        Generator gen = Generator.getThreadGenerator();
         try {
-            return generateInternal(root, oracle);
+            gen.init(ssn);
+            return generate(gen, oracle);
         } catch (Throwable t) {
             ProtoException e =
                 new ProtoException("oql compilation error: " + this) {};
             e.initCause(t);
             throw e;
+        } finally {
+            gen.clear();
         }
     }
 
@@ -81,10 +86,7 @@ public class Query {
 
     private static final Map s_cache = new HashMap();
 
-    private Code generateInternal(Root root, boolean oracle) {
-        Generator gen = Generator.getThreadGenerator();
-        gen.init(root);
-
+    private Code generate(Generator gen, boolean oracle) {
         m_query.hash(gen);
 
         for (int i = 0; i < m_names.size(); i++) {
@@ -101,7 +103,7 @@ public class Query {
         }
 
         if (cached != null) {
-            Code c = cached.resolve(gen.getBindings(), root);
+            Code c = cached.resolve(gen.getBindings(), gen.getRoot());
             return c;
         }
 
@@ -252,7 +254,7 @@ public class Query {
             s_cache.put(gen.getStoreKey(), sql);
         }
 
-        sql = sql.resolve(gen.getBindings(), root);
+        sql = sql.resolve(gen.getBindings(), gen.getRoot());
 
         return sql;
     }

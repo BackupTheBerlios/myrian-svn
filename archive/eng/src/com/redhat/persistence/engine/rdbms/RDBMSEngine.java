@@ -60,12 +60,12 @@ import org.apache.log4j.Priority;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/08/05 $
+ * @version $Revision: #5 $ $Date: 2004/08/18 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#4 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#5 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -276,7 +276,7 @@ public class RDBMSEngine extends Engine {
         }
 
         return new RDBMSRecordSet
-            (sig, expr.getMap(getSession().getRoot()), this, execute(sel));
+            (sig, expr.getMap(getSession()), this, execute(sel));
     }
 
     public long size(Expression expr) {
