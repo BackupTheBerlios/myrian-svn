@@ -13,7 +13,7 @@ import javax.jdo.Query;
  * CRPMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #13 $ $Date: 2004/07/13 $
+ * @version $Revision: #14 $ $Date: 2004/07/14 $
  **/
 class CRPMap implements Map {
     private Set entries;
@@ -23,13 +23,26 @@ class CRPMap implements Map {
     }
 
     private Map.Entry getEntry(Object key) {
-        PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-        Query query = pm.newQuery("oql", "filter($1, key==$2)");
+        Query query = getPMI().newQuery("oql", "filter($1, key==$2)");
         Collection coll = (Collection) query.execute(entries, key);
         Iterator it = coll.iterator();
         return it.hasNext() ? (Map.Entry) it.next() : null;
     }
 
+    private PersistenceManagerImpl getPMI() {
+        return (PersistenceManagerImpl) JDOHelper.getPersistenceManager(this);
+    }
+
+    private MapEntry newMapEntry(Object key, Object value) {
+        PersistenceManagerImpl pmi = getPMI();
+        StateManagerImpl smi = pmi.getStateManager(this);
+
+        MapEntry entry = new MapEntry
+            (pmi.getSession().retrieve(smi.getPropertyMap()), key);
+
+        entry.setValue(value);
+        return entry;
+    }
     // =========================================================================
     // Map interface
     // =========================================================================
@@ -44,15 +57,7 @@ class CRPMap implements Map {
         final Map.Entry me = getEntry(key);
 
         if (me == null) {
-            PersistenceManagerImpl pmi = (PersistenceManagerImpl)
-                JDOHelper.getPersistenceManager(this);
-            StateManagerImpl smi = pmi.getStateManager(this);
-
-            Map.Entry entry = new MapEntry
-                (pmi.getSession().retrieve(smi.getPropertyMap()), key);
-
-            entry.setValue(value);
-            entries.add(entry);
+            entries.add(newMapEntry(key, value));
             return null;
         } else {
             return me.setValue(value);
@@ -69,8 +74,7 @@ class CRPMap implements Map {
     }
 
     private Collection keys() {
-        PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-        Query query = pm.newQuery("oql", "$1.key");
+        Query query = getPMI().newQuery("oql", "$1.key");
         return (Collection) query.execute(entries);
     }
 
@@ -81,8 +85,26 @@ class CRPMap implements Map {
     }
 
     public Set entrySet() {
-        // XXX: the returned set should not support add and addAll.
-        return entries;
+        return new ProxySet(entries) {
+                public boolean add(Object elem) {
+                    throw new UnsupportedOperationException();
+                }
+
+                public boolean addAll(Collection coll) {
+                    throw new UnsupportedOperationException();
+                }
+
+                public boolean contains(Object elem) {
+                    if (!(elem instanceof Map.Entry)) { return false; }
+
+                    Map.Entry entry = (Map.Entry) elem;
+                    MapEntry mapEntry =
+                        newMapEntry(entry.getKey(), entry.getValue());
+                    // XXX: this installs a PMI for the newly created MapEntry
+                    getPMI().makePersistent(mapEntry);
+                    return super.contains(mapEntry);
+                }
+            };
     }
 
     public void putAll(Map map) {

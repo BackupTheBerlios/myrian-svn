@@ -301,6 +301,9 @@ public class PersistenceManagerImpl implements PersistenceManager {
         // XXX: This rests on the assumption that the Java class and the
         // corresponding object type have the same name.
         ObjectType type = root.getObjectType(cls.getName());
+        if (type == null) {
+            throw new IllegalStateException("no type for " + cls.getName());
+        }
         makePersistent(pc, type);
     }
 
