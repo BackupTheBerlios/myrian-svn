@@ -273,9 +273,18 @@ public class PersistenceManagerImpl implements PersistenceManager {
      * Make the transient instance persistent in this PersistenceManager.
      */
     public void makePersistent(Object obj) {
+        if (obj == null) { throw new NullPointerException("obj"); }
+
         if (!(obj instanceof PersistenceCapable)) {
-            throw new IllegalArgumentException(obj.getClass().getName());
+            throw new ClassCastException
+                ("Expected " + obj.getClass().getName() + " to implement " +
+                 PersistenceCapable.class.getName());
         }
+
+        if (!m_txn.isActive()) {
+            throw new JDOUserException("No active transaction");
+        }
+
         PersistenceCapable pc = (PersistenceCapable) obj;
 
         Class cls = pc.getClass();
