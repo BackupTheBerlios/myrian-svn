@@ -14,12 +14,12 @@ import java.io.*;
  * SQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/03/14 $
+ * @version $Revision: #2 $ $Date: 2003/03/15 $
  */
 
 public class SQLParser {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/common/SQLParser.jj#1 $ by $Author: rhs $, $DateTime: 2003/03/14 13:52:50 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/common/SQLParser.jj#2 $ by $Author: rhs $, $DateTime: 2003/03/15 12:47:21 $";
 
     public static interface Mapper {
         Path map(Path path);
@@ -82,9 +82,13 @@ public class SQLParser {
         m_image.append(t.image);
     }
 
-    private void token(boolean bind) {
+    private void token() {
+        token(null);
+    }
+
+    private void token(SQLToken.Type type) {
         if (m_image.length() > 0) {
-            m_sql.append(new SQLToken(m_image.toString(), bind));
+            m_sql.append(new SQLToken(m_image.toString(), type));
             m_image.setLength(0);
         }
     }
@@ -161,6 +165,9 @@ TOKEN [IGNORE_CASE]:
   | <PRIOR: "prior">
   | <LIMIT: "limit">
   | <OFFSET: "offset">
+// allowed functions
+  | <UPPER: "upper">
+  | <LOWER: "lower">
 // Clause beginnings
   | <SELECT: "select">
   | <INSERT_INTO: "insert" <WS> "into">
@@ -195,7 +202,7 @@ void sql() :
 {
  [ ( statement() | unstructuredElement()
      ( ( unstructuredElement() | clauseStart() ) )* ) ] <EOF>
-     { token(false); }
+     { token(); }
 }
 
 void statement() :
@@ -255,7 +262,9 @@ void symbol() :
   | t = <LIMIT>
   | t = <OFFSET>
   | t = <MINUS>
-  | t = <PRIOR> )
+  | t = <PRIOR>
+  | t = <UPPER>
+  | t = <LOWER> )
     { append(t); }
 }
 
@@ -301,17 +310,18 @@ void identifier() :
 }
 {
     ( t = <BINDVAR> { bind = true; } | t = <ID>  )
-        { buf.append(t.image); appendSpecial(t); token(false); }
+        { buf.append(t.image); appendSpecial(t); token(); }
         ( LOOKAHEAD(2) <PERIOD> t = <ID>
             { buf.append('.'); buf.append(t.image);
         } )*
     {
         if (bind) {
             m_image.append(buf.substring(1));
+            token(SQLToken.BIND);
         } else {
-            m_image.append(m_mapper.map(Path.get(buf.toString())));
+            m_image.append(m_mapper.map(Path.get(buf.toString())).getPath());
+            token(SQLToken.PATH);
         }
-        token(bind);
     }
 }
 
@@ -362,10 +372,10 @@ void assign() :
 }
 {
 
-    { token(false); begin = m_sql.getLast(); }
+    { token(); begin = m_sql.getLast(); }
     identifier() t = <EQ> { append(t); } ( unstructuredElementNoComma() )+
     {
-        token(false);
+        token();
         m_assigns.add(new Assign(begin.getNext(), m_sql.getLast()));
     }
 }

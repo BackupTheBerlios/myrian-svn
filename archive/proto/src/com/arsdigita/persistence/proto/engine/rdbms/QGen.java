@@ -13,12 +13,12 @@ import java.io.*;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #15 $ $Date: 2003/03/15 $
+ * @version $Revision: #16 $ $Date: 2003/03/15 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#15 $ by $Author: rhs $, $DateTime: 2003/03/15 02:35:11 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#16 $ by $Author: rhs $, $DateTime: 2003/03/15 12:47:21 $";
 
     private static final HashMap SOURCES = new HashMap();
     private static final HashMap BLOCKS = new HashMap();
@@ -383,8 +383,13 @@ class QGen {
                         (new StringReader(f.getConditions()),
                          new SQLParser.Mapper() {
                                  public Path map(Path path) {
-                                     genPath(path);
-                                     return getColumn(path);
+                                     Root r = Root.getRoot();
+                                     if (r.hasObjectType(path.getPath())) {
+                                         return path;
+                                     } else {
+                                         genPath(path);
+                                         return getColumn(path);
+                                     }
                                  }
                              });
 

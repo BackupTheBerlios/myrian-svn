@@ -11,12 +11,12 @@ import java.sql.*;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2003/03/15 $
+ * @version $Revision: #9 $ $Date: 2003/03/15 $
  **/
 
 abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#8 $ by $Author: rhs $, $DateTime: 2003/03/15 02:35:11 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#9 $ by $Author: rhs $, $DateTime: 2003/03/15 12:47:21 $";
 
     private Operation m_op = null;
     private StringBuffer m_sql = new StringBuffer();
@@ -100,12 +100,25 @@ abstract class SQLWriter {
     }
 
     public void write(SQLToken start, SQLToken end) {
+        Root r = Root.getRoot();
+
         for (SQLToken t = start; t != end; t = t.getNext()) {
             if (t.isBind()) {
                 write(Path.get(t.getImage()));
-            } else {
-                write(t.getImage());
+                continue;
             }
+
+            if (t.isPath() && r.hasObjectType(t.getImage())) {
+                ObjectMap om = r.getObjectMap
+                    (r.getObjectType(t.getImage()));
+                SQLBlock b = om.getRetrieveAll();
+                if (b != null) {
+                    write(b.getSQL());
+                    continue;
+                }
+            }
+
+            write(t.getImage());
         }
     }
 
