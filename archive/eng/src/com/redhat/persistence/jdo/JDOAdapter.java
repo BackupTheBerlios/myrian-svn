@@ -3,6 +3,7 @@ package com.redhat.persistence.jdo;
 import com.redhat.persistence.*;
 import com.redhat.persistence.metadata.*;
 import java.util.*;
+import javax.jdo.PersistenceManager;
 import javax.jdo.spi.*;
 
 import org.apache.log4j.Logger;
@@ -17,9 +18,20 @@ public class JDOAdapter extends Adapter {
     }
 
     public PropertyMap getProperties(Object obj) {
-        return ((PersistenceManagerImpl)
-         ((PersistenceCapable) obj).jdoGetPersistenceManager())
-            .getStateManager((PersistenceCapable) obj).getPropertyMap();
+        if (!(obj instanceof PersistenceCapable)) {
+            throw new ClassCastException
+                ("expected PersistenceCapable: " + obj);
+        }
+
+        PersistenceManager pm = ((PersistenceCapable) obj).jdoGetPersistenceManager();
+
+        if (!(pm instanceof PersistenceManagerImpl)) {
+            throw new ClassCastException
+                ("expected PersistenceManagerImpl: " + pm);
+        }
+
+        return ((PersistenceManagerImpl) pm).
+            getStateManager((PersistenceCapable) obj).getPropertyMap();
     }
 
     public ObjectType getObjectType(Object obj) {
