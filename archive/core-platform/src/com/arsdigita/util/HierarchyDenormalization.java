@@ -33,11 +33,11 @@ import org.apache.log4j.Logger;
  * </p>
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Revision: #10 $ $Date: 2004/03/03 $
+ * @version $Revision: #11 $ $Date: 2004/03/03 $
  */
 public abstract class HierarchyDenormalization {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/HierarchyDenormalization.java#10 $ by $Author: vadim $, $DateTime: 2004/03/03 11:29:37 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/HierarchyDenormalization.java#11 $ by $Author: vadim $, $DateTime: 2004/03/03 11:34:01 $";
 
     private final static Logger s_log =
         Logger.getLogger(HierarchyDenormalization.class);
@@ -75,7 +75,14 @@ public abstract class HierarchyDenormalization {
 
             if (!name.equals(m_attributeName)) { return; }
 
-            if (!m_isModified) {
+            if (m_isModified) {
+                if (s_log.isDebugEnabled()) {
+                    s_log.debug("Got another set on " + dobj + "." + 
+                                name + " old " + old_value + " new " + 
+                                new_value);
+                }
+                m_newAttributeValue = (String) new_value;
+            } else {
                 if (s_log.isDebugEnabled()) {
                     s_log.debug("Got set on " + dobj + "." + name + 
                                 " old " + old_value + " new " + new_value);
@@ -83,13 +90,6 @@ public abstract class HierarchyDenormalization {
                 m_oldAttributeValue = (String) old_value;
                 m_newAttributeValue = (String) new_value;
                 m_isModified = true;
-            } else {
-                if (s_log.isDebugEnabled()) {
-                    s_log.debug("Got another set on " + dobj + "." + 
-                                name + " old " + old_value + " new " + 
-                                new_value);
-                }
-                m_newAttributeValue = (String) new_value;
             }
 
         }
@@ -112,7 +112,7 @@ public abstract class HierarchyDenormalization {
             if (s_log.isDebugEnabled()) {
                 s_log.debug("In after save for " + dobj);
             }
-            if (! m_isModified) { return; }
+            if (!m_isModified) { return; }
 
             if (s_log.isDebugEnabled()) {
                 s_log.debug("After save: oid:" + dobj +
