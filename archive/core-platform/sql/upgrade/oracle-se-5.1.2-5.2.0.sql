@@ -12,7 +12,7 @@
 -- rights and limitations under the License.
 --
 --
--- $Id: //core-platform/dev/sql/upgrade/oracle-se-5.1.2-5.2.0.sql#3 $
+-- $Id: //core-platform/dev/sql/upgrade/oracle-se-5.1.2-5.2.0.sql#4 $
 
 @@ ../oracle-se/upgrade/5.1.2-5.2.0/function-last_attr_value.sql
 @@ ../oracle-se/upgrade/5.1.2-5.2.0/function-package_id_for_object_id.sql
@@ -38,3 +38,4 @@
 @@ ../oracle-se/upgrade/5.1.2-5.2.0/drop-table-secret-tokens.sql
 @@ ../oracle-se/upgrade/5.1.2-5.2.0/misc.sql
 @@ ../oracle-se/upgrade/5.1.2-5.2.0/update-constraints.sql
+@@ ../oracle-se/upgrade/5.1.2-5.2.0/drop-applications-package-type-id-constraint.sql
