@@ -9,12 +9,12 @@ import java.util.*;
  * Root
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/03/27 $
+ * @version $Revision: #6 $ $Date: 2003/04/02 $
  **/
 
 public class Root {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Root.java#5 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Root.java#6 $ by $Author: rhs $, $DateTime: 2003/04/02 12:28:31 $";
 
     private static final Root ROOT = new Root();
 
@@ -22,12 +22,64 @@ public class Root {
         return ROOT;
     }
 
+    private static final class Location {
+
+	private final String m_filename;
+	private final int m_line;
+	private final int m_column;
+
+	public Location(String filename, int line, int column) {
+	    m_filename = filename;
+	    m_line = line;
+	    m_column = column;
+	}
+
+	public String getFilename() {
+	    return m_filename;
+	}
+
+	public int getLine() {
+	    return m_line;
+	}
+
+	public int getColumn() {
+	    return m_column;
+	}
+
+    }
+
+    private HashMap m_locations = new HashMap();
     private Mist m_types = new Mist(this);
     private Mist m_maps = new Mist(this);
     private Mist m_tables = new Mist(this);
     private Mist m_ops = new Mist(this);
 
     private Root() {}
+
+    public void setLocation(Object element, String filename, int line,
+			    int column) {
+	m_locations.put(element, new Location(filename, line, column));
+    }
+
+    private Location getLocation(Object element) {
+	Location result = (Location) m_locations.get(element);
+	if (result == null) {
+	    throw new IllegalArgumentException("no such element: " + element);
+	}
+	return result;
+    }
+
+    public String getFilename(Object element) {
+	return getLocation(element).getFilename();
+    }
+
+    public int getLine(Object element) {
+	return getLocation(element).getLine();
+    }
+
+    public int getColumn(Object element) {
+	return getLocation(element).getColumn();
+    }
 
     public boolean hasObjectType(String qualifiedName) {
         return m_types.containsKey(qualifiedName);

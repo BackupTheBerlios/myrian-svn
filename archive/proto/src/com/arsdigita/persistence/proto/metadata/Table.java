@@ -24,12 +24,12 @@ import java.io.*;
  * Table
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/03/05 $
+ * @version $Revision: #6 $ $Date: 2003/04/02 $
  **/
 
 public class Table extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Table.java#5 $ by $Author: rhs $, $DateTime: 2003/03/05 18:41:57 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Table.java#6 $ by $Author: rhs $, $DateTime: 2003/04/02 12:28:31 $";
 
     private String m_name;
     private Mist m_columns = new Mist(this);
@@ -124,11 +124,10 @@ public class Table extends Element {
         columns.addAll(m_columns);
 
         for (int i = 0; i < columns.size(); i++) {
-            String colName = (String) columns.get(i);
-            Column col = getColumn(colName);
+            Column col = (Column) columns.get(i);
             if (col.hasPrimaryKey()) {
                 columns.remove(i);
-                columns.add(0, colName);
+                columns.add(0, col);
             }
         }
 
@@ -136,8 +135,7 @@ public class Table extends Element {
 
         String comment = null;
         for (int i = 0; i < columns.size(); i++) {
-            String colName = (String) columns.get(i);
-            Column column = getColumn(colName);
+            Column column = (Column) columns.get(i);
             result.append(column.getInlineSQL(defer));
             boolean hasNext = i < columns.size() - 1;
             if (hasNext) {

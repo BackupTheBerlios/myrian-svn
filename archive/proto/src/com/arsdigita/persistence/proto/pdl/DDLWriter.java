@@ -13,7 +13,9 @@
  *
  */
 
-package com.arsdigita.persistence.metadata;
+package com.arsdigita.persistence.proto.pdl;
+
+import com.arsdigita.persistence.proto.metadata.*;
 
 import com.arsdigita.util.Assert;
 
@@ -24,25 +26,18 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Comparator;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 /**
  * DDLWriter
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #1 $ $Date: 2003/04/02 $
  **/
 
 public class DDLWriter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/DDLWriter.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/DDLWriter.java#1 $ by $Author: rhs $, $DateTime: 2003/04/02 12:28:31 $";
 
     private File m_base;
     private boolean m_overwrite;
@@ -80,7 +75,7 @@ public class DDLWriter {
     public void setTestPDL(boolean isTestPDL) {
         m_isTestPDL = isTestPDL;
     }
-    public void write(MetadataRoot root) throws IOException {
+    public void write(Root root) throws IOException {
         write(root.getTables());
     }
 

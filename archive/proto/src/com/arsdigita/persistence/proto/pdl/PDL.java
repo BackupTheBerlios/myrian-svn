@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #33 $ $Date: 2003/03/27 $
+ * @version $Revision: #34 $ $Date: 2003/04/02 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#33 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#34 $ by $Author: rhs $, $DateTime: 2003/04/02 12:28:31 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -30,6 +30,7 @@ public class PDL {
     private SymbolTable m_symbols = new SymbolTable(m_errors);
     private HashMap m_properties = new HashMap();
     private HashSet m_links = new HashSet();
+    private HashSet m_fks = new HashSet();
 
     public PDL() {}
 
@@ -334,6 +335,8 @@ public class PDL {
         UniqueKey key = new UniqueKey(table, null, cols);
         if (primary) {
             table.setPrimaryKey(key);
+	    m_root.setLocation(table, nd.getFile().getName(), nd.getLine(),
+			       nd.getColumn());
         }
     }
 
@@ -416,25 +419,22 @@ public class PDL {
             }));
 
 	m_ast.traverse(new Node.Switch() {
-		private ColumnNd getColumn(PropertyNd role) {
-		    JoinPathNd jpn = (JoinPathNd) role.getMapping();
-		    JoinNd jn = (JoinNd) jpn.getJoins().get(1);
-		    return jn.getFrom();
-		}
-
-		public void onAssociation(AssociationNd assn) {
-		    JoinPathNd jpn =
-			(JoinPathNd) assn.getRoleOne().getMapping();
-		    if (jpn == null || jpn.getJoins().size() != 2) {
+		public void onJoinPath(JoinPathNd jpn) {
+		    List joins = jpn.getJoins();
+		    if (joins.size() != 2) {
 			return;
 		    }
 
-		    ColumnNd from = getColumn(assn.getRoleOne());
-		    ColumnNd to = getColumn(assn.getRoleTwo());
-		    unique(assn, new Column[] { lookup(from), lookup(to) },
+		    ColumnNd from = ((JoinNd) joins.get(0)).getTo();
+		    ColumnNd to = ((JoinNd) joins.get(1)).getFrom();
+		    unique(jpn, new Column[] { lookup(from), lookup(to) },
 			   true);
 		}
-	    });
+	    }, new Node.IncludeFilter(new Node.Field[] {
+		AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.PROPERTIES,
+		FileNd.ASSOCIATIONS, AssociationNd.PROPERTIES,
+		AssociationNd.ROLE_ONE, PropertyNd.MAPPING
+	    }));
     }
 
     private ObjectMap getMap(Node nd) {
@@ -470,8 +470,8 @@ public class PDL {
 		    Collection keys = om.getKeyProperties();
 		    Property pone = ot.getProperty(one.getName().getName());
 		    Property ptwo = ot.getProperty(two.getName().getName());
-		    keys.add(pone);
 		    keys.add(ptwo);
+		    keys.add(pone);
 
 		    if (one.getMapping() != null) {
 			emitMapping(pone, (JoinPathNd) one.getMapping(), 1);
@@ -539,6 +539,32 @@ public class PDL {
                 }
             });
 
+	m_ast.traverse(new Node.Switch() {
+		public void onReferenceKey(ReferenceKeyNd rkn) {
+		    Column key = lookup(rkn.getCol());
+		    ObjectMap om = getMap(rkn);
+		    Column[] cols = new Column[] {key};
+		    if (key.getTable().getForeignKey(cols) == null) {
+			ObjectMap sm = om.getSuperMap();
+			Table table = null;
+			while (sm != null) {
+			    table = sm.getTable();
+			    if (table != null) {
+				break;
+			    }
+			    sm = sm.getSuperMap();
+			}
+			if (table == null) {
+			    throw new IllegalStateException
+				("unable to find supertable");
+			}
+			fk(cols, table.getPrimaryKey());
+		    }
+		}
+	    });
+
+	propogateTypes();
+
 /*        m_ast.traverse(new Node.Switch() {
                 public void onJoin(JoinNd nd) {
                     ObjectMap om = m_root.getObjectMap
@@ -564,6 +590,27 @@ public class PDL {
                 AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.AGGRESSIVE_LOAD,
                 AggressiveLoadNd.PATHS, PathNd.PATH
             }));
+    }
+
+    private void propogateTypes() {
+	int before;
+	do {
+	    before = m_fks.size();
+	    for (Iterator it = m_fks.iterator(); it.hasNext(); ) {
+		ForeignKey fk = (ForeignKey) it.next();
+		Column[] cols = fk.getColumns();
+		Column[] to = fk.getUniqueKey().getColumns();
+		for (int i = 0; i < cols.length; i++) {
+		    if (cols[i].getType() == Integer.MIN_VALUE &&
+			to[i].getType() != Integer.MIN_VALUE) {
+			cols[i].setType(to[i].getType());
+			cols[i].setSize(to[i].getSize());
+			cols[i].setPrecision(to[i].getPrecision());
+			it.remove();
+		    }
+		}
+	    }
+	} while (m_fks.size() < before);
     }
 
     private void emitMapping(Property prop, ColumnNd colNd) {
@@ -597,8 +644,20 @@ public class PDL {
             m_errors.warn(tond, "not a unique key");
             return null;
         }
-        return new ForeignKey
-            (from.getTable(), null, new Column[] {from}, uk, false);
+
+	return fk(new Column[] {from}, uk);
+    }
+
+    private ForeignKey fk(Column[] cols, UniqueKey uk) {
+	Column[] to = uk.getColumns();
+	if (cols.length != to.length) {
+	    throw new IllegalArgumentException
+		("foreign key length must match unique key length");
+	}
+	ForeignKey fk =
+	    new ForeignKey(cols[0].getTable(), null, cols, uk, false);
+	m_fks.add(fk);
+        return fk;
     }
 
     private void emitMapping(Property prop, JoinPathNd jpn) {

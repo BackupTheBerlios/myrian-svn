@@ -24,12 +24,12 @@ import com.arsdigita.util.UncheckedWrapperException;
  * Constraint
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/03/11 $
+ * @version $Revision: #4 $ $Date: 2003/04/02 $
  **/
 
 public abstract class Constraint {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Constraint.java#3 $ by $Author: rhs $, $DateTime: 2003/03/11 10:49:54 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Constraint.java#4 $ by $Author: rhs $, $DateTime: 2003/04/02 12:28:31 $";
 
     private Table m_table;
     private String m_name;
@@ -179,13 +179,13 @@ public abstract class Constraint {
         return m_columns;
     }
 
-    abstract boolean isDeferred();
+    public abstract boolean isDeferred();
 
     abstract String getSuffix();
 
     abstract String getColumnSQL();
 
-    abstract String getSQL();
+    public abstract String getSQL();
 
     String getColumnList() {
         return getColumnList(false);

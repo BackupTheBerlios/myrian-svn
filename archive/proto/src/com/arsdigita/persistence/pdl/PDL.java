@@ -24,10 +24,11 @@ import com.arsdigita.util.cmd.*;
 
 import com.arsdigita.persistence.pdl.ast.AST;
 import com.arsdigita.persistence.Utilities;
-import com.arsdigita.persistence.metadata.DDLWriter;
+import com.arsdigita.persistence.proto.pdl.DDLWriter;
+import com.arsdigita.persistence.proto.metadata.Root;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
-import com.arsdigita.persistence.metadata.Table;
+import com.arsdigita.persistence.proto.metadata.Table;
 import com.arsdigita.persistence.oql.Query;
 import com.arsdigita.db.DbHelper;
 
@@ -62,12 +63,12 @@ import org.apache.log4j.Logger;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/02/17 $
+ * @version $Revision: #5 $ $Date: 2003/04/02 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/PDL.java#4 $ by $Author: vadim $, $DateTime: 2003/02/17 19:25:30 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/PDL.java#5 $ by $Author: rhs $, $DateTime: 2003/04/02 12:28:31 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
     private static boolean s_quiet = false;
@@ -96,7 +97,7 @@ public class PDL {
      */
     public void generateMetadata(MetadataRoot root) {
         m_ast.generateMetadata(root);
-        m_pdl.emit(com.arsdigita.persistence.proto.metadata.Root.getRoot());
+        m_pdl.emit(Root.getRoot());
         m_pdl.emitVersioned();
     }
 
@@ -282,10 +283,10 @@ public class PDL {
                 writer.setTestPDL(true);
             }
 
-            List tables = new ArrayList(root.getTables());
+            List tables = new ArrayList(Root.getRoot().getTables());
             for (Iterator it = tables.iterator(); it.hasNext(); ) {
                 Table table = (Table) it.next();
-                if (!files.contains(table.getFilename())) {
+                if (!files.contains(Root.getRoot().getFilename(table))) {
                     it.remove();
                 }
             }

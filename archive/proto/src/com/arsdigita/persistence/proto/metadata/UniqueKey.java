@@ -21,12 +21,12 @@ import java.util.*;
  * UniqueKey
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/03/11 $
+ * @version $Revision: #4 $ $Date: 2003/04/02 $
  **/
 
 public class UniqueKey extends Constraint {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/UniqueKey.java#3 $ by $Author: rhs $, $DateTime: 2003/03/11 10:49:54 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/UniqueKey.java#4 $ by $Author: rhs $, $DateTime: 2003/04/02 12:28:31 $";
 
     private Set m_foreignKeys = new HashSet();
 
@@ -59,7 +59,7 @@ public class UniqueKey extends Constraint {
         m_foreignKeys.add(fk);
     }
 
-    boolean isDeferred() {
+    public boolean isDeferred() {
         return false;
     }
 
@@ -81,7 +81,7 @@ public class UniqueKey extends Constraint {
         }
     }
 
-    String getSQL() {
+    public String getSQL() {
         String keyword = isPrimaryKey() ? "primary key" : "unique";
         if (getName() == null) {
             return "    " + keyword + getColumnList();
