@@ -1,3 +1,0 @@
--- foreign key index
--- This index makes oracle 9i go totally mad
--- create index ocm_context_id_idx on object_context_map(context_id);

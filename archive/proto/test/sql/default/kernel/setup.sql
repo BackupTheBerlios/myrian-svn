@@ -1,2 +1,0 @@
-
-@@ url-service-test.sql

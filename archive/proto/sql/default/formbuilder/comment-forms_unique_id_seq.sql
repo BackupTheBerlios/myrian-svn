@@ -1,5 +1,0 @@
---comment on sequence forms_unique_id_seq is '
---  Sequence for generating unique form submission ID
---  numbers
---';
--- end;
