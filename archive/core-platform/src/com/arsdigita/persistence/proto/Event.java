@@ -11,12 +11,12 @@ import java.util.*;
  * Event
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/05/16 $
  **/
 
 public abstract class Event {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Event.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Event.java#2 $ by $Author: ashah $, $DateTime: 2003/05/16 23:05:05 $";
 
     private static final Logger LOG = Logger.getLogger(Event.class);
 
@@ -45,6 +45,9 @@ public abstract class Event {
     Event(Session ssn, Object obj) {
         m_ssn = ssn;
         m_obj = obj;
+        if (m_obj == null) {
+            throw new NullException(ProtoException.OBJECT);
+        }
     }
 
     public final Session getSession() {

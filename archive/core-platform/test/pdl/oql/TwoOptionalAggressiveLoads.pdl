@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/test/pdl/oql/TwoOptionalAggressiveLoads.pdl#5 $ 
-// $DateTime: 2002/10/16 14:12:35 $
+// $Id: //core-platform/dev/test/pdl/oql/TwoOptionalAggressiveLoads.pdl#6 $ 
+// $DateTime: 2003/05/16 23:05:05 $
 
 model oql;
 
@@ -27,6 +27,8 @@ object type TwoOptionalAggressiveLoads extends ACSObject {
 			   to t_docs_resources.resource_id;
     String bio = t_up_profiles.bio VARCHAR(4000);
     String skills = t_up_profiles.skills VARCHAR(4000);
+
+    component User[1..1] user = join t_up_profiles.user_id to users.user_id;
 
     reference key (t_up_profiles.profile_id);
 
@@ -108,11 +110,6 @@ object type TwoOptionalAggressiveLoads extends ACSObject {
 	     where profile_id = :id
 	}
     }
-}
-
-association {
-    component User[1..1] user = join t_up_profiles.user_id to users.user_id;
-    TwoOptionalAggressiveLoads[0..1] profile = join users.user_id to t_up_profiles.user_id;
 }
 
 object type ResourceImpl extends VersionedACSObject { 

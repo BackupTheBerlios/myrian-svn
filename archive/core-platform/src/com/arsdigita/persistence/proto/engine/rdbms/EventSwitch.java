@@ -12,12 +12,12 @@ import java.util.*;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/05/15 $
+ * @version $Revision: #3 $ $Date: 2003/05/16 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#2 $ by $Author: rhs $, $DateTime: 2003/05/15 16:45:22 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#3 $ by $Author: ashah $, $DateTime: 2003/05/16 23:05:05 $";
 
     private static final Logger LOG = Logger.getLogger(EventSwitch.class);
 
@@ -279,7 +279,17 @@ class EventSwitch extends Event.Switch {
             }
 
             public void onJoinFrom(JoinFrom m) {
-                set(arg, m.getKey(), obj);
+                if (e instanceof SetEvent) {
+                    SetEvent se = (SetEvent) e;
+                    Object prev = se.getPreviousValue();
+                    if (prev != null) {
+                        set(prev, m.getKey(), null);
+                    }
+                }
+
+                if (arg != null) {
+                    set(arg, m.getKey(), obj);
+                }
             }
 
             public void onJoinThrough(JoinThrough m) {
