@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/upgrade/postgres-5.2.1-6.0.0.sql#2 $
--- $DateTime: 2003/05/05 15:56:50 $
+-- $Id: //core-platform/dev/sql/upgrade/postgres-5.2.1-6.0.0.sql#3 $
+-- $DateTime: 2003/07/14 08:16:34 $
 
 
 begin;
@@ -21,6 +21,7 @@ begin;
 
 drop trigger acs_permissions_cascade_del_tr on acs_objects;
 drop function acs_permissions_cascade_del_fn();
+\i ../default/upgrade/web-hosts.sql
 
 commit;
 
