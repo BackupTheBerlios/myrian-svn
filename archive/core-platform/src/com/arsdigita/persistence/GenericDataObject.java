@@ -46,12 +46,12 @@ import java.util.ArrayList;
  * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/05/30 $
+ * @version $Revision: #3 $ $Date: 2002/05/30 $
  */
 
 public class GenericDataObject implements DataObject {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#2 $ by $Author: rhs $, $DateTime: 2002/05/30 17:04:17 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#3 $ by $Author: rhs $, $DateTime: 2002/05/30 17:55:49 $";
 
     private ObjectType    m_type;
     private Session       m_session;
@@ -127,12 +127,15 @@ public class GenericDataObject implements DataObject {
         if (observer == null) {
             throw new IllegalArgumentException("Can't add a null observer.");
         }
-        if (m_firing) {
-            throw new IllegalStateException(
-                "Can't add an observer from within an observer."
-                );
+        ObserverEntry entry = new ObserverEntry(observer, m_observers.size());
+        if (!m_observers.contains(entry)) {
+            if (m_firing) {
+                throw new IllegalStateException(
+                    "Can't add an observer from within an observer."
+                    );
+            }
+            m_observers.add(entry);
         }
-        m_observers.add(new ObserverEntry(observer, m_observers.size()));
     }
 
     private static final int BEFORE_SAVE = 0;
