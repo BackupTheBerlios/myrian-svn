@@ -25,13 +25,13 @@ import org.apache.oro.text.perl.Perl5Util;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/BooleanParameter.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/BooleanParameter.java#3 $
  */
 public class BooleanParameter extends StringParameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/BooleanParameter.java#2 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/BooleanParameter.java#3 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/08/26 20:38:18 $";
+        "$DateTime: 2003/09/02 18:33:16 $";
 
     static {
         Converters.set(Boolean.class, new BooleanConverter());
@@ -39,5 +39,11 @@ public class BooleanParameter extends StringParameter {
 
     public BooleanParameter(final String name) {
         super(name, Boolean.class);
+    }
+
+    public BooleanParameter(final String name,
+                            final int multiplicity,
+                            final Object defaalt) {
+        super(name, multiplicity, defaalt);
     }
 }

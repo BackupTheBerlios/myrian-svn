@@ -15,37 +15,43 @@
 
 package com.arsdigita.util;
 
+import com.arsdigita.logging.*;
+import com.arsdigita.util.config.*;
+import com.arsdigita.util.parameter.*;
 import org.apache.log4j.Logger;
 
 /**
  * @author Justin Ross
  * @see com.arsdigita.util.Util
  */
-final class UtilConfig extends Record {
+final class UtilConfig extends BaseConfig {
     public static final String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/UtilConfig.java#2 $" +
-        "$Author: rhs $" +
-        "$DateTime: 2003/08/19 22:28:24 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/UtilConfig.java#3 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/09/02 18:33:16 $";
 
     private static final Logger s_log = Logger.getLogger(UtilConfig.class);
 
-    private boolean m_isAssertEnabled = true;
-
-    private static final String[] s_fields = new String[] {
-        "AssertEnabled"
-    };
+    private final boolean m_assert;
+    private final String m_dir;
 
     UtilConfig() {
-        super(UtilConfig.class, s_log, s_fields);
+        super("/util.properties");
+
+        final BooleanParameter assertion = new BooleanParameter
+            ("waf.debug", Parameter.REQUIRED, Boolean.FALSE);
+        m_assert = ((Boolean) initialize(assertion)).booleanValue();
+
+        final StringParameter dir = new StringParameter
+            ("waf.util.logging.error_report_dir", Parameter.OPTIONAL, null);
+        m_dir = (String) initialize(dir);
+
+        if (m_dir != null) {
+            ErrorReport.initializeAppender(m_dir);
+        }
     }
 
     public final boolean isAssertEnabled() {
-        return m_isAssertEnabled;
-    }
-
-    final void setAssertEnabled(boolean enabled) {
-        m_isAssertEnabled = enabled;
-
-        mutated("AssertEnabled");
+        return m_assert;
     }
 }

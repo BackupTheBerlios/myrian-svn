@@ -31,12 +31,12 @@ import java.util.List;
  * Script
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/08/28 $
+ * @version $Revision: #5 $ $Date: 2003/09/02 $
  */
 
 public class Script {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/initializer/Script.java#4 $ by $Author: justin $, $DateTime: 2003/08/28 18:40:59 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/initializer/Script.java#5 $ by $Author: justin $, $DateTime: 2003/09/02 18:33:16 $";
 
     private static final Logger s_log =
         Logger.getLogger(Script.class);
@@ -199,9 +199,9 @@ public class Script {
                 }
 
                 final String name = ini.getClass().getName();
-                if (com.arsdigita.logging.Initializer.class.getName().equals(name)) {
-                    loggerIsInitialized = true;
-                }
+//                 if (com.arsdigita.logging.Initializer.class.getName().equals(name)) {
+//                     loggerIsInitialized = true;
+//                 }
 
                 ini.startup();
                 initializersRun.add(name);
