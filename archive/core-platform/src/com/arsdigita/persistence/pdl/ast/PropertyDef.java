@@ -27,12 +27,12 @@ import com.arsdigita.persistence.Utilities;
  * multiplicity, and whether or not the property is composite.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/07/28 $
+ * @version $Revision: #5 $ $Date: 2002/08/07 $
  */
 
 public class PropertyDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/PropertyDef.java#4 $ by $Author: randyg $, $DateTime: 2002/07/28 12:21:11 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/PropertyDef.java#5 $ by $Author: rhs $, $DateTime: 2002/08/07 15:28:00 $";
 
     // property name
     private String m_name;
@@ -42,6 +42,9 @@ public class PropertyDef extends Element {
 
     // the multiplicity of the property
     private MultiplicityDef m_mult;
+
+    // if it's a component or not
+    private boolean m_isComponent;
 
     // if it's composite or not
     private boolean m_isComposite;
@@ -63,10 +66,11 @@ public class PropertyDef extends Element {
      * @pre type != null
      */
     public PropertyDef(String name, Identifier type, MultiplicityDef mult,
-                       boolean isComposite) {
+                       boolean isComponent, boolean isComposite) {
         m_name = name;
         m_type = type;
         m_mult = mult;
+        m_isComponent = isComponent;
         m_isComposite = isComposite;
 
         super.add(m_type);
@@ -162,7 +166,8 @@ public class PropertyDef extends Element {
             defaultJDBCType = ((SimpleType) datatype).getJDBCtype();
         }
 
-        prop = new Property(m_name, datatype, mult, m_isComposite);
+        prop = new Property(m_name, datatype, mult,
+                            m_isComponent || m_isComposite);
         initLineInfo(prop);
 
         if (m_column != null) {

@@ -25,7 +25,7 @@
 // ACSObject services. 
 //
 // @author <a href="mailto:pmarklun@arsdigita.com">Peter Marklund</a>
-// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/formbuilder/Component.pdl#2 $
+// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/formbuilder/Component.pdl#3 $
 //
 
 model com.arsdigita.formbuilder;
@@ -51,10 +51,10 @@ association {
                                   to bebop_component_hierarchy.component_id,
                                 join bebop_component_hierarchy.container_id
                                   to bebop_components.component_id;
-    Component[0..n] component = join bebop_components.component_id
-                                  to bebop_component_hierarchy.container_id,
-                                join bebop_component_hierarchy.component_id
-                                  to bebop_components.component_id;
+    Component[0..n] \component = join bebop_components.component_id
+                                   to bebop_component_hierarchy.container_id,
+                                 join bebop_component_hierarchy.component_id
+                                   to bebop_components.component_id;
     BigDecimal[1..1] orderNumber = bebop_component_hierarchy.order_number INTEGER;
     Boolean[1..1] isSelected = bebop_component_hierarchy.selected_p CHAR(1);
 }
