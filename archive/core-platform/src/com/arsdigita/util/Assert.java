@@ -25,29 +25,39 @@ import org.apache.log4j.Logger;
  *
  * @author David Lutterkort (lutter@arsdigita.com)
  * @author Uday Mathur (umathur@arsdigita.com)
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#6 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#7 $
  *
  */
 public class Assert {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#6 $" +
-        "$Author: dennis $" +
-        "$DateTime: 2002/08/14 23:39:40 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#7 $" +
+        "$Author: justin $" +
+        "$DateTime: 2002/10/07 12:19:07 $";
 
     private static final Logger s_log = Logger.getLogger
-        (Assert.class.getName());
+        (Assert.class);
 
     public static final boolean ASSERT_ON = true;
 
     /**
      * Indicates state of the ASSERT_ON flag.
+     *
+     * @deprecated Use {#isAssertEnabled()} instead.
      */
     public static final boolean isAssertOn() {
+        return isAssertEnabled();
+    }
+
+    /**
+     * Tells whether asserts are turned on.  Use this to wrap code
+     * that should be optimized away if asserts are disabled.
+     */
+    public static final boolean isAssertEnabled() {
         return ASSERT_ON;
     }
 
     /**
-     * Assert that an arbitrary condition is true and throw an
+     * Assert that an arbitrary condition is true, and throw an
      * exception if the condition is false.
      *
      * @param cond condition to assert
@@ -58,8 +68,9 @@ public class Assert {
     }
 
     /**
-     * Assert that an arbitrary condition is true throw an exception
-     * with message <code>msg</code> if the condition is false.
+     * Assert that an arbitrary condition is true, and throw an
+     * exception with message <code>msg</code> if the condition is
+     * false.
      *
      * @param cond condition to assert
      * @param msg failure message
