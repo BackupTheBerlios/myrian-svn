@@ -7,12 +7,15 @@ object type Party class com.redhat.persistence.PropertyMap
     String type = oql_parties.type;
     String email = oql_parties.email;
 
+    // turn an enum into an object type
     String discriminator1 = qualias {
         if(type == "user", "parties.User",
            if(type == "group", "parties.Group",
               if(type == "role", "parties.Role", null)))
     };
 
+    // use the existence of rows in subtype tables to determine an
+    // object type
     String discriminator2 = qualias {
         if(filter(u = all(parties.User), this == u) == null,
            if(filter(g = all(parties.Group), this == g) == null,
