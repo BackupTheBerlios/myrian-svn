@@ -11,23 +11,16 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/test/src/com/arsdigita/persistence/testpdl/static/DataQueryExtra.ora.pdl#2 $ 
-// $DateTime: 2002/10/16 14:12:35 $
+// $Id: //core-platform/dev/test/pdl/com/arsdigita/lucene/OtherType.pdl#1 $
+// $DateTime: 2003/02/19 22:26:51 $
 
-model examples;
+model com.arsdigita.lucene;
 
-query DataOperationWithPLSQLAndArgsAndReturn {
-    do {
-        select DataOperationProcWithReturn(:entryID) as entry from dual
-    } map {
-        Item = dual.entry;
-    }
-}
+import com.arsdigita.kernel.*;
 
-query SubQuery {
-    do {
-        select 1
-        from dual
-        where 2 = :two
-    }
+object type OtherType extends ACSObject {
+    String[1..1] name = l_other.name VARCHAR(100);
+    String[0..1] text = l_other.text CLOB;
+
+    reference key (l_other.id);
 }

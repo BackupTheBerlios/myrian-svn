@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/test/sql/oracle-se/persistence/teardown.sql#11 $
--- $DateTime: 2002/10/31 12:25:15 $
+-- $Id: //core-platform/dev/test/sql/oracle-se/persistence/teardown.sql#12 $
+-- $DateTime: 2003/02/19 22:26:51 $
 
 
 --
@@ -20,13 +20,12 @@
 -- tests to run.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #11 $ $Date: 2002/10/31 $
+-- @version $Revision: #12 $ $Date: 2003/02/19 $
 --
 
 -- Right now this is duplicated from the individual files. This should
 -- be fixed at some point.
 
-@@ drop-constraints.sql
 
 @@ ../../default/persistence/teardown.sql
 
@@ -44,4 +43,4 @@ drop procedure DataOperationProcedureWithArgs;
 drop procedure PLSQLWithArbitraryArgs;
 drop procedure DataOperationProcedureOneArg;
 
-@@ drop-tables.sql
+

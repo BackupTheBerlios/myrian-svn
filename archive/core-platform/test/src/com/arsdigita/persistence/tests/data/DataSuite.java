@@ -23,12 +23,12 @@ import junit.framework.Test;
  * DataSuite
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/01/07 $
+ * @version $Revision: #3 $ $Date: 2003/02/19 $
  **/
 
 public class DataSuite extends PackageTestSuite {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/DataSuite.java#2 $ by $Author: dennis $, $DateTime: 2003/01/07 14:51:38 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/DataSuite.java#3 $ by $Author: jorris $, $DateTime: 2003/02/19 22:26:51 $";
 
     public DataSuite() {}
 
@@ -45,10 +45,10 @@ public class DataSuite extends PackageTestSuite {
         populateSuite(suite);
         BaseTestSetup wrapper = new BaseTestSetup(suite);
         wrapper.setInitScriptTarget("com.arsdigita.persistence.Initializer");
-        wrapper.setSetupSQLScript(System.getProperty("test.sql.dir") +
-                                  "/persistence/setup.sql");
-        wrapper.setTeardownSQLScript(System.getProperty("test.sql.dir") +
-                                     "/persistence/teardown.sql");
+        wrapper.addSQLSetupScript(System.getProperty("test.sql.dir") +
+                                  "/com/arsdigita/persistence/tests/data/setup.sql");
+        wrapper.addSQLTeardownScript(System.getProperty("test.sql.dir") +
+                                     "/com/arsdigita/persistence/tests/data/teardown.sql");
         return wrapper;
     }
 

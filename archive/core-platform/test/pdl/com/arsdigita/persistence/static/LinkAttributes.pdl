@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/test/src/com/arsdigita/persistence/testpdl/static/LinkAttributes.pdl#6 $ 
-// $DateTime: 2003/01/07 14:51:38 $
+// $Id: //core-platform/dev/test/pdl/com/arsdigita/persistence/static/LinkAttributes.pdl#1 $ 
+// $DateTime: 2003/02/19 22:26:51 $
 
 model examples;
 

@@ -37,12 +37,12 @@ import java.util.Set;
  * DDLWriter
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #13 $ $Date: 2003/01/07 $
+ * @version $Revision: #14 $ $Date: 2003/02/19 $
  **/
 
 public class DDLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLWriter.java#13 $ by $Author: dennis $, $DateTime: 2003/01/07 14:51:38 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLWriter.java#14 $ by $Author: jorris $, $DateTime: 2003/02/19 22:26:51 $";
 
     private File m_base;
     private boolean m_overwrite;
@@ -148,91 +148,140 @@ public class DDLWriter {
 
         } while (created.size() > before);
 
-        if (deferred.size() > 0) {
-            List alters = new ArrayList();
-            List dropConstraints = new ArrayList();
-
-            for (Iterator it = deferred.iterator(); it.hasNext(); ) {
-                Table table = (Table) it.next();
-                if (skipped.contains(table)) {
-                    continue;
-                }
-                for (Iterator iter = table.getConstraints().iterator();
-                     iter.hasNext(); ) {
-                    Constraint con = (Constraint) iter.next();
-                    if (con.isDeferred()) {
-                        alters.add("alter table " + table.getName() +
-                                   " add " + Utilities.LINE_BREAK +
-                                   con.getSQL() + ";" +
-                                   Utilities.LINE_BREAK);
-                        if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
-                            dropConstraints.add("alter table " + table.getName() +
-                                                Utilities.LINE_BREAK + 
-                                                " drop constraint " + 
-                                                con.getName() + " RESTRICT;" + 
-                                                Utilities.LINE_BREAK);
-                        } else {
-                            dropConstraints.add("alter table " + table.getName() +
-                                                Utilities.LINE_BREAK + 
-                                                " drop constraint " + 
-                                                con.getName() + ";" + 
-                                                Utilities.LINE_BREAK);
-                        }
-                    }
-                }
-            }
-
-            Collections.sort(alters);
-            Collections.sort(dropConstraints);
-
-            FileWriter writer = new FileWriter(new File(m_base,
-                                                        "deferred.sql"));
-            for (Iterator it = alters.iterator(); it.hasNext(); ) {
-                writer.write((String) it.next());
-            }
-            writer.close();
-
-            FileWriter dropFileWriter = 
-                new FileWriter(new File(m_base, "drop-constraints.sql"));
-            
-            for (Iterator it = dropConstraints.iterator(); it.hasNext(); ) {
-                dropFileWriter.write((String) it.next());
-            }
-            dropFileWriter.close();
+        final boolean deferedConstraintsExist = deferred.size() > 0;
+        if (deferedConstraintsExist) {
+            writeDeferredSQL(deferred, skipped);
         }
 
-        FileWriter dropFileWriter = 
-            new FileWriter(new File(m_base, "drop-tables.sql"));
-        FileWriter writer = new FileWriter(new File(m_base, "create.sql"));
-        for (Iterator it = createOrder.iterator(); it.hasNext(); ) {
-            Table table = (Table) it.next();
-            if (skipped.contains(table)) {
-                //writer.write("@@table-" + table.getName() + ".sql\n");
-            } else {
-                if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
-                    writer.write("\\i " + getDDLPath() + "table-" +
-                                 table.getName() + "-auto.sql" + 
-                                 Utilities.LINE_BREAK);
-                } else {
-                    writer.write("@@ " + getDDLPath() + "table-" +
-                                 table.getName() + "-auto.sql" +
-                                 Utilities.LINE_BREAK);
-                }
-                // The order does not matter since we drop the constraints
-                // first
-                dropFileWriter.write("drop table " + table.getName() + ";" +
-                                     Utilities.LINE_BREAK);
-            }
+        writeTableCreateAndDropSQL(createOrder, skipped, deferred);
+        if (m_isTestPDL) {
+            writeSetupAndTeardown(deferedConstraintsExist);
         }
-        if (deferred.size() > 0) {
-            //writer.write("@@deferred.sql\n");
-        }
-        writer.close();
-        dropFileWriter.close();
-
         Assert.assertEquals(tables.size(), created.size());
     }
 
+    private void writeSetupAndTeardown(boolean deferedConstraintsExist) throws IOException {
+        FileWriter setup = new FileWriter(new File(m_base, "setup.sql"));
+        FileWriter teardown = new FileWriter(new File(m_base, "teardown.sql"));
+
+        try {
+            setup.write(getDBFileLoadPrefix() + "create.sql" + Utilities.LINE_BREAK);
+            if (deferedConstraintsExist) {
+                setup.write(getDBFileLoadPrefix() + "deferred.sql" + Utilities.LINE_BREAK);
+                teardown.write(getDBFileLoadPrefix() + "drop-constraints.sql" + Utilities.LINE_BREAK);
+            }
+            teardown.write(getDBFileLoadPrefix() + "drop-tables.sql" + Utilities.LINE_BREAK);
+
+        } finally {
+            try {
+                setup.close();
+            } catch(IOException e) {
+            }
+            try {
+                teardown.close();
+            } catch(IOException e) {
+            }
+
+        }
+
+
+
+
+    }
+
+    private void writeDeferredSQL(Set deferred, Set skipped) throws IOException {
+        List alters = new ArrayList();
+        List dropConstraints = new ArrayList();
+
+        for (Iterator it = deferred.iterator(); it.hasNext(); ) {
+            Table table = (Table) it.next();
+            if (skipped.contains(table)) {
+                continue;
+            }
+            for (Iterator iter = table.getConstraints().iterator();
+                 iter.hasNext(); ) {
+                Constraint con = (Constraint) iter.next();
+                if (con.isDeferred()) {
+                    alters.add("alter table " + table.getName() +
+                               " add " + Utilities.LINE_BREAK +
+                               con.getSQL() + ";" +
+                               Utilities.LINE_BREAK);
+                    if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
+                        dropConstraints.add("alter table " + table.getName() +
+                                            Utilities.LINE_BREAK +
+                                            " drop constraint " +
+                                            con.getName() + " RESTRICT;" +
+                                            Utilities.LINE_BREAK);
+                    } else {
+                        dropConstraints.add("alter table " + table.getName() +
+                                            Utilities.LINE_BREAK +
+                                            " drop constraint " +
+                                            con.getName() + ";" +
+                                            Utilities.LINE_BREAK);
+                    }
+                }
+            }
+        }
+
+        Collections.sort(alters);
+        Collections.sort(dropConstraints);
+
+        FileWriter writer = new FileWriter(new File(m_base,
+                                                    "deferred.sql"));
+        for (Iterator it = alters.iterator(); it.hasNext(); ) {
+            writer.write((String) it.next());
+        }
+        writer.close();
+
+        FileWriter dropFileWriter =
+            new FileWriter(new File(m_base, "drop-constraints.sql"));
+
+        for (Iterator it = dropConstraints.iterator(); it.hasNext(); ) {
+            dropFileWriter.write((String) it.next());
+        }
+        dropFileWriter.close();
+    }
+
+    private void writeTableCreateAndDropSQL(List createOrder, Set skipped, Set deferred) throws IOException {
+        FileWriter dropFileWriter =
+            new FileWriter(new File(m_base, "drop-tables.sql"));
+        FileWriter writer = new FileWriter(new File(m_base, "create.sql"));
+        try {
+            final String loaderPrefix = getDBFileLoadPrefix() + getDDLPath();
+            for (Iterator it = createOrder.iterator(); it.hasNext(); ) {
+                Table table = (Table) it.next();
+                if (skipped.contains(table)) {
+                    //writer.write("@@table-" + table.getName() + ".sql\n");
+                } else {
+                    writer.write(loaderPrefix + "table-" +
+                                     table.getName() + "-auto.sql" +
+                                     Utilities.LINE_BREAK);
+
+                    // The order does not matter since we drop the constraints
+                    // first
+                    dropFileWriter.write("drop table " + table.getName() + ";" +
+                                         Utilities.LINE_BREAK);
+                }
+            }
+
+            if (deferred.size() > 0) {
+                //writer.write("@@deferred.sql\n");
+            }
+
+        } finally {
+            writer.close();
+            dropFileWriter.close();
+        }
+    }
+
+    private String getDBFileLoadPrefix() {
+        if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
+            return "\\i ";
+        } else {
+            return "@@ ";
+        }
+
+    }
     private String getDDLPath() {
         if (m_isTestPDL) {
             return "";
