@@ -36,7 +36,7 @@ import java.io.UnsupportedEncodingException;
  * @since ACS 4.5a
  */
 public class Document {
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/xml/Document.java#8 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/xml/Document.java#9 $ by $Author: randyg $, $DateTime: 2004/02/18 16:22:23 $";
 
     private static final Logger s_log =
         Logger.getLogger(Document.class.getName());
@@ -156,7 +156,23 @@ public class Document {
         m_document.appendChild(rootNode.getInternalElement());
     }
 
+    /**
+     *  Creates a document from the passed in string that should
+     *  be properly formatted XML
+     */
     public Document( String xmlString ) 
+        throws ParserConfigurationException, org.xml.sax.SAXException {
+        this(new org.xml.sax.InputSource
+             (new java.io.StringReader(xmlString)));
+    }
+
+    public Document( byte[] xmlBytes ) 
+        throws ParserConfigurationException, org.xml.sax.SAXException {
+        this(new org.xml.sax.InputSource
+             (new java.io.ByteArrayInputStream(xmlBytes)));
+    }
+
+    private Document(org.xml.sax.InputSource inputSource) 
         throws ParserConfigurationException, org.xml.sax.SAXException {
         DocumentBuilder db = (DocumentBuilder)s_db.get();
         if (db == null) {
@@ -166,14 +182,11 @@ public class Document {
 
         org.w3c.dom.Document domDoc;
         try {
-            domDoc =
-                db.parse(new org.xml.sax.InputSource
-                         (new java.io.StringReader(xmlString)));
+            domDoc = db.parse(inputSource);
         } catch (java.io.IOException e) {
             throw new com.arsdigita.util.UncheckedWrapperException(e);
         }
         m_document = domDoc;
-
     }
 
     /**
