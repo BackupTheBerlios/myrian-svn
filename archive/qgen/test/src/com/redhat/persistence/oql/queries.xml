@@ -624,4 +624,14 @@
       <row id="9" name="Jennifer"/>
     </results>
   </test>
+
+  <test>
+    <query>query(filter(all(test.User), name == "Britney").groups, id = id, name = name)</query>
+    <query>query(filter(all(test.User), firstName == "Britney").groups, id = id, name = name)</query>
+    <results>
+      <row id="0" name="Pop"/>
+      <row id="8" name="90s"/>
+      <row id="9" name="00s"/>
+    </results>
+  </test>
 </tests>

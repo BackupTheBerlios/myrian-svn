@@ -16,7 +16,7 @@ import java.io.*;
  * OQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2004/01/29 $
+ * @version $Revision: #9 $ $Date: 2004/02/06 $
  */
 
 class OQLParser {
@@ -64,7 +64,7 @@ class OQLParser {
 
     static String parseString(String image) {
         StringBuffer result = new StringBuffer(image.length());
-        for (int i = 0; i < image.length(); i++) {
+        for (int i = 1; i < image.length() - 1; i++) {
             char c = image.charAt(i);
             if (c == '\\') { c = image.charAt(++i); }
             result.append(c);
