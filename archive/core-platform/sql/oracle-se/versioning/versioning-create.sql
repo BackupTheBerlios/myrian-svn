@@ -18,7 +18,7 @@
 -- @author Joseph Bank (jbank@arsdigita.com)
 -- @author Stanislav Freidin (sfreidin@arsdigita.com)
 -- @author Karl Goldstein (karlg@arsdigita.com)
--- @version $Id: //core-platform/dev/sql/oracle-se/versioning/versioning-create.sql#3 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/versioning/versioning-create.sql#4 $
 --
 
 create table vc_objects (
@@ -60,10 +60,10 @@ create table vc_transactions (
     constraint vc_trans_objects_fk references vc_objects
     on delete cascade,
   modifying_user   integer,
-  modifying_ip     varchar2(400),
+  modifying_ip     varchar(400),
   timestamp        date default sysdate,
-  description      varchar2(4000),
-  tag              varchar2(400)
+  description      varchar(4000),
+  tag              varchar(400)
 );
 
 -- index the foreign key
@@ -87,9 +87,9 @@ comment on column vc_transactions.object_id is '
 ';
 
 create table vc_actions (
-  action            varchar2(200) 
+  action            varchar(200) 
     constraint vc_actions_pk primary key,
-  description       varchar2(4000)
+  description       varchar(4000)
 );
 
 comment on table vc_actions is '
@@ -138,10 +138,10 @@ create table vc_operations (
   transaction_id    integer
     constraint vc_operations_trans_id_fk references vc_transactions
     on delete cascade,
-  action            varchar2(200)
+  action            varchar(200)
     constraint vc_operations_actions_fk references vc_actions,
-  attribute         varchar2(200),
-  classname         varchar2(4000) 
+  attribute         varchar(200),
+  classname         varchar(4000) 
     constraint vc_operations_classname_nn not null
 );
 
@@ -163,9 +163,9 @@ create table vc_generic_operations (
     constraint vc_gen_operations_pk primary key
     constraint vc_gen_operations_fk references vc_operations
     on delete cascade,
-  datatype          varchar2(200),
-  old_value         varchar2(4000),
-  new_value         varchar2(4000)
+  datatype          varchar(200),
+  old_value         varchar(4000),
+  new_value         varchar(4000)
 );
 
 comment on column vc_generic_operations.old_value is '
@@ -197,8 +197,8 @@ create table vc_blob_operations (
 -- returning it.
 
 create or replace
-function last_attr_value(attr varchar2, start_transaction_id in integer)
-return varchar2
+function last_attr_value(attr varchar, start_transaction_id in integer)
+return varchar
 is
   v_master_id integer;
   start_time date;

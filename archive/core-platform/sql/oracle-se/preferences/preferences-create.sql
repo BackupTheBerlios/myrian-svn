@@ -19,18 +19,18 @@ create table preferences  (
                                 constraint preferences_parent_fk
                                 references preferences (preference_id)
                                 on delete cascade,
-    name                        varchar2(80)
+    name                        varchar(80)
                                 constraint preferences_name_nn
                                 not null,
-    description                 varchar2(4000),
+    description                 varchar(4000),
     is_node                     number(1)
                                 default 0
                                 constraint preferences_is_node_ck
                                 check (is_node in (0, 1)),
-    preference_type             varchar2(16)
+    preference_type             varchar(16)
                                 constraint preferences_type_ck
                                 check (preference_type in ('user', 'system')),
-    value_type                  varchar2(20)
+    value_type                  varchar(20)
                                 constraint preference_values_type_ck
                                 check (value_type in (
                                                       'int',
@@ -42,7 +42,7 @@ create table preferences  (
                                                       'bytearray'
                                                      )
                                       ),
-    value_string                varchar2(4000)
+    value_string                varchar(4000)
 );
 
 -- triple unique index since we have user and system root nodes, both with the

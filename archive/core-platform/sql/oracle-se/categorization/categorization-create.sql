@@ -19,7 +19,7 @@
 -- Copyright (C) 2001 Arsdigita Corporation
 -- @author Randy Graebner (randyg@arsdigita.com)
 --
--- $Id: //core-platform/dev/sql/oracle-se/categorization/categorization-create.sql#2 $
+-- $Id: //core-platform/dev/sql/oracle-se/categorization/categorization-create.sql#3 $
 
 
 create table cat_categories (
@@ -28,7 +28,7 @@ create table cat_categories (
                        references acs_objects on delete cascade
                        constraint cat_categories_pk
                        primary key,
-    name               varchar2(200) not null,
+    name               varchar(200) not null,
     description        varchar(4000),
     -- this should deafult to the JDBC version of true
     enabled_p          char(1),

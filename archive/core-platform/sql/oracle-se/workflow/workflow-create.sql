@@ -22,13 +22,13 @@ create table cw_tasks (
                          constraint task_parent_task_id 
 			 references cw_tasks(task_id)
                          on delete cascade,
-  label            	 varchar2(200)
+  label            	 varchar(200)
                    	 constraint task_label_nn not null,
-  description      	 varchar2(4000),
+  description      	 varchar(4000),
   is_active        	 char(1) default '0'
                    	 constraint task_is_active_ck
                    	 check (is_active in ('0', '1')),
-  task_state             varchar2(16)
+  task_state             varchar(16)
                          constraint task_state_ck
                          check (task_state in 
                                  ('disabled', 'enabled', 'finished','deleted'))
@@ -78,7 +78,7 @@ create table cw_task_comments (
 			  constraint task_comments_task_id_nn not null
 			  constraint task_comments_task_id_fk 
 			  references cw_tasks(task_id) on delete cascade,
-  task_comment		  varchar2(4000),
+  task_comment		  varchar(4000),
   comment_date		  date default sysdate,
   party_id		  integer,     
   --
@@ -158,7 +158,7 @@ create table cw_processes (
   process_def_id         integer
                		 constraint process_process_def_id_fk 
                		 references cw_tasks on delete cascade,
-  process_state          varchar2(16)
+  process_state          varchar(16)
                          constraint process_state_ck
                          check (process_state in ('stopped', 'started','deleted','init')),
   object_id              integer

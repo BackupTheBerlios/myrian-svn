@@ -16,7 +16,7 @@
 --
 -- Procedures for building and syncing the search index.
 -- Written by Teeters@arsdigita.com (Jeff Teeters).
--- $Id: //core-platform/dev/sql/oracle-se/search/search-indexing-procs-create.sql#2 $
+-- $Id: //core-platform/dev/sql/oracle-se/search/search-indexing-procs-create.sql#3 $
 
 -- Table for keeping track of search indexing jobs
 
@@ -46,11 +46,11 @@ values
 create or replace package search_indexing
 as                                                                              
     function queue_task (                                                 
-	v_task_name in varchar2
+	v_task_name in varchar
     ) return integer;   -- returns 0 if failed, or jobnum
  
     function get_status 
-    return varchar2;  -- returns status code
+    return varchar;  -- returns status code
 
     procedure build_index;
     procedure sync_index;
@@ -79,12 +79,12 @@ create or replace package body search_indexing as
     -----------------------------------------------------
 
     function queue_task (                                                 
-       v_task_name     in   varchar2
+       v_task_name     in   varchar
     )  return integer 
     is
        job_n          integer;   -- job number
-       job_status     varchar2(100);
-       proc_call      varchar2(100);
+       job_status     varchar(100);
+       proc_call      varchar(100);
     begin
        -- make sure valid task name
        if (v_task_name <> 'build' and v_task_name <> 'sync') then
@@ -127,7 +127,7 @@ create or replace package body search_indexing as
     -----------------------------------------------------
  
     function get_status
-       return varchar2
+       return varchar
     is
        job_n          number;
        cursor job_times_cur is

@@ -16,7 +16,7 @@
 -- This file contains the data model for the data query test cases.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #3 $ $Date: 2002/07/23 $
+-- @version $Revision: #4 $ $Date: 2002/07/31 $
 --
 
 create or replace procedure DataOperationProcedure as
@@ -31,9 +31,9 @@ show errors
 
 
 create or replace function DataOperationFunction 
-return varchar2
+return varchar
 is 
-  toReturn varchar2(300);
+  toReturn varchar(300);
 begin
    insert into t_data_query (entry_id, action, priority, action_time)
    select entry_id + 1, action, priority, action_time from t_data_query 
@@ -44,7 +44,7 @@ end;
 /
 show errors
 
-create or replace procedure DataOperationProcWithOut(v_new_id OUT varchar2) 
+create or replace procedure DataOperationProcWithOut(v_new_id OUT varchar) 
 as 
 begin
    insert into t_data_query (entry_id, action, priority, action_time)
@@ -55,7 +55,7 @@ end;
 /
 show errors
 
-create or replace procedure DataOperationProcWithOut(v_new_id OUT varchar2) 
+create or replace procedure DataOperationProcWithOut(v_new_id OUT varchar) 
 as 
 begin
    insert into t_data_query (entry_id, action, priority, action_time)
@@ -67,8 +67,8 @@ end;
 show errors
 
 create or replace procedure DataOperationProcWithInOut(
-       v_old_id IN varchar2,
-       v_new_id OUT varchar2) 
+       v_old_id IN varchar,
+       v_new_id OUT varchar) 
 as 
 begin
    insert into t_data_query (entry_id, action, priority, action_time)

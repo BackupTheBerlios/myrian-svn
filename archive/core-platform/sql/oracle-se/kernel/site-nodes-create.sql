@@ -19,7 +19,7 @@
 --
 -- @author Bryan Quinn (bquinn@arsdigita.com) 
 -- @creation-date May 16, 2001 20:16:43
--- @version $Id: //core-platform/dev/sql/oracle-se/kernel/site-nodes-create.sql#2 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/kernel/site-nodes-create.sql#3 $
 --
 
 create table site_nodes (
@@ -28,14 +28,14 @@ create table site_nodes (
 			primary key,
 	parent_id       constraint site_nodes_parent_id_fk
 			references site_nodes (node_id),
-        name		varchar2(100)
+        name		varchar(100)
 			constraint site_nodes_name_ck
 			check (name not like '%/%'),
 	constraint site_nodes_un
 	unique (parent_id, name),
         --denormalized url, it is definitely worth it to store
         --this here instead of traversing the tree every time!
-        url             varchar2(4000),
+        url             varchar(4000),
 	-- Is it legal to create a child node?
 	directory_p	char(1) default '1' not null 
 			constraint site_nodes_directory_p_ck

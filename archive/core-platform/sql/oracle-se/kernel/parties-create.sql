@@ -17,7 +17,7 @@
 --
 -- @author oumi@arsdigita.com
 -- @creation-date 2001-05-10
--- @version $Id: //core-platform/dev/sql/oracle-se/kernel/parties-create.sql#2 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/kernel/parties-create.sql#3 $
 --
 
 ---------------------
@@ -25,7 +25,7 @@
 ---------------------
 
 create table email_addresses (
-	email_address   varchar2(100) not null
+	email_address   varchar(100) not null
                     constraint email_addresses_pk primary key
                     constraint email_address_lower_ck
                         check (lower(email_address) = email_address),
@@ -51,7 +51,7 @@ create table parties (
 			        constraint parties_party_id_fk references
 			        acs_objects (object_id)
 			        constraint parties_pk primary key,
-    primary_email   varchar2(100),
+    primary_email   varchar(100),
 	uri		        varchar(200)
 );
 
@@ -73,7 +73,7 @@ create table party_email_map (
 	party_id	    integer not null
     			    constraint pem_party_id_fk
 	        		    references parties(party_id) on delete cascade,
-    email_address   varchar2(100),
+    email_address   varchar(100),
     constraint pem_party_email_uq
                     unique(party_id, email_address)
 );
@@ -99,9 +99,9 @@ comment on table party_email_map is '
 create table person_names (
 	name_id	        integer not null
                         constraint person_names_pk primary key,
-	given_name	varchar2(60) not null,
-	family_name	varchar2(60) not null,
-	middle_names	varchar2(80)
+	given_name	varchar(60) not null,
+	family_name	varchar(60) not null,
+	middle_names	varchar(80)
 );
 
 comment on table person_names is '
@@ -127,7 +127,7 @@ create table users (
 				constraint users_person_name_id_fk
 				references person_names(name_id)
 				constraint users_person_name_id_un unique,
-	screen_name		varchar2(100)
+	screen_name		varchar(100)
 				constraint users_screen_name_un
 				unique
 );
@@ -700,10 +700,10 @@ create table user_authentication (
 				constraint user_auth_user_id_fk
 				references users (user_id)
 				constraint user_auth_user_un unique,
-	password		varchar2(100) not null,
-	salt			varchar2(100),
-	password_question	varchar2(1000),
-	password_answer		varchar2(1000)
+	password		varchar(100) not null,
+	salt			varchar(100),
+	password_question	varchar(1000),
+	password_answer		varchar(1000)
 );
 
 -------------

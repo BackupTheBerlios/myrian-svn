@@ -16,7 +16,7 @@
 -- Create US Addresses
 --
 -- @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
--- @version $Id: //core-platform/dev/sql/oracle-se/addresses/us-addresses-create.sql#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/addresses/us-addresses-create.sql#3 $ by $Author: dan $, $DateTime: 2002/07/31 10:49:40 $
 --
 
 create table us_addresses (
@@ -24,13 +24,13 @@ create table us_addresses (
                                 references acs_objects (object_id)
                                 constraint us_addresses_pk
                                 primary key,
-    line1                       varchar2(200)
+    line1                       varchar(200)
                                 constraint us_addresses_line1_nn
                                 not null,
-    line2                       varchar2(200),
-    line3                       varchar2(200),
-    line4                       varchar2(200),
-    city                        varchar2(200)
+    line2                       varchar(200),
+    line3                       varchar(200),
+    line4                       varchar(200),
+    city                        varchar(200)
                                 constraint us_addresses_city_nn
                                 not null,
     state                       char(2)

@@ -23,7 +23,7 @@
 
 -- Author: Jeff Teeters (teeters@arsdigita.com)
 
--- $Id: //core-platform/dev/sql/oracle-se/search/SearchContent-create.sql#2 $
+-- $Id: //core-platform/dev/sql/oracle-se/search/SearchContent-create.sql#3 $
 
 
 -- Table that stores content to be indexed.
@@ -33,14 +33,14 @@ create table search_content (
 			constraint search_content_id_fk references
 			acs_objects (object_id) on delete cascade
 	          	constraint search_content_pk primary key,
-    object_type         varchar2(100), -- Same as acs_object(object_type)
+    object_type         varchar(100), -- Same as acs_object(object_type)
                         -- denormalized to reduce joins
-    link_text           varchar2(1000),
-    url_stub            varchar2(100),
-    summary             varchar2(4000),
+    link_text           varchar(1000),
+    url_stub            varchar(100),
+    summary             varchar(4000),
     xml_content         clob,  -- xml content to be indexed
     raw_content         blob,  -- non-xml content to be indexed
-    language            varchar2(3)
+    language            varchar(3)
 );
 
 

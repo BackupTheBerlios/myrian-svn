@@ -19,7 +19,7 @@
 --
 -- @author Bryan Quinn (bquinn@arsdigita.com)
 -- @creation-date 2001/05/16
--- @version-id $Id: //core-platform/dev/sql/oracle-se/kernel/apm-create.sql#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $
+-- @version-id $Id: //core-platform/dev/sql/oracle-se/kernel/apm-create.sql#3 $ by $Author: dan $, $DateTime: 2002/07/31 10:49:40 $
 
 -----------------------------
 --     PACKAGE OBJECT      --
@@ -32,19 +32,19 @@
 create table apm_package_types (
     package_type_id             integer 
                                 constraint apm_package_types_pk primary key,
-    package_key                 varchar2(100)
+    package_key                 varchar(100)
                                 constraint apm_package_types_key_nn not null
                                 constraint apm_package_types_key_un unique,
-    pretty_name                 varchar2(100)
+    pretty_name                 varchar(100)
                                 constraint apm_package_types_pretty_n_nn not null
                                 constraint apm_package_types_pretty_n_un unique,
-    pretty_plural               varchar2(100)
+    pretty_plural               varchar(100)
                                 constraint apm_package_types_pretty_pl_un unique,
-    package_uri                 varchar2(1500)
+    package_uri                 varchar(1500)
                                 constraint apm_packages_types_p_uri_nn not null
                                 constraint apm_packages_types_p_uri_un unique,
-    servlet_package             varchar2(100),
-    dispatcher_class            varchar2(100) 
+    servlet_package             varchar(100),
+    dispatcher_class            varchar(100) 
         default 'com.arsdigita.dispatcher.JSPApplicationDispatcher'
 );
 
@@ -52,7 +52,7 @@ create table apm_listeners (
     listener_id                 integer
                                 constraint apm_listeners_pk
                                 primary key,
-    listener_class              varchar2(100)
+    listener_class              varchar(100)
                                 constraint apm_listeners_class_nn
                                 not null
                                 constraint apm_listeners_class_un
@@ -83,7 +83,7 @@ create table apm_packages (
     package_type_id             constraint apm_packages_type_id_fk
                                 references apm_package_types(package_type_id)
                                 on delete cascade,
-    pretty_name                 varchar2(300),
+    pretty_name                 varchar(300),
     locale_id                   constraint apm_packages_locale_id_fk
                                 references g11n_locales (locale_id)
 );

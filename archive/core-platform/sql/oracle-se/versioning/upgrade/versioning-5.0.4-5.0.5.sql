@@ -46,7 +46,7 @@ drop index vc_transactions_object_id_idx;
 create index vc_transactions_master_id_idx on vc_transactions(master_id);
 
 alter table vc_operations add (
-    classname varchar2(4000) 
+    classname varchar(4000) 
 );
 
 comment on column vc_operations.classname is '
@@ -56,8 +56,8 @@ comment on column vc_operations.classname is '
 create index vc_transactions_tstamp_idx on vc_transactions(timestamp);
 
 create or replace
-function last_attr_value(attr varchar2, start_transaction_id in integer)
-return varchar2
+function last_attr_value(attr varchar, start_transaction_id in integer)
+return varchar
 is
   v_master_id integer;
   start_time date;

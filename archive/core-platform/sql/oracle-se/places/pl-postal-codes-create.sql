@@ -16,7 +16,7 @@
 -- Create postal codes.
 --
 -- @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
--- @version $Id: //core-platform/dev/sql/oracle-se/places/pl-postal-codes-create.sql#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/places/pl-postal-codes-create.sql#3 $ by $Author: dan $, $DateTime: 2002/07/31 10:49:40 $
 --
 
 create table pl_postal_codes (
@@ -24,7 +24,7 @@ create table pl_postal_codes (
                                 references places (place_id)
                                 constraint pl_postal_codes_pk
                                 primary key,
-    postal_code                 varchar2(100)
+    postal_code                 varchar(100)
                                 constraint pl_pc_postal_code_nn
                                 not null
 );

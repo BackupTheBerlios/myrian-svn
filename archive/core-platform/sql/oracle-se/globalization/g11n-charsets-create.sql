@@ -16,14 +16,14 @@
 -- Create character sets.
 --
 -- @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
--- @version $Id: //core-platform/dev/sql/oracle-se/globalization/g11n-charsets-create.sql#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/globalization/g11n-charsets-create.sql#3 $ by $Author: dan $, $DateTime: 2002/07/31 10:49:40 $
 --
 
 create table g11n_charsets (
     charset_id                  integer
                                 constraint g11n_charsets_charset_id_pk
                                 primary key,
-    charset                     varchar2(30)
+    charset                     varchar(30)
                                 constraint g11n_charsets_charset_nn
                                 not null
 );

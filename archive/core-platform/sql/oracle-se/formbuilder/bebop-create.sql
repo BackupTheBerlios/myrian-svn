@@ -15,7 +15,7 @@
 -- service
 --
 -- @author <a href="mailto:berrange@redhat.com">Daniel Berrange</a>
--- @version $Id: //core-platform/dev/sql/oracle-se/formbuilder/bebop-create.sql#1 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/formbuilder/bebop-create.sql#2 $
 --
 
 
@@ -26,9 +26,9 @@ create table bebop_components (
                         references acs_objects (object_id)
 			            constraint bebop_components_pk
 			            primary key,
-    admin_name          varchar2(100),
-    description         varchar2(4000),
-    attribute_string	varchar2(4000),
+    admin_name          varchar(100),
+    description         varchar(4000),
+    attribute_string	varchar(4000),
     active_p            char(1)
 );
 
@@ -63,9 +63,9 @@ create table bebop_widgets (
                           references bebop_components (component_id)
 			              constraint bebop_widgets_pk
 			              primary key,
-    parameter_name        varchar2(100),
-    parameter_model       varchar2(150),
-    default_value         varchar2(4000)
+    parameter_name        varchar(100),
+    parameter_model       varchar(150),
+    default_value         varchar(4000)
 );
 
 comment on table bebop_widgets is '
@@ -94,8 +94,8 @@ create table bebop_options (
        option_id                  integer
                                   constraint bebop_options_id_pk
                                   primary key,
-       parameter_name             varchar2(100),
-       label                      varchar2(300)          
+       parameter_name             varchar(100),
+       label                      varchar(300)          
 );
 
 comment on table bebop_options is '
@@ -120,7 +120,7 @@ create table bebop_form_sections (
                                  references bebop_components (component_id)
                                  constraint bebop_form_sections_pk
                                  primary key,
-       action                    varchar2(500)
+       action                    varchar(500)
 );
 
 comment on table bebop_form_sections is '
@@ -142,9 +142,9 @@ create table bebop_process_listeners (
                         references acs_objects (object_id) on delete cascade
                         constraint bebop_process_listeners_pk
                         primary key,
-      name              varchar2(40),
-      description       varchar2(120),
-      listener_class    varchar2(100)
+      name              varchar(40),
+      description       varchar(120),
+      listener_class    varchar(100)
 );
 
 comment on table bebop_process_listeners is '
@@ -240,8 +240,8 @@ create table bebop_listeners (
                              references acs_objects(object_id)
                              constraint bebop_listeners_id_pk
                              primary key,
-       class_name            varchar2(150),
-       attribute_string      varchar2(4000)
+       class_name            varchar(150),
+       attribute_string      varchar(4000)
 );
 
 comment on table bebop_listeners is '
@@ -286,7 +286,7 @@ create table bebop_object_type (
         constraint bebop_object_type_type_id_pk primary key,
     app_type varchar(20)
         constraint bebop_object_type_app_nn not null,
-    class_name varchar2(120)
+    class_name varchar(120)
         constraint bebop_object_type_class_nn not null,
     constraint bebop_object_type_un unique(app_type, class_name)
 );
@@ -321,10 +321,10 @@ create table bebop_meta_object (
         constraint bebop_meta_object_type_id_nn not null
         constraint bebop_meta_object_type_id_fk references
         bebop_object_type on delete cascade,
-    pretty_name varchar2(50),
-    pretty_plural varchar2(50),
-    class_name varchar2(200),
-    props_form varchar2(200),
+    pretty_name varchar(50),
+    pretty_plural varchar(50),
+    class_name varchar(200),
+    props_form varchar(200),
     constraint bebop_meta_obj_un unique (type_id, class_name)
 );
 

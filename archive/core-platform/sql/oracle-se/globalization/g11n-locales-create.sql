@@ -16,7 +16,7 @@
 -- Create locales.
 --
 -- @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
--- @version $Id: //core-platform/dev/sql/oracle-se/globalization/g11n-locales-create.sql#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/globalization/g11n-locales-create.sql#3 $ by $Author: dan $, $DateTime: 2002/07/31 10:49:40 $
 --
 
 create table g11n_locales (
@@ -27,7 +27,7 @@ create table g11n_locales (
                                 constraint g11n_locales_language_nn
                                 not null,
     country                     char(2),
-    variant                     varchar2(30),
+    variant                     varchar(30),
     default_charset_id          integer
                                 constraint g11n_locales_def_charset_id_fk
                                 references g11n_charsets (charset_id)

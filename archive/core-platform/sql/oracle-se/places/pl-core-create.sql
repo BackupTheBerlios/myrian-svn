@@ -16,14 +16,14 @@
 -- Create places core.
 --
 -- @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
--- @version $Id: //core-platform/dev/sql/oracle-se/places/pl-core-create.sql#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/places/pl-core-create.sql#3 $ by $Author: dan $, $DateTime: 2002/07/31 10:49:40 $
 --
 
 create table places (
     place_id                    integer
                                 constraint places_pk
                                 primary key,
-    place_name                  varchar2(200)
+    place_name                  varchar(200)
                                 constraint places_place_name_nn
                                 not null,
     latitude                    number(9,6),

@@ -18,7 +18,7 @@
 -- Copyright (C) 2001 Arsdigita Corporation
 -- @author Joseph Bank (jbank@arsdigita.com)
 --
--- $Id: //core-platform/dev/sql/oracle-se/auditing/auditing-create.sql#2 $
+-- $Id: //core-platform/dev/sql/oracle-se/auditing/auditing-create.sql#3 $
 
 create table acs_auditing (
         object_id          constraint audited_acs_object_id_fk
@@ -28,11 +28,11 @@ create table acs_auditing (
 	creation_user      constraint audited_creation_user_fk
                            references users on delete set null,
 	creation_date      date not null,
-	creation_ip        varchar2(50),
+	creation_ip        varchar(50),
 	last_modified      date not null,
 	modifying_user     constraint audited_modifying_user_fk
                            references users on delete set null,
-	modifying_ip       varchar2(50)
+	modifying_ip       varchar(50)
 );
 
 -- Create foreign key indexes

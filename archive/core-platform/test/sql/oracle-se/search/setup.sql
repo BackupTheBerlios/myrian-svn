@@ -19,7 +19,7 @@
 
 -- Author: Jeff Teeters (teeters@arsdigita.com)
 
--- $Id: //core-platform/dev/test/sql/oracle-se/search/setup.sql#2 $
+-- $Id: //core-platform/dev/test/sql/oracle-se/search/setup.sql#3 $
 
 create table searchable_notes (
     note_id integer 
@@ -40,7 +40,7 @@ create table search_test_book (
 			constraint search_test_book_fk references
 			acs_objects (object_id)
 			constraint search_test_book_pk primary key,
-    title       varchar2(100)
+    title       varchar(100)
 );
 
 
@@ -61,7 +61,7 @@ create table search_test_author (
 			constraint search_test_author_fk references
 			acs_objects (object_id)
 			constraint search_test_author_pk primary key,
-    name        varchar2(100)
+    name        varchar(100)
 );
 
 create table search_test_book_chap_map (

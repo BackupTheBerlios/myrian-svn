@@ -15,7 +15,7 @@
 -- service
 --
 -- @author <a href="mailto:berrange@redhat.com">Daniel Berrange</a>
--- @version $Id: //core-platform/dev/sql/oracle-se/formbuilder/widgets-create.sql#1 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/formbuilder/widgets-create.sql#2 $
 --
 
 
@@ -51,10 +51,10 @@ create table forms_lstnr_conf_email (
         constraint forms_lstnr_conf_email_fk references
         bebop_process_listeners on delete cascade
         constraint forms_lstnr_conf_email_pk primary key,
-    sender varchar2(120),
-    subject varchar2(120),
+    sender varchar(120),
+    subject varchar(120),
     -- XXX may need to make this a blob
-    body varchar2(4000)
+    body varchar(4000)
 );
 
 
@@ -82,7 +82,7 @@ create table forms_lstnr_conf_redirect (
         constraint forms_lstnr_conf_redirect_fk references
         bebop_process_listeners on delete cascade
         constraint forms_lstnr_conf_redirect_pk primary key,
-    url varchar2(160)
+    url varchar(160)
 );
 
 
@@ -95,8 +95,8 @@ create table forms_lstnr_simple_email (
         constraint forms_lstnr_simple_email_fk references
         bebop_process_listeners on delete cascade
         constraint forms_lstnr_simple_email_pk primary key,
-    recipient varchar2(120),
-    subject varchar2(120)
+    recipient varchar(120),
+    subject varchar(120)
 );
 
 comment on table forms_lstnr_simple_email is '
@@ -109,10 +109,10 @@ create table forms_lstnr_tmpl_email (
         constraint forms_lstnr_tmpl_email_fk references
         bebop_process_listeners on delete cascade
         constraint forms_lstnr_tmpl_email_pk primary key,
-    recipient varchar2(120),
-    subject varchar2(120),
+    recipient varchar(120),
+    subject varchar(120),
     -- XXX may need to make this a blob
-    body varchar2(4000)
+    body varchar(4000)
 );
 
 comment on table forms_lstnr_tmpl_email is '
@@ -125,8 +125,8 @@ create table forms_lstnr_xml_email (
         constraint forms_lstnr_xml_email_fk references
         bebop_process_listeners on delete cascade
         constraint forms_lstnr_xml_email_pk primary key,
-    recipient varchar2(120),
-    subject varchar2(120)
+    recipient varchar(120),
+    subject varchar(120)
 );
 
 comment on table forms_lstnr_xml_email is '

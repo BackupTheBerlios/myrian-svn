@@ -19,7 +19,7 @@
 --
 -- @author ron@arsdigita.com
 -- @author ddao@arsdigita.com
--- @version $Id: //core-platform/dev/sql/oracle-se/notification/notification-create.sql#2 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/notification/notification-create.sql#3 $
 
 -- Digest support
 
@@ -32,16 +32,16 @@ create table nt_digests (
     party_from        integer
                       constraint nt_digest_party_from_fk
                           references parties(party_id),
-    subject           varchar2(250)
+    subject           varchar(250)
                       constraint nt_digest_subject_nn 
                           not null,
-    header            varchar2(4000)
+    header            varchar(4000)
                       constraint nt_digest_header_nn
                           not null,
-    separator         varchar2(100)
+    separator         varchar(100)
                       constraint nt_digest_separator_nn
                           not null,
-    signature         varchar2(4000)
+    signature         varchar(4000)
                       constraint nt_digest_signature_nn
                           not null,
     frequency         integer
@@ -73,8 +73,8 @@ create table nt_requests (
     message_id        integer                         
                       constraint nt_requests_message_fk
                           references messages(message_id),
-    header            varchar2(4000),
-    signature         varchar2(4000),
+    header            varchar(4000),
+    signature         varchar(4000),
     expand_group      char(1)
                       default '1'
                       constraint nt_requests_expand_ck
@@ -82,7 +82,7 @@ create table nt_requests (
     request_date      date
                       default sysdate,
     fulfill_date      date,
-    status            varchar2(20)
+    status            varchar(20)
                       default 'pending'
                       constraint nt_requests_status_ck
                           check (status in 

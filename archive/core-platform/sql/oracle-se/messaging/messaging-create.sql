@@ -18,7 +18,7 @@
 -- @author David Dao <ddao@arsdigita.com>
 -- @author John Prevost <jmp@arsdigita.com>
 --
--- @version $Id: //core-platform/dev/sql/oracle-se/messaging/messaging-create.sql#3 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/messaging/messaging-create.sql#4 $
 
 --
 -- The messages table stores the basic sender and reply-to information
@@ -34,15 +34,15 @@ create table messages (
     object_id      integer
                    constraint messages_object_id_fk
                        references acs_objects(object_id) on delete cascade,
-    reply_to       varchar2(250),
+    reply_to       varchar(250),
     sender         integer
                    constraint messages_sender_fk  
                        references parties (party_id),
-    subject        varchar2(250)
+    subject        varchar(250)
                    constraint messages_subject_nn not null,
-    body           varchar2(4000)
+    body           varchar(4000)
                    constraint messages_body_nn not null,
-    type           varchar2(50)
+    type           varchar(50)
                    constraint messages_type_nn not null,
     sent_date      date 
                    default sysdate
@@ -50,11 +50,11 @@ create table messages (
     in_reply_to    integer
                    constraint messages_reply_to_fk
                        references messages(message_id) on delete set null,
-    rfc_message_id varchar2(250),
+    rfc_message_id varchar(250),
     root_id        integer
                    constraint messages_root_id_fk
                        references messages(message_id) on delete cascade,
-    sort_key       varchar2(300)
+    sort_key       varchar(300)
 );
 
 create index messages_reply_to_idx on messages (in_reply_to);
@@ -137,14 +137,14 @@ create table message_parts (
     message_id  integer
                 constraint message_parts_message_id_fk 
                      references messages(message_id) on delete cascade,
-    type        varchar2(50)
+    type        varchar(50)
                 constraint message_parts_type_nn not null,
-    name        varchar2(100)
+    name        varchar(100)
                 constraint message_parts_name_nn 
                     not null,
-    description varchar2(500),
-    disposition varchar2(50) default 'attachment',
-    headers     varchar2(4000),
+    description varchar(500),
+    disposition varchar(50) default 'attachment',
+    headers     varchar(4000),
     content     blob
 );
 

@@ -16,14 +16,14 @@
 -- Create message catalog.
 --
 -- @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
--- @version $Id: //core-platform/dev/sql/oracle-se/globalization/g11n-catalog-create.sql#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/globalization/g11n-catalog-create.sql#3 $ by $Author: dan $, $DateTime: 2002/07/31 10:49:40 $
 --
 
 create table g11n_catalogs (
     catalog_id                  integer
                                 constraint g11n_catalogs_pk
                                 primary key,
-    catalog_name                varchar2(400)
+    catalog_name                varchar(400)
                                 constraint g11n_catalogs_catalog_name_nn
                                 not null,
     locale_id                   integer

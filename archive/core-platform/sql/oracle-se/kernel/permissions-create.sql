@@ -17,7 +17,7 @@
 --
 -- @author phong@arsdigita.com
 -- @creation-date 2001-05-21
--- @cvs-id $Id: //core-platform/dev/sql/oracle-se/kernel/permissions-create.sql#3 $
+-- @cvs-id $Id: //core-platform/dev/sql/oracle-se/kernel/permissions-create.sql#4 $
 --
 
 
@@ -25,7 +25,7 @@
 -- PRIVILEGES --
 ----------------
 create table acs_privileges (
-       privilege            varchar2(100) not null 
+       privilege            varchar(100) not null 
                             constraint acs_privileges_pk primary key
 );
                             
@@ -104,7 +104,7 @@ create table acs_permissions (
 	   creation_user         constraint acs_perm_creation_user_fk
                              references users on delete set null,
 	   creation_date         date default sysdate not null,
-	   creation_ip           varchar2(50)
+	   creation_ip           varchar(50)
 );
 
 comment on table acs_permissions is ' 

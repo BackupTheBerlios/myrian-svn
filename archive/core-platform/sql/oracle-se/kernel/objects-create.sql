@@ -17,7 +17,7 @@
 --
 -- @author oumi@arsdigita.com
 -- @creation-date 2001-05-10
--- @cvs-id $Id: //core-platform/dev/sql/oracle-se/kernel/objects-create.sql#3 $
+-- @cvs-id $Id: //core-platform/dev/sql/oracle-se/kernel/objects-create.sql#4 $
 --
 
 create sequence acs_object_id_seq cache 1000;
@@ -25,9 +25,9 @@ create sequence acs_object_id_seq cache 1000;
 create table acs_objects (
 	object_id		        integer not null
 				            constraint acs_objects_pk primary key,
-	object_type		        varchar2(100) not null,
-    display_name            varchar2(200) not null,
-    default_domain_class    varchar2(100)
+	object_type		        varchar(100) not null,
+    display_name            varchar(200) not null,
+    default_domain_class    varchar(100)
 );
 
 create index acs_objects_object_type_idx on acs_objects(object_type);

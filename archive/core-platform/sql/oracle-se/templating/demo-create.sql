@@ -16,12 +16,12 @@ create sequence ad_template_sample_users_seq start with 5 increment by 1;
 
 create table ad_template_sample_users (
        user_id         integer,
-       first_name      varchar2(20),
-       last_name       varchar2(20),
-       address1        varchar2(40),
-       address2        varchar2(40),
-       city            varchar2(40),
-       state           varchar2(2)
+       first_name      varchar(20),
+       last_name       varchar(20),
+       address1        varchar(40),
+       address2        varchar(40),
+       city            varchar(40),
+       state           varchar(2)
 );
 
 
