@@ -12,6 +12,7 @@ public class JDOSuite extends TestSuite {
         suite.addTestSuite(WithoutTxnTest.class);
         suite.addTestSuite(MapTest.class);
         suite.addTestSuite(ListTest.class);
+        suite.addTestSuite(ManagerTest.class);
         suite.addTest(QueryTest.suite());
         return new JDOTestSetup(suite);
     }
