@@ -20,12 +20,12 @@ import java.util.*;
  * Equals
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/07/15 $
  **/
 
 public class Equals extends BinaryCondition {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Equals.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Equals.java#2 $ by $Author: ashah $, $DateTime: 2004/07/15 12:07:20 $";
 
     public Equals(Expression left, Expression right) {
         super(left, right);
@@ -116,7 +116,7 @@ public class Equals extends BinaryCondition {
                     }
 
                     if (!lsql.equals(rsql)) {
-                        conds.add(emit(lsql, rsql));
+                        conds.add(emit(lsql, null, rsql, null));
                     }
                 }
                 if (conds.isEmpty()) {
@@ -140,17 +140,17 @@ public class Equals extends BinaryCondition {
         if (lsql.getBindings().isEmpty() && lsql.equals(rsql)) {
             return Code.TRUE;
         } else {
-            return emit(lsql, rsql);
+            return emit(lsql, lexpr, rsql, rexpr);
         }
     }
 
-    private static Code emit(Code left, Code right) {
-        if (left.isNull()) {
-            return right.add(" is ").add(left);
-        } else if (right.isNull()) {
-            return left.add(" is ").add(right);
+    private static Code emit(Code lc, Expression le, Code rc, Expression re) {
+        if (lc.isNull()) {
+            return emit(rc, re, "is", lc, le);
+        } else if (rc.isNull()) {
+            return emit(lc, le, "is", rc, re);
         } else {
-            return left.add(" = ").add(right);
+            return emit(lc, le, "=", rc, re);
         }
     }
 

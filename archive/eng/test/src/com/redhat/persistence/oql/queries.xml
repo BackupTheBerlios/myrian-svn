@@ -1147,6 +1147,18 @@
       query(filter(all(test.A),
                    sql { 1 = 0 } and sql { 1 = 0 or 0 = 0 }), id = id)
     </query>
+    <query fetched="id">
+      query(filter(filter(all(test.A), id == 0),
+                    (1 == id) == (id == 0 or 1 == id)), id = id)
+    </query>
+    <query fetched="id">
+      query(filter(filter(all(test.A), id == 0),
+                   sql { 1 &lt; id } == (id == 0 or 1 ==id)), id = id)
+    </query>
+    <query fetched="id">
+      query(filter(filter(all(test.A), id == 0),
+                   1 &lt; id == (id == 0 or 1 == id)), id = id)
+    </query>
     <results></results>
   </test>
 
@@ -1158,6 +1170,25 @@
       <row id="0"/>
       <row id="1"/>
       <row id="2"/>
+    </results>
+  </test>
+
+  <test name="Comparisons">
+    <query fetched="id">
+      query(filter(all(test.A), id &lt; 4 and id &gt; 0), id = id)
+    </query>
+    <query fetched="id">
+      query(filter(all(test.A), id &lt;= 3 and id != 0), id = id)
+    </query>
+    <query fetched="id">
+      query(filter(all(test.A),
+                   (id &gt;= 1 and id &lt;= 2) or (id &lt; 4 and id &gt; 2)),
+            id = id)
+    </query>
+    <results>
+      <row id="1"/>
+      <row id="2"/>
+      <row id="3"/>
     </results>
   </test>
 

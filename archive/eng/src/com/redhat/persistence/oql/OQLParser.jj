@@ -16,7 +16,7 @@ import java.io.*;
  * OQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/07/14 $
+ * @version $Revision: #5 $ $Date: 2004/07/15 $
  */
 
 class OQLParser {
@@ -120,6 +120,11 @@ TOKEN:
   | <COMMA: ",">
   | <EQ: "=">
   | <EQUALS: "==">
+  | <NEQ: "!=">
+  | <LT: "<">
+  | <LTE: "<=">
+  | <GT: ">">
+  | <GTE: ">=">
   | <DOT: ".">
   | <AND: "and">
   | <OR: "or">
@@ -244,8 +249,27 @@ Expression equals() :
     Expression l, r;
 }
 {
-    l = unary() [ <EQUALS> r = equals() { return new Equals(l, r); } ]
-        { return l; }
+    l = comparison()
+    [ ( <EQUALS> r = equals() { return new Equals(l, r); }
+      | <NEQ> r = equals() { return new Not(new Equals(l, r)); }
+      )
+    ]
+    { return l; }
+}
+
+Expression comparison() :
+{
+   Expression l, r;
+}
+{
+    l = unary()
+    [ ( <LT> r = unary() { return new Comparison(l, r, "<"); }
+      | <LTE> r = unary() { return new Comparison(l, r, "<="); }
+      | <GT> r = unary() { return new Comparison(l, r, ">"); }
+      | <GTE> r = unary() { return new Comparison(l, r, ">="); }
+      )
+    ]
+    { return l; }
 }
 
 Expression unary() :
