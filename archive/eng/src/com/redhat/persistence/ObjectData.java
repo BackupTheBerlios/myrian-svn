@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * ObjectData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2004/09/13 $
+ * @version $Revision: #9 $ $Date: 2004/09/20 $
  **/
 
 class ObjectData implements Violation {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/ObjectData.java#8 $ by $Author: rhs $, $DateTime: 2004/09/13 15:39:12 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/ObjectData.java#9 $ by $Author: rhs $, $DateTime: 2004/09/20 11:09:29 $";
 
     private static final Logger LOG = Logger.getLogger(ObjectData.class);
 
@@ -102,6 +102,7 @@ class ObjectData implements Violation {
             obj = ad.getObject(type, pmap, ssn);
             setObject(obj);
             ssn.setSessionKey(obj, m_key);
+            m_ssn.addObjectData(this);
         }
 
         return obj;
