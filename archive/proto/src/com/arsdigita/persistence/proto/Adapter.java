@@ -9,12 +9,12 @@ import java.util.*;
  * Adapter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/02/13 $
+ * @version $Revision: #5 $ $Date: 2003/02/13 $
  **/
 
 public abstract class Adapter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Adapter.java#4 $ by $Author: rhs $, $DateTime: 2003/02/13 11:20:06 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Adapter.java#5 $ by $Author: rhs $, $DateTime: 2003/02/13 17:16:57 $";
 
     private static final Map ADAPTERS = new HashMap();
 
@@ -64,6 +64,10 @@ public abstract class Adapter {
         }
 
         return new CompoundKey(basetype, key);
+    }
+
+    public void setSession(Object obj, Session ssn) {
+        throw new UnsupportedOperationException("not a keyed type");
     }
 
     public Object getObject(ObjectType basetype, PropertyMap props) {

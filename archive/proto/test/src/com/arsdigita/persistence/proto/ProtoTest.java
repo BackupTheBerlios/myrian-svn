@@ -13,12 +13,12 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #13 $ $Date: 2003/02/13 $
+ * @version $Revision: #14 $ $Date: 2003/02/13 $
  **/
 
 public class ProtoTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#13 $ by $Author: ashah $, $DateTime: 2003/02/13 15:47:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#14 $ by $Author: rhs $, $DateTime: 2003/02/13 17:16:57 $";
 
 
     private static class Generic {
@@ -59,6 +59,10 @@ public class ProtoTest extends TestCase {
                 return new Generic
                     (type,
                      (BigInteger) properties.get(type.getProperty("id")));
+            }
+
+            public void setSession(Object obj, Session ssn) {
+                // do nothing
             }
 
             public PropertyMap getProperties(Object obj) {

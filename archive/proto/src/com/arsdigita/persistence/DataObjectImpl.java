@@ -1,49 +1,45 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.*;
+import com.arsdigita.persistence.proto.Session;
 import java.util.*;
 
 /**
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/02/12 $
+ * @version $Revision: #5 $ $Date: 2003/02/13 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#4 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#5 $ by $Author: rhs $, $DateTime: 2003/02/13 17:16:57 $";
 
     private Session m_ssn;
-    private OID m_oid = null;
-    private HashMap m_temp = null;
-    private ObjectType m_type = null;
+    private OID m_oid;
 
-    DataObjectImpl(Session ssn, ObjectType type) {
-        m_ssn = ssn;
-        m_temp = new HashMap();
-        m_type = type;
+    DataObjectImpl(ObjectType type) {
+        m_oid = new OID(type);
     }
 
-    DataObjectImpl(Session ssn, OID oid) {
-        m_ssn = ssn;
+    DataObjectImpl(OID oid) {
         m_oid = oid;
+    }
+
+    void setSession(Session ssn) {
+        m_ssn = ssn;
     }
 
     private com.arsdigita.persistence.proto.metadata.Property convert(String property) {
         return C.prop(getObjectType().getProperty(property));
     }
 
-    public Session getSession() {
-        return m_ssn;
+    public com.arsdigita.persistence.Session getSession() {
+        return SessionManager.getSession();
     }
 
     public ObjectType getObjectType() {
-        if (m_type != null) {
-            return m_type;
-        } else {
-            return C.fromType(m_ssn.getProtoSession().getObjectType(this));
-        }
+        return m_oid.getObjectType();
     }
 
     public OID getOID() {
@@ -53,52 +49,34 @@ class DataObjectImpl implements DataObject {
     public Object get(String property) {
         Property prop = getObjectType().getProperty(property);
         if (prop.isCollection()) {
-            return new DataAssociationImpl(m_ssn, this, prop);
+            return new DataAssociationImpl(getSession(), this, prop);
         }
 
-        if (m_temp == null) {
-            return m_ssn.getProtoSession().get(this, convert(property));
+        if (prop.isKeyProperty()) {
+            return m_oid.get(property);
         } else {
-            return m_temp.get(property);
+            return m_ssn.get(this, convert(property));
         }
     }
 
     public void set(String property, Object value) {
-        if (m_temp != null) {
-            m_temp.put(property, value);
-
-            OID oid = new OID(m_type);
-            for (Iterator it = m_type.getKeyProperties(); it.hasNext(); ) {
-                Property prop = (Property) it.next();
-                Object val = m_temp.get(prop.getName());
-                if (val == null) {
-                    return;
-                } else {
-                    oid.set(prop.getName(), val);
-                }
+        Property prop = getObjectType().getProperty(property);
+        if (prop.isKeyProperty()) {
+            m_oid.set(property, value);
+            if (m_oid.isInitialized()) {
+                m_ssn.create(this);
             }
-            m_ssn.getProtoSession().create(this);
-            m_temp = null;
-            m_type = null;
         } else {
-            m_ssn.getProtoSession().set(this, convert(property), value);
+            m_ssn.set(this, convert(property), value);
         }
     }
 
     public boolean isNew() {
-        if (m_temp == null) {
-            return m_ssn.getProtoSession().isNew(this);
-        } else {
-            return true;
-        }
+        return m_ssn.isNew(this);
     }
 
     public boolean isDeleted() {
-        if (m_temp == null) {
-            return m_ssn.getProtoSession().isDeleted(this);
-        } else {
-            return false;
-        }
+        return m_ssn.isDeleted(this);
     }
 
     public boolean isDisconnected() {
@@ -110,19 +88,11 @@ class DataObjectImpl implements DataObject {
     }
 
     public boolean isModified() {
-        if (m_temp == null) {
-            return m_ssn.getProtoSession().isModified(this);
-        } else {
-            return true;
-        }
+        return m_ssn.isModified(this);
     }
 
     public boolean isPropertyModified(String name) {
-        if (m_temp == null) {
-            return m_ssn.getProtoSession().isModified(this, convert(name));
-        } else {
-            return true;
-        }
+        return m_ssn.isModified(this, convert(name));
     }
 
     public boolean isValid() {
@@ -130,11 +100,7 @@ class DataObjectImpl implements DataObject {
     }
 
     public void delete() {
-        if (m_temp == null) {
-            m_ssn.getProtoSession().delete(this);
-        } else {
-            throw new Error("deleting a new object");
-        }
+        m_ssn.delete(this);
     }
 
     public void specialize(String subtypeName) {
@@ -146,11 +112,7 @@ class DataObjectImpl implements DataObject {
     }
 
     public void save() {
-        if (m_temp == null) {
-            m_ssn.getProtoSession().flush();
-        } else {
-            throw new Error("cannot save without key properties");
-        }
+        m_ssn.flush();
     }
 
     public void addObserver(DataObserver observer) {

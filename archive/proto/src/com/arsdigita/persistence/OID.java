@@ -51,10 +51,10 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/02/12 $ */
+ * @version $Revision: #5 $ $Date: 2003/02/13 $ */
 
 public class OID {
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/OID.java#4 $ by $Author: rhs $, $DateTime: 2003/02/12 14:23:26 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/OID.java#5 $ by $Author: rhs $, $DateTime: 2003/02/13 17:16:57 $";
 
     private ObjectType m_type;
     private Map m_values = new HashMap();

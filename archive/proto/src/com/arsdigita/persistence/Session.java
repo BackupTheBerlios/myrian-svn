@@ -21,6 +21,7 @@ import com.arsdigita.persistence.proto.Adapter;
 import com.arsdigita.persistence.proto.Signature;
 import com.arsdigita.persistence.proto.Query;
 import com.arsdigita.persistence.proto.PropertyMap;
+import com.arsdigita.persistence.proto.metadata.Property;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -39,7 +40,7 @@ import java.sql.Connection;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/02/13 $
+ * @version $Revision: #8 $ $Date: 2003/02/13 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -47,6 +48,22 @@ public class Session {
     // This is just a temporary way to get an adapter registered.
     static {
         Adapter.addAdapter(DataObjectImpl.class, null, new Adapter() {
+                public void setSession(Object obj, com.arsdigita.persistence.proto.Session ssn) {
+                    ((DataObjectImpl) obj).setSession(ssn);
+                }
+
+                public Object getObject(com.arsdigita.persistence.proto.metadata.ObjectType type,
+                                        PropertyMap props) {
+                    OID oid = new OID(C.fromType(type));
+                    for (Iterator it = props.entrySet().iterator();
+                         it.hasNext(); ) {
+                        Map.Entry me = (Map.Entry) it.next();
+                        Property prop = (Property) me.getKey();
+                        oid.set(prop.getName(), me.getValue());
+                    }
+                    return new DataObjectImpl(oid);
+                }
+
                 public PropertyMap getProperties(Object obj) {
                     OID oid = ((DataObjectImpl) obj).getOID();
                     PropertyMap result = new PropertyMap();
@@ -54,7 +71,7 @@ public class Session {
                              oid.getProperties().entrySet().iterator();
                          it.hasNext(); ) {
                         Map.Entry me = (Map.Entry) it.next();
-                        result.put((com.arsdigita.persistence.proto.metadata.Property) me.getKey(), me.getValue());
+                        result.put(getObjectType(obj).getProperty((String) me.getKey()), me.getValue());
                     }
                     return result;
                 }
@@ -159,7 +176,9 @@ public class Session {
      * @see GenericDataObjectFactory
      **/
     public DataObject create(ObjectType type) {
-        return new DataObjectImpl(this, type);
+        DataObjectImpl result = new DataObjectImpl(type);
+        result.setSession(m_ssn);
+        return result;
     }
 
 
@@ -205,7 +224,7 @@ public class Session {
      **/
 
     public DataObject create(OID oid) {
-        DataObject result = new DataObjectImpl(this, oid);
+        DataObject result = new DataObjectImpl(oid);
         m_ssn.create(result);
         return result;
     }
@@ -224,7 +243,14 @@ public class Session {
      **/
 
     public DataObject retrieve(OID oid) {
-        throw new Error("not implemented");
+        Map props = oid.getProperties();
+        if (props.size() == 1) {
+            return (DataObject) m_ssn.retrieve
+                (C.type(oid.getObjectType()),
+                 props.values().iterator().next());
+        } else {
+            throw new Error("not implemented");
+        }
     }
 
 

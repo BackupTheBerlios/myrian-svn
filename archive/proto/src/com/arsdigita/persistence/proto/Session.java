@@ -14,12 +14,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #26 $ $Date: 2003/02/13 $
+ * @version $Revision: #27 $ $Date: 2003/02/13 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#26 $ by $Author: ashah $, $DateTime: 2003/02/13 15:47:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#27 $ by $Author: rhs $, $DateTime: 2003/02/13 17:16:57 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -50,11 +50,8 @@ public class Session {
             od.setState(od.NUBILE);
         }
 
-        // This will have problems if there was a preexisting object with the
-        // same identity, but different type. Also if the object already
-        // existed and was modified the new object will pick up all the
-        // changes made to the old one. Not sure what to do about this except
-        // perhaps disallow it at some point.
+        getAdapter(obj).setSession(obj, this);
+
         addEvent(new CreateEvent(this, obj));
         processPending();
 

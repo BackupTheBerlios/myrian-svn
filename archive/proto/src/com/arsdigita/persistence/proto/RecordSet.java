@@ -10,12 +10,12 @@ import java.util.*;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2003/02/13 $
+ * @version $Revision: #8 $ $Date: 2003/02/13 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/RecordSet.java#7 $ by $Author: rhs $, $DateTime: 2003/02/13 11:20:06 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/RecordSet.java#8 $ by $Author: rhs $, $DateTime: 2003/02/13 17:16:57 $";
 
     private Signature m_signature;
     private Adapter m_adapter;
@@ -82,6 +82,7 @@ public abstract class RecordSet {
                 Object obj = ssn.getObject(m_adapter.getSessionKey(ot, props));
                 if (obj == null) {
                     obj = m_adapter.getObject(ot, props);
+                    m_adapter.setSession(obj, ssn);
                 }
                 objs.put(p, obj);
             }
