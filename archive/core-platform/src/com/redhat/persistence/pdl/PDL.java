@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/07/09 $
+ * @version $Revision: #6 $ $Date: 2003/07/29 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDL.java#5 $ by $Author: rhs $, $DateTime: 2003/07/09 15:26:29 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDL.java#6 $ by $Author: rhs $, $DateTime: 2003/07/29 19:14:05 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -569,8 +569,22 @@ public class PDL {
 
 		    ColumnNd from = ((JoinNd) joins.get(0)).getTo();
 		    ColumnNd to = ((JoinNd) joins.get(1)).getFrom();
-		    unique(jpn, new Column[] { lookup(from), lookup(to) },
-			   true);
+
+                    boolean collection = true;
+                    Object obj = getEmitted(jpn.getParent());
+                    if (obj != null && obj instanceof Property) {
+                        Property prop = (Property) obj;
+                        if (!prop.isCollection()) {
+                            collection = false;
+                        }
+                    }
+
+                    if (collection) {
+                        unique(jpn, new Column[] { lookup(from), lookup(to) },
+                               true);
+                    } else {
+                        unique(jpn, new Column[] { lookup(from) }, true);
+                    }
 		}
 	    }, new Node.IncludeFilter(new Node.Field[] {
 		AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.PROPERTIES,
