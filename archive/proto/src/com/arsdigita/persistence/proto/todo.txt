@@ -1,36 +1,17 @@
 Functionality:
- * Reorder DML in relational engine (2,0) (1)
-
-     SQL Generation must be made to obey event ordering constraints.
-     Optionally optimize with dotted arrow constraints for MDSQL
-     events.
-
-     Status: Functional, currently solid arrows are set up where
-             dotted arrows should be set up since the SQL generation
-             isn't smart enough to obey the arrow constraints. This
-             simply means that instance loops may not be flushable,
-             but this isn't a blocking issue right now since instance
-             loops were previously guaranteed to cause constraint
-             violations.
-
- * Observers (3,2) (2)
+ * Observers (3,2,2) (2,4)
 
      Infinite loop prevention. Reentrance.
-     Plan: beforeActive --> afterActivate, make top level flush be the
-     only flush to write to event processors, track events produced by
-     DataObservers in wrapper layer and don't send them back to their
-     own observer.
 
-     Status: Some infrastructure work completed, but we are still
-             struggling with the problem of matching old observer
-             semantics to the new event stream listeners.
+     Status: Reentrance works. Bug fixing. Preventing infinite loops.
 
- * Link attributes (2,2) (0)
+ * Link attributes (2,2,2) (0,4)
 
      Desugar into object model that uses compound keys + containment
      by multiple objects.
 
-     Status: Not started. (Not blocking anything so far.)
+     Status: Mostly works. Statically defined queries for link
+             attributes are not used.
 
       - isModified(link) will never return true
 
@@ -41,21 +22,7 @@ Functionality:
       - extraneous join for queries only fetching ids, genPath should
         map id props to parent join if it exists
 
- * Compound keys (1,0) (1)
-
-     Mostly done in checkout. Difficult to confirm due to lack of
-     significant test coverage.
-
-     Status: Done
-
- * sub query filtering (1,0) (0.5)
-
-     Simple addition to anonymous mapper in QGen.java, may require
-     some fanciness for legacy bind variable support.
-
-     Status: Done
-
- * Disconnected data (1,0.5) (0.5)
+ * Disconnected data (1,0.5,0.5) (0.5,0)
 
      On disconnect store HashMap of object data in wrapper layer. Also
      requires some simple state management to make sure writing is not
@@ -65,7 +32,7 @@ Functionality:
      Status: API implemented with incorrect semantics. No longer
              blocking.
 
- * Data Operations (2,1.5) (0.5)
+ * Data Operations (2,1.5,1.5) (0.5,0)
 
      Must be loaded into metadata structures.
      Requires API for creating an operation, setting any required
@@ -77,57 +44,32 @@ Functionality:
      Status: Basic functionality in place. Not all exotic forms may be
              supported, but this is not currently blocking.
 
- * GenericDataQuery (1,1) (0)
+ * GenericDataQuery (1,1,1) (0,0)
 
      Requires exposing methods on RDBMSEngine and writing some wrapper
      code.
 
      Status: Not started, nonblocking.
 
- * immediate properties/specialize (1, 0) (0.5)
-
-     Plan A: New PDL keyword. Error checking for queries that don't
-     fetch immediate properties. Adapter must be modified to use
-     object type column to determine the correct type when it exists.
-
-     Plan B: Somehow support specialize by removing any direct storage
-     of the object type in new persistence and always delegate to the
-     object. Then store specific object type in wrapper layer and do
-     specialization via the wrapper layer.
-
-     Status: Plan B implemented, Plan A deferred.
-
- * order with null (1,1) (0)
+ * order with null (1,1,1) (0,0)
 
      Passthrough code + some minor API additions to Query and friends.
 
      Status: Not started, nonblocking.
 
- * Session.getConnection() (1,1) (0)
+ * Session.getConnection() (1,1,0.5) (0,0.5)
 
      Passthrough code.
 
      Status: Not started, nonblocking.
 
- * DataQuery.setRange (1,0) (0.5)
-
-     API addtions + minor implementation.
-
-     Status: Done
-
- * DataQuery.set/getParameter (1,0) (1)
-
-     Passthrough code ???
-
-     Status: Done
-
- * Better connection source (1,1) (0)
+ * Better connection source (1,1,0.5) (0,0)
 
      Look at old connection handling code, copy/reimplement.
 
      Status: Not started, nonblocking.
 
- * Size (1,1) (0)
+ * Size (1,1,1) (0,0)
 
      API additions + minor implementation. API additions can be done
      cheesily for now, but at some point we need a consistent story
@@ -135,25 +77,25 @@ Functionality:
 
      Status: Not started, nonblocking.
 
- * Query caching (1,1) (0)
+ * Query caching (1,1,1) (0,0)
 
      Cache data structures, cache invalidation.
 
      Status: Not started, nonblocking.
 
- * Weak refs (0.5,0.5) (0)
+ * Weak refs (0.5,0.5,0.5) (0,0)
 
      Do it.
 
      Status: Not started, nonblocking.
 
- * Oracle (1,1) (0)
+ * Oracle (1,1,1) (0,0)
 
      Oracle implementation of SQLWriter.
 
      Status: Not started.
 
- * LOBs (1,1) (0)
+ * LOBs (1,1,1) (0,0)
 
      Dig up Oracle specific code from perforce. Figure out how to call
      it without hack up RDBMSEngine to be oracle specific.
@@ -161,26 +103,12 @@ Functionality:
      Status: Not started.
 
 Error Checking/Handling:
- * type checks for PropertyEvent (0.5,0) (0)
-
-     Status: Done
-
- * null/"" handling (0.5,0.5) (0.5)
+ * null/"" handling (0.5,0.5,1) (0.5,0)
 
      Plan A: DOI.set converts ""-> null. Session disallows "". Deal
              with filtering.
 
- * throwing appropriate exceptions save() (1,0) (1)
-
-     Plan A: Be fundamental. Adjust fundament as appropriate.
-
-     Status: Done
-
- * GDflush() (0.5,0) (0.5)
-
-     Status: Done
-
- * Auto-detect two wayness and warn (1,1) (0)
+ * Auto-detect two wayness and warn (1,1,1) (0,0)
 
      Status: Not started, nonblocking.
 
@@ -206,3 +134,72 @@ Documentation:
  * Training documentation
 
 Disable all cascading deletes.
+
+-= D O N E =-
+
+ * Reorder DML in relational engine (2,0) (1)
+
+     SQL Generation must be made to obey event ordering constraints.
+     Optionally optimize with dotted arrow constraints for MDSQL
+     events.
+
+     Status: Functional, currently solid arrows are set up where
+             dotted arrows should be set up since the SQL generation
+             isn't smart enough to obey the arrow constraints. This
+             simply means that instance loops may not be flushable,
+             but this isn't a blocking issue right now since instance
+             loops were previously guaranteed to cause constraint
+             violations.
+
+ * Compound keys (1,0) (1)
+
+     Mostly done in checkout. Difficult to confirm due to lack of
+     significant test coverage.
+
+     Status: Done
+
+ * sub query filtering (1,0) (0.5)
+
+     Simple addition to anonymous mapper in QGen.java, may require
+     some fanciness for legacy bind variable support.
+
+     Status: Done
+
+ * throwing appropriate exceptions save() (1,0) (1)
+
+     Plan A: Be fundamental. Adjust fundament as appropriate.
+
+     Status: Done
+
+ * GDflush() (0.5,0) (0.5)
+
+     Status: Done
+
+ * DataQuery.setRange (1,0) (0.5)
+
+     API addtions + minor implementation.
+
+     Status: Done
+
+ * DataQuery.set/getParameter (1,0) (1)
+
+     Passthrough code ???
+
+     Status: Done
+
+ * immediate properties/specialize (1, 0) (0.5)
+
+     Plan A: New PDL keyword. Error checking for queries that don't
+     fetch immediate properties. Adapter must be modified to use
+     object type column to determine the correct type when it exists.
+
+     Plan B: Somehow support specialize by removing any direct storage
+     of the object type in new persistence and always delegate to the
+     object. Then store specific object type in wrapper layer and do
+     specialization via the wrapper layer.
+
+     Status: Plan B implemented, Plan A deferred.
+
+ * type checks for PropertyEvent (0.5,0) (0)
+
+     Status: Done
