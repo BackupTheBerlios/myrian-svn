@@ -28,14 +28,14 @@ import org.apache.log4j.Logger;
  * Central location for obtaining database connection.
  *
  * @author David Dao
- * @version $Revision: #22 $ $Date: 2003/11/21 $
+ * @version $Revision: #23 $ $Date: 2003/12/02 $
  * @since 4.5
  *
  */
 
 public class ConnectionManager {
 
-    public static final String versionId = "$Author: rhs $ - $Date: 2003/11/21 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#22 $";
+    public static final String versionId = "$Author: vadim $ - $Date: 2003/12/02 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#23 $";
 
     private static final Logger LOG =
         Logger.getLogger(ConnectionManager.class);
@@ -43,7 +43,7 @@ public class ConnectionManager {
     /**
      * Gets a jdbc connection.
      *
-     * @deprecated Use {@link Session.getConnection()} instead.
+     * @deprecated Use {@link Session#getConnection()} instead.
      **/
     public static java.sql.Connection getConnection()
         throws java.sql.SQLException {
@@ -69,7 +69,7 @@ public class ConnectionManager {
 
     /**
      * Returns the connection presently in use by this thread.
-     * @deprecated Use {@link Session.getConnection()} instead.
+     * @deprecated Use {@link Session#getConnection()} instead.
      **/
     public static java.sql.Connection getCurrentThreadConnection() {
         return SessionManager.getSession().getConnection();

@@ -119,13 +119,13 @@ import org.apache.log4j.Logger;
  * no query string.</p>
  *
  * @author Justin Ross &lt;<a href="mailto:jross@redhat.com">jross@redhat.com</a>&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/servlet/HttpResourceLocator.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/servlet/HttpResourceLocator.java#4 $
  */
 public class HttpResourceLocator {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/servlet/HttpResourceLocator.java#3 $" +
-        "$Author: jorris $" +
-        "$DateTime: 2003/10/28 18:36:21 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/servlet/HttpResourceLocator.java#4 $" +
+        "$Author: vadim $" +
+        "$DateTime: 2003/12/02 13:45:44 $";
 
     private static final Logger s_log = Logger.getLogger
         (HttpResourceLocator.class);
@@ -317,7 +317,7 @@ public class HttpResourceLocator {
      * <code>String[]</code>s.  If the URL was constructed with a null
      * <code>HttpParameterMap</code>, this method returns null.
      *
-     * @see javax.servlet.http.HttpServletRequest#getHttpParameterMap()
+     * @see javax.servlet.http.HttpServletRequest#getParameterMap()
      * @return a <code>Map</code> of the URL's query parameters
      */
     public final Map getParameterMap() {

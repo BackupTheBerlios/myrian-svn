@@ -28,16 +28,16 @@ import org.apache.log4j.Logger;
  *
  * <a href="http://www.faqs.org/rfcs/rfc2109.html">http://www.faqs.org/rfcs/rfc2109.html</a>
  *
- * @see javax.servlet.http.HttpServletRequest.getCookies()
+ * @see javax.servlet.http.HttpServletRequest#getCookies()
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/servlet/Cookies.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/servlet/Cookies.java#3 $
  */
 public class Cookies {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/servlet/Cookies.java#2 $" +
-        "$Author: jorris $" +
-        "$DateTime: 2003/10/28 18:36:21 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/servlet/Cookies.java#3 $" +
+        "$Author: vadim $" +
+        "$DateTime: 2003/12/02 13:45:44 $";
 
     private static final Logger s_log = Logger.getLogger(Cookies.class);
 
