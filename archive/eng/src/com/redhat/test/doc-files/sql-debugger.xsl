@@ -1,14 +1,17 @@
 <?xml version="1.0"?>
 <!--
- Copyright (C) 2003-2004 Red Hat, Inc.  All Rights Reserved.
- This program is Open Source software; you can redistribute it and/or
- modify it under the terms of the Open Software License version 2.1 as
- published by the Open Source Initiative.
- You should have received a copy of the Open Software License along
- with this program; if not, you may obtain a copy of the Open Software
- License version 2.1 from http://www.opensource.org/licenses/osl-2.1.php
- or by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
- 3001 King Ranch Road, Ukiah, CA 95482.
+ Copyright (C) 2003-2004 Red Hat, Inc. All Rights Reserved.
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation; either version 2.1 of
+ the License, or (at your option) any later version.
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ Lesser General Public License for more details.
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 -->
 <xsl:stylesheet version="1.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
