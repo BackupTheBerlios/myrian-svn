@@ -30,7 +30,7 @@ import java.util.Stack;
  *
  * @author Archit Shah (ashah@mit.edu)
  * @author Vadim Nasardinov (vadimn@redhat.com)
- * @version $Date: 2003/03/11 $
+ * @version $Date: 2003/04/30 $
  * @since 2003-01-22
  **/
 public class Graphs {
@@ -219,13 +219,11 @@ public class Graphs {
 
             if ( nodeCount==0 || nodeAttrs != null ) {
                 writer.print(INDENT + nodeName);
-                if ( nodeCount == 0 ) {
+
+                if ( nodeAttrs == null ) {
                     writer.println(";");
-                    continue;
-                } else if ( nodeAttrs != null ) {
-                    writer.println(nodeAttrs + ";");
                 } else {
-                    throw new Error("can't get here");
+                    writer.println(nodeAttrs + ";");
                 }
             }
 
