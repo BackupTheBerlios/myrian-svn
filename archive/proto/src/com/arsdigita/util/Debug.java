@@ -20,6 +20,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.lang.reflect.Field;
 
 import org.apache.log4j.Logger;
 
@@ -29,7 +30,7 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2002-08-23
- * @version $Id: //core-platform/proto/src/com/arsdigita/util/Debug.java#2 $ $Date: 2002/12/09 $
+ * @version $Id: //core-platform/proto/src/com/arsdigita/util/Debug.java#3 $ $Date: 2003/03/21 $
  **/
 public class Debug {
     private static final Logger s_log = Logger.getLogger(Debug.class);
@@ -111,5 +112,50 @@ public class Debug {
             s_log.error("Couldn't read " + filename, ex);
         }
         return null;
+    }
+
+    /**
+     * This method allows you to access a private field named
+     * <code>fieldName</code> of the object <code>obj</code>.
+     *
+     * <p>Example usage:</p>
+     *
+     * <pre>
+     * public void doStuff(Foo foo) {
+     *     Baz baz = (Baz) Debug.getPrivateField(Foo.class, foo, "m_baz");
+     *     System.err.println("foo's private field m_baz is " + baz);
+     *     // do stuff with foo
+     *     // ...
+     * }
+     * </pre>
+     *
+     * @see java.lang.reflect.AccessibleObject#setAccessible(boolean)
+     * @see java.lang.reflect.ReflectPermission
+     *
+     * @param klass the class of <code>obj</code>
+     * @param obj the object whose field is being accessed
+     * @param fieldName the name of the field being accessed
+     *
+     * @throws SecurityException if there is a {@link SecurityManager security
+     * manager} and its {@link
+     * SecurityManager#checkPermission(java.security.Permission)} method returns
+     * <code>true</code> for the
+     * <code>ReflectPermission("suppressAccessChecks")</code> permission. Note
+     * that this is an unchecked exception.
+     **/
+    public static Object getPrivateField(Class klass, Object obj,
+                                         String fieldName)
+        throws SecurityException {
+
+        try {
+            Field field = klass.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            return field.get(obj);
+        } catch (NoSuchFieldException ex) {
+            throw new Error("No field named " + fieldName + " in " +
+                            klass.getName());
+        } catch (IllegalAccessException ex) {
+            throw new Error("This can't normally happen.");
+        }
     }
 }
