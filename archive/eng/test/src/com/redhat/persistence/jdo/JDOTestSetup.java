@@ -49,6 +49,7 @@ public class JDOTestSetup extends TestSetup {
         Schema.load(root, conn);
         conn.createStatement().execute("create sequence jdotest_seq");
         conn.commit();
+        conn.close();
     }
 
     protected void tearDown() throws Exception {

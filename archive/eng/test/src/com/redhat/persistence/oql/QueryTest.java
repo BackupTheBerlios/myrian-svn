@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
  * QueryTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/07/27 $
  **/
 
 public class QueryTest extends TestCase {
@@ -40,7 +40,7 @@ public class QueryTest extends TestCase {
     // being an instance of TestCase. Later versions of ant don't
     // suffer from this problem.
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/oql/QueryTest.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/oql/QueryTest.java#2 $ by $Author: ashah $, $DateTime: 2004/07/27 18:02:20 $";
 
     private static final Logger s_log = Logger.getLogger(QueryTest.class);
 
@@ -56,8 +56,8 @@ public class QueryTest extends TestCase {
     private Integer m_outerCount = null;
     //private static final String NL = System.getProperty("line.separator");
 
-    public QueryTest(QuerySuite suite, 
-                     String name, 
+    public QueryTest(QuerySuite suite,
+                     String name,
                      String query,
                      boolean ordered) {
         m_suite = suite;
@@ -74,10 +74,7 @@ public class QueryTest extends TestCase {
         m_error = error;
     }
 
-    public int countTestCases() { return 1; }
-
-    public void run(TestResult result) {
-        result.startTest(this);
+    protected void runTest() throws Exception {
         try {
             s_log.info("Query:\n" + m_query);
             OQLParser p = new OQLParser(new StringReader(m_query));
@@ -164,17 +161,10 @@ public class QueryTest extends TestCase {
             } finally {
                 stmt.close();
             }
-
-        } catch (AssertionFailedError e) {
+        } catch (Exception e) {
             if (isUnexpected(e)) {
-                result.addFailure(this, e);
+                throw e;
             }
-        } catch (Throwable t) {
-            if (isUnexpected(t)) {
-                result.addError(this, t);
-            }
-        } finally {
-            result.endTest(this);
         }
     }
 
@@ -184,10 +174,6 @@ public class QueryTest extends TestCase {
         } else {
             return m_name;
         }
-    }
-
-    public String toString() {
-        return m_query;
     }
 
     boolean isUnexpected(final Throwable t) {

@@ -74,6 +74,10 @@ class JDOQLParser {
         }
     }
 
+    private Map getParameters() {
+        return m_params;
+    }
+
     private Object getParameter(String name) {
         return m_params.get(name);
     }
@@ -83,10 +87,35 @@ class JDOQLParser {
             configure(q);
             configure(m);
             ReInit(new StringReader(s));
-            return null;
+            return filter();
+        } catch (ParseException pe) {
+            throw new RuntimeException(pe);
         } finally {
             clear();
         }
+    }
+
+    void parseOrdering(JDOQuery q, String s, Map m) {
+        try {
+            configure(q);
+            configure(m);
+            ReInit(new StringReader(s));
+            ordering();
+        } catch (ParseException pe) {
+            throw new RuntimeException(pe);
+        } finally {
+            clear();
+        }
+    }
+
+    static String parseStringLiteral(String image) {
+        StringBuffer result = new StringBuffer(image.length());
+        for (int i = 1; i < image.length() - 1; i++) {
+            char c = image.charAt(i);
+            if (c == '\\') { c = image.charAt(++i); }
+            result.append(c);
+        }
+        return result.toString();
     }
 
     private static class Name {
@@ -107,7 +136,7 @@ class JDOQLParser {
         }
 
         public String toString() {
-            return m_scope + m_name;
+            return m_scope == null ? m_name : m_scope + m_name;
         }
     }
 }
@@ -354,6 +383,35 @@ void importStmt() :
     }
 }
 
+void ordering() :
+{
+}
+{
+    [ orderSpec() ] [ <COMMA> ] <EOF>
+}
+
+void orderSpec() :
+{
+    Expression e;
+    boolean asc;
+}
+{
+    ( e = expression()
+      ( <ASCENDING> { asc = true; } | <DESCENDING> { asc = false; } )
+      [ LOOKAHEAD(2) <COMMA> orderSpec() ]
+    ) {
+        getQuery().addOrder(e, asc);
+    }
+}
+
+Expression filter() :
+{
+    Expression e = null;
+}
+{
+      [ e = expression() ] <EOF> { return e; }
+}
+
 Expression literal() :
 {
     Token t;
@@ -364,7 +422,7 @@ Expression literal() :
     | <TRUE> { o = Boolean.TRUE; }
     | <FALSE> { o = Boolean.FALSE; }
     | t = <CHARACTER_LITERAL> { o = new Character(t.image.charAt(0)); }
-    | t = <STRING_LITERAL> { o = t.image; }
+    | t = <STRING_LITERAL> { o = parseStringLiteral(t.image); }
     | t = <INTEGER_LITERAL> { o = Integer.valueOf(t.image); }
     | t = <FLOATING_POINT_LITERAL> { o = Double.valueOf(t.image); } ) {
 
@@ -380,18 +438,20 @@ Expression primary() :
     Expression arg;
 }
 {
-      <LPAREN> expr = expression() <RPAREN>
-    | expr = literal()
-    | <THIS> { expr = new Variable("this"); }
+    (
+          <LPAREN> expr = expression() <RPAREN>
+        | expr = literal()
+        | <THIS> { expr = new Variable("this"); }
 
-    ( LOOKAHEAD(3) 
-      <DOT> t = <IDENTIFIER> <LPAREN> { args = new ArrayList(); }
-        [ arg = expression() { args.add(arg); }
-          ( <COMMA> arg = expression() { args.add(arg); } )*
-        ]
-      <RPAREN> { throw new Error("not implemented"); }
-    | ( <DOT> t = <IDENTIFIER> ) { expr = new Get(expr, t.image); }
-    )*
+        ( LOOKAHEAD(3) 
+          <DOT> t = <IDENTIFIER> <LPAREN> { args = new ArrayList(); }
+            [ arg = expression() { args.add(arg); }
+              ( <COMMA> arg = expression() { args.add(arg); } )*
+            ]
+          <RPAREN> { throw new Error("not implemented"); }
+        | ( <DOT> t = <IDENTIFIER> ) { expr = new Get(expr, t.image); }
+        )*
+    )
     { return expr; }
 }
 
@@ -469,11 +529,12 @@ Expression relationalExpression() :
 {
     Expression expr;
     Expression r;
+    Token t;
 }
 {
     expr = additiveExpression()
-    ( ( <LT> | <GT> | <LTE> | <GTE> ) r = additiveExpression()
-        { throw new Error("not implemented"); }
+    ( ( t = <LT> | t = <GT> | t = <LTE> | t = <GTE> ) r = additiveExpression()
+        { expr = new Comparison(expr, r, t.image); }
     )*
     { return expr; }
 }

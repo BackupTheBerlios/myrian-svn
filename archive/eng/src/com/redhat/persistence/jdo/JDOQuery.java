@@ -1,5 +1,6 @@
 package com.redhat.persistence.jdo;
 
+import com.redhat.persistence.Session;
 import com.redhat.persistence.metadata.*;
 import com.redhat.persistence.oql.*;
 import com.redhat.persistence.oql.Query;
@@ -17,17 +18,23 @@ class JDOQuery implements javax.jdo.Query, Serializable {
     transient private final Map m_paramMap = new HashMap();
     transient private final List m_paramOrder = new ArrayList();
     transient private final Map m_varMap = new HashMap();
+    transient private final List m_orders = new ArrayList();
 
-    private String m_extent = null;
-    private String m_params = null;
-    private String m_vars = null;
-    private String m_imports = null;
-    private String m_filter = null;
-    private String m_order = null;
+    transient private Expression m_expr = null;
+
+    transient private OQLCollection m_candidates = null;
+
+    private String m_extent = "";
+    private String m_params = "";
+    private String m_vars = "";
+    private String m_imports = "";
+    private String m_filter = "";
+    private String m_order = "";
 
     public JDOQuery(PersistenceManagerImpl pmi) {
         m_pm = pmi;
         m_parser = new JDOQLParser();
+        reset();
     }
 
     private Root getRoot() {
@@ -45,6 +52,7 @@ class JDOQuery implements javax.jdo.Query, Serializable {
         m_paramMap.clear();
         m_paramOrder.clear();
         m_varMap.clear();
+        m_expr = null;
     }
 
     public void compile() {
@@ -96,9 +104,7 @@ class JDOQuery implements javax.jdo.Query, Serializable {
                 ("repeat declaration of variable " + name);
         }
 
-        // XXX not using any adapter ness
-        ObjectType t = getRoot().getObjectType(c.getName());
-        m_varMap.put(name, t);
+        m_varMap.put(name, c);
     }
 
     Class resolveType(String name) {
@@ -145,23 +151,62 @@ class JDOQuery implements javax.jdo.Query, Serializable {
         return match;
     }
 
-
     public void declareImports(String imports) { m_imports = imports; }
 
     public void declareParameters(String params) { m_params = params; }
 
     public void declareVariables(String vars) { m_vars = vars; }
 
+    void addOrder(Expression e, boolean asc) {
+        m_expr = new Sort(m_expr, e, asc ? Sort.ASCENDING : Sort.DESCENDING);
+    }
+
+    private Expression makeExpr(Map params) {
+        try {
+            JDOQLParser p = getParser();
+            if (m_candidates != null) {
+                m_expr = m_candidates.expression();
+            } else {
+                m_expr = new All(m_extent);
+            }
+
+            m_expr = new Define(m_expr, "this");
+
+            for (Iterator it = m_varMap.entrySet().iterator();
+                 it.hasNext(); ) {
+                Map.Entry me = (Map.Entry) it.next();
+                String name = (String) me.getKey();
+                Class cls = (Class) me.getValue();
+                // XXX going from class to object type
+                throw new Error("not implemented");
+            }
+
+            Expression filter = p.filter(this, m_filter, params);
+            if (filter != null) {
+                m_expr = new Filter(m_expr, filter);
+            }
+
+            p.parseOrdering(this, m_order, params);
+
+            m_expr = new Get(m_expr, "this");
+            return m_expr;
+        } finally {
+            m_expr = null;
+        }
+    }
+
     public Object execute() {
+        compile();
         if (m_paramMap.size() > 0) {
             throw new JDOUserException
                 ("can not execute with unbound parameters " +
                  m_paramMap.keySet());
         }
-        return execute(Collections.EMPTY_MAP);
+        return executeInternal(Collections.EMPTY_MAP);
     }
 
     public Object execute(Object p1) {
+        compile();
         if (m_paramMap.size() > 1) {
             throw new JDOUserException
                 ("can not execute with unbound parameters " +
@@ -169,10 +214,11 @@ class JDOQuery implements javax.jdo.Query, Serializable {
         }
         Map m = new HashMap();
         m.put(m_paramOrder.get(0), p1);
-        return executeWithMap(m);
+        return executeInternal(m);
     }
 
     public Object execute(Object p1, Object p2) {
+        compile();
         if (m_paramMap.size() > 2) {
             throw new JDOUserException
                 ("can not execute with unbound parameters " +
@@ -181,10 +227,11 @@ class JDOQuery implements javax.jdo.Query, Serializable {
         Map m = new HashMap();
         m.put(m_paramOrder.get(0), p1);
         m.put(m_paramOrder.get(1), p1);
-        return executeWithMap(m);
+        return executeInternal(m);
     }
 
     public Object execute(Object p1, Object p2, Object p3) {
+        compile();
         if (m_paramMap.size() > 3) {
             throw new JDOUserException
                 ("can not execute with unbound parameters " +
@@ -194,25 +241,16 @@ class JDOQuery implements javax.jdo.Query, Serializable {
         m.put(m_paramOrder.get(0), p1);
         m.put(m_paramOrder.get(1), p1);
         m.put(m_paramOrder.get(2), p1);
-        return executeWithMap(m);
+        return executeInternal(m);
     }
 
     public Object executeWithMap(Map params) {
-        JDOQLParser p = getParser();
-        Expression expr = new All(m_extent);
-
-        for (Iterator it = m_varMap.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry me = (Map.Entry) it.next();
-            String name = (String) me.getKey();
-            ObjectType type = (ObjectType) me.getValue();
-            // join here?
-        }
-
-        Expression filter = p.filter(this, m_filter, params);
-        throw new Error("not implemented");
+        compile();
+        return executeInternal(params);
     }
 
     public Object executeWithArray(Object[] params) {
+        compile();
         if (params.length != m_paramMap.size()) {
             throw new JDOUserException
                 ("can not execute with unbound parameters " +
@@ -222,23 +260,59 @@ class JDOQuery implements javax.jdo.Query, Serializable {
         for (int i = 0; i < params.length; i++) {
             m.put(m_paramOrder.get(i), params[i]);
         }
-        return executeWithMap(m);
+        return executeInternal(m);
+    }
+
+    private Collection executeInternal(Map params) {
+        final Expression expr = makeExpr(params);
+        final ObjectType type = expr.getType(m_pm.getSession().getRoot());
+
+        return new CRPCollection() {
+            Session ssn() { return m_pm.getSession(); }
+            ObjectType type() { return type; }
+            public Expression expression() { return expr; }
+            public boolean add(Object o) {
+                throw new UnsupportedOperationException();
+            }
+            public boolean remove(Object o) {
+                throw new UnsupportedOperationException();
+            }
+            public void clear() {
+                throw new UnsupportedOperationException();
+            }
+        };
     }
 
     public PersistenceManager getPersistenceManager() {
         return m_pm;
     }
 
+    private void setCandidates(OQLCollection pcs) {
+        m_candidates = pcs;
+        m_extent = null;
+    }
+
     public void setCandidates(Collection pcs) {
-        throw new Error("not implemented");
+        if (pcs instanceof OQLCollection) {
+            setCandidates((OQLCollection) pcs);
+        } else {
+            throw new IllegalArgumentException
+                ("collection must be generated by a query execution");
+        }
     }
 
     public void setCandidates(Extent pcs) {
-        throw new Error("not implemented");
+        if (pcs instanceof OQLCollection) {
+            setCandidates((OQLCollection) pcs);
+        } else {
+            throw new IllegalArgumentException
+                ("unsupported extent of class " + pcs.getClass());
+        }
     }
 
     public void setClass(Class cls) {
         m_extent = cls.getName();
+        m_candidates = null;
     }
 
     public void setFilter(String filter) {
