@@ -98,7 +98,9 @@ class TransactionImpl implements Transaction {
     }
 
     public void setOptimistic(boolean value) {
-        throw new JDOUnsupportedOptionException();
+        if (value) {
+            throw new JDOUnsupportedOptionException();
+        }
     }
 
     public void setRestoreValues(boolean value) {
