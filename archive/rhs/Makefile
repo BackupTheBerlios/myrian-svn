@@ -3,50 +3,58 @@ BUILD=build
 empty:=
 space:=$(empty) $(empty)
 
-CLASSPATH:=$(CLASSPATH):$(BUILD)/classes
-CLASSPATH:=$(CLASSPATH):$(subst $(space),:,$(wildcard lib/*.jar))
-CLASSPATH:=$(CLASSPATH):$(subst $(space),:,$(wildcard lib/*.zip))
-
-#JAVAC=gcj-ssa -L~/lib -o build/dumper --main=Main --classpath $(CLASSPATH):$(BUILD)/src ~/lib/log4j.jar lib/xerces.jar
-# -C -d $(BUILD)/classes
-JAVAC=javac -classpath $(CLASSPATH) -sourcepath $(BUILD)/src -d $(BUILD)/classes
 JAVACC=java -cp javacc/JavaCC.zip COM.sun.labs.javacc.Main
 
-FILES:=$(shell find src -name *.java -or -name *.jj)
-GRAMMARS:=$(filter %.jj,$(FILES))
-PARSERS:=$(GRAMMARS:src/%.jj=$(BUILD)/src/%.java)
-SOURCES:=$(filter %.java,$(FILES))
+SOURCES:=src test/src
 
-TIMESTAMP:=$(BUILD)/classes/.timestamp
+SOURCEPATH:=$(subst $(space),:,$(SOURCES:%=$(BUILD)/%))
 
-all: $(TIMESTAMP)
+CLASSPATH:=$(CLASSPATH):$(subst $(space),:,$(wildcard lib/*.jar))
+CLASSPATH:=$(CLASSPATH):$(subst $(space),:,$(wildcard lib/*.zip))
+CLASSPATH:=$(CLASSPATH):$(SOURCEPATH)
 
-tags:
-	rm -f TAGS
-	find src -name "*.java" | xargs etags -a \
-		--language=none \
-		--regex='/^\([ \t]\|public\|private\|static\|protected\|final\|abstract\)*[ \t\n]*\(class\|interface\)+[ \t\n]+\([a-zA-Z0-9_]+\)/\3/' \
-		--output=TAGS
+JSTAMPS:=$(SOURCES:%=$(BUILD)/%.jstamp)
+
+-include $(SOURCES:%=$(BUILD)/%.jmake)
+
+all: $(filter-out $(BUILD)/test/%,$(JSTAMPS))
+
+test: all $(filter $(BUILD)/test/%,$(JSTAMPS))
 
 clean:
 	rm -rf $(BUILD)
 
-$(TIMESTAMP): $(SOURCES) $(PARSERS)
-	@mkdir -p $(BUILD)/classes
-#	$(JAVAC) $? `find $(BUILD)/src -name "*.java"`
-	$(JAVAC) $?
-	@touch $(BUILD)/classes/.timestamp
+jar: all
+	jar cf $(BUILD)/crp.jar -C $(BUILD)/src .
+	jar uf $(BUILD)/crp.jar -C src .
 
-$(BUILD)/src/%.java: src/%.jj
+tags:
+	rm -f TAGS
+	find $(SOURCES) -name "*.java" | xargs etags -a \
+		--language=none \
+		--regex='/^\([ \t]\|public\|private\|static\|protected\|final\|abstract\)*[ \t\n]*\(class\|interface\)+[ \t\n]+\([a-zA-Z0-9_]+\)/\3/' \
+		--output=TAGS
+
+$(BUILD)/%.java: %.jj
 	@mkdir -p $(dir $(BUILD)/$<)
 	@$(JAVACC) -OUTPUT_DIRECTORY=$(dir $(BUILD)/$<) $<
 
-#-include build/foo.jdep
-
-#build/%.jdep: %/src
-#	echo -n $@ > $@
-#	echo -n ": " >> $@
-#	find $</ -name "*.java" -printf " %p" >> $@
-
-#%.fake: %.jdep
-#	echo asdf
+$(BUILD)/%.jmake: %
+	@echo generating $@
+	@mkdir -p $(dir $@)
+	@echo -n "\$$(BUILD)/$<.jstamp" > $@
+	@echo -n ":" >> $@
+	@find $< -name *.java -printf " \\\\\n	%p" >> $@
+	@find $< -name *.jj -printf " \\\\\n	\$$(BUILD)/%p" \
+		| sed -e "s@\.jj@\.java@g" >> $@
+	@echo "" >> $@
+	@echo "	@mkdir -p \$$(BUILD)" >> $@
+	@echo -n "	javac -classpath \$$(CLASSPATH)" >> $@
+	@echo " -sourcepath \$$(SOURCEPATH) -d \$$(BUILD)/$< \$$?" >> $@
+	@echo "	@touch \$$(BUILD)/$<.jstamp" >> $@
+	@echo "" >> $@
+	@echo -n "$@:" >> $@
+	@find $< -type d -printf " \\\\\n	%p" >> $@
+	@echo "" >> $@
+	@echo "" >> $@
+	@find $< -type d -printf "%p:\n" >> $@

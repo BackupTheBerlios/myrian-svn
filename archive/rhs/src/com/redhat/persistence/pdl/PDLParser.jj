@@ -13,12 +13,12 @@ import com.redhat.persistence.pdl.nodes.*;
  * PDLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2004/04/05 $
+ * @version $Revision: #3 $ $Date: 2004/05/02 $
  */
 
 class PDLParser {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/pdl/PDLParser.jj#2 $ by $Author: rhs $, $DateTime: 2004/04/05 15:33:44 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/pdl/PDLParser.jj#3 $ by $Author: rhs $, $DateTime: 2004/05/02 13:12:27 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);
@@ -211,13 +211,11 @@ ObjectTypeNd object_type() :
     [ <VERSIONED> { ot.setVersioned();} ]
     ( t = <QUERY> | t = <OBJECTTYPE> )
         n = id() { ot.add(ObjectTypeNd.NAME, n); }
-    [ ( <EXTENDS> n = type() { ot.add(ObjectTypeNd.EXTENDS, n); }
-       |
-        <CLASS> n = javaClass() { ot.add(ObjectTypeNd.CLASS, n); }
-        <ADAPTER> n = javaClass() { ot.add(ObjectTypeNd.ADAPTER, n); }
-       |
-        <RETURNS> <INT> <DOT> <DOT> ( id() | <INT> )
-        { ot.setReturns(true); } ) ]
+    [ <EXTENDS> n = type() { ot.add(ObjectTypeNd.EXTENDS, n); } ]
+    [ <CLASS> n = javaClass() { ot.add(ObjectTypeNd.CLASS, n); }
+      [ <ADAPTER> n = javaClass() { ot.add(ObjectTypeNd.ADAPTER, n); } ] ]
+    [ <RETURNS> <INT> <DOT> <DOT> ( id() | <INT> )
+        { ot.setReturns(true); } ]
     <LBRACE>
         ( statement(ot) )*
     <RBRACE>

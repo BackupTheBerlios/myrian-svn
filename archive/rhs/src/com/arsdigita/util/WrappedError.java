@@ -1,15 +1,15 @@
 /*
  * Copyright (C) 2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the Open Software License v2.1
- * (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at
- * http://rhea.redhat.com/licenses/osl2.1.html.
+ * The contents of this file are subject to the CCM Public
+ * License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the
+ * License at http://www.redhat.com/licenses/ccmpl.html.
  *
- * Software distributed under the License is distributed on an "AS
- * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * rights and limitations under the License.
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language
+ * governing rights and limitations under the License.
  *
  */
 package com.arsdigita.util;
@@ -27,11 +27,11 @@ import org.apache.log4j.Logger;
  * treated just like any normal exception in actual use.
  *
  * @since   2004-01-19
- * @version $Id: //users/rhs/persistence/src/com/arsdigita/util/WrappedError.java#1 $
+ * @version $Id: //users/rhs/persistence/src/com/arsdigita/util/WrappedError.java#2 $
  */
 public class WrappedError extends Error {
 
-    public static final String versionId = "$Id: //users/rhs/persistence/src/com/arsdigita/util/WrappedError.java#1 $";
+    public static final String versionId = "$Id: //users/rhs/persistence/src/com/arsdigita/util/WrappedError.java#2 $";
 
     static {
         Exceptions.registerUnwrapper(

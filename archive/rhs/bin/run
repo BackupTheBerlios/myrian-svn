@@ -1,0 +1,8 @@
+#!/bin/sh
+. extend
+
+extend lib/*.jar lib/*.zip
+extend `find build -name "*.jmake" | sed s/\\.jmake\$//g`
+extend src test/src
+
+exec java $*

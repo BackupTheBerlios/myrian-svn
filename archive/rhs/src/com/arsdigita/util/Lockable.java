@@ -1,15 +1,15 @@
 /*
  * Copyright (C) 2001-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the Open Software License v2.1
- * (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at
- * http://rhea.redhat.com/licenses/osl2.1.html.
+ * The contents of this file are subject to the CCM Public
+ * License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the
+ * License at http://www.redhat.com/licenses/ccmpl.html.
  *
- * Software distributed under the License is distributed on an "AS
- * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * rights and limitations under the License.
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language
+ * governing rights and limitations under the License.
  *
  */
 package com.arsdigita.util;
@@ -50,11 +50,11 @@ package com.arsdigita.util;
  * attempt is made to modify it.
  *
  * @author David Lutterkort 
- * @version $Id: //users/rhs/persistence/src/com/arsdigita/util/Lockable.java#2 $ */
+ * @version $Id: //users/rhs/persistence/src/com/arsdigita/util/Lockable.java#3 $ */
 
 public interface Lockable {
 
-    public static final String versionId = "$Id: //users/rhs/persistence/src/com/arsdigita/util/Lockable.java#2 $ by $Author: rhs $, $DateTime: 2004/04/05 15:33:44 $";
+    public static final String versionId = "$Id: //users/rhs/persistence/src/com/arsdigita/util/Lockable.java#3 $ by $Author: rhs $, $DateTime: 2004/05/02 13:12:27 $";
     /**
      * Lock an object. Locked objects are to be considered immutable. Any
      * attempt to modify them, e.g., through a <code>setXXX</code> method

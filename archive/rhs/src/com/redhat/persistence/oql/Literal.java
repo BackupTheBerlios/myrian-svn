@@ -1,15 +1,15 @@
 /*
  * Copyright (C) 2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the Open Software License v2.1
- * (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at
- * http://rhea.redhat.com/licenses/osl2.1.html.
+ * The contents of this file are subject to the CCM Public
+ * License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the
+ * License at http://www.redhat.com/licenses/ccmpl.html.
  *
- * Software distributed under the License is distributed on an "AS
- * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * rights and limitations under the License.
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language
+ * governing rights and limitations under the License.
  *
  */
 package com.redhat.persistence.oql;
@@ -28,12 +28,12 @@ import java.util.*;
  * Literal
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/04/05 $
+ * @version $Revision: #2 $ $Date: 2004/05/02 $
  **/
 
 public class Literal extends Expression {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/oql/Literal.java#1 $ by $Author: rhs $, $DateTime: 2004/04/05 15:33:44 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/oql/Literal.java#2 $ by $Author: rhs $, $DateTime: 2004/05/02 13:12:27 $";
 
     private Object m_value;
 
@@ -41,8 +41,18 @@ public class Literal extends Expression {
         m_value = value;
     }
 
+    private ObjectType type(Generator gen) {
+        if (m_value == null || m_value instanceof Collection) {
+            return null;
+        } else {
+            Adapter ad = gen.getRoot().getAdapter(m_value.getClass());
+            if (ad == null) { return null; }
+            return ad.getObjectType(m_value);
+        }
+    }
+
     void frame(Generator gen) {
-        QFrame frame = gen.frame(this, null);
+        QFrame frame = gen.frame(this, type(gen));
         List result = new ArrayList();
         Object key = gen.level > 0 ? null : getBindKey(gen);
         convert(m_value, result, gen.getRoot(), key);
