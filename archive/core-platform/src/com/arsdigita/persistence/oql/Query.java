@@ -11,12 +11,12 @@ import org.apache.log4j.Category;
  * specified in a PDL file to generate sql queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/05/21 $
+ * @version $Revision: #3 $ $Date: 2002/05/22 $
  **/
 
 public class Query extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#3 $ by $Author: rhs $, $DateTime: 2002/05/22 18:02:37 $";
 
     private static final Category s_log = Category.getInstance(Query.class);
 
@@ -175,7 +175,12 @@ public class Query extends Node {
         traverse(CHECK_QUERY);
 
         if (m_errors.size() > 0) {
-            throw new Error("Errors: " + m_errors + "\n\n" + toDot());
+            ObjectType type = getObjectType();
+            throw new Error(
+                type.getFilename() + ": " + type.getLineNumber() +
+                " column " + type.getColumnNumber() +
+                " errors generating query: " + m_errors + "\n\n" + toDot()
+                );
         }
 
         // Phase one, identify all the tables from which we must do direct

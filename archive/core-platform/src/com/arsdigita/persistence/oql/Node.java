@@ -10,12 +10,12 @@ import org.apache.log4j.Category;
  * Node
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/05/21 $
+ * @version $Revision: #3 $ $Date: 2002/05/22 $
  **/
 
 abstract class Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Node.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Node.java#3 $ by $Author: rhs $, $DateTime: 2002/05/22 18:02:37 $";
 
     private static final Category s_log = Category.getInstance(Node.class);
 
@@ -170,6 +170,7 @@ abstract class Node {
     void buildQuery() {
         Query query = getQuery();
         Set elements = getJoinElements();
+
         for (Iterator it = elements.iterator(); it.hasNext(); ) {
             JoinElement je = (JoinElement) it.next();
 
@@ -194,12 +195,56 @@ abstract class Node {
                 }
                 throw new Error(msg.toString());
             }
+        }
 
-            if (to.getTable().getEntering().size() > 0) {
-                query.addCondition(new Condition(to, from));
-            } else {
-                query.addCondition(new Condition(from, to));
+        Set connected = new HashSet();
+        boolean start = true;
+        for (Iterator it = getTables().iterator(); it.hasNext(); ) {
+            Table table = (Table) it.next();
+            if (table.getEntering().size() > 0) {
+                start = false;
+                connected.add(table);
             }
+        }
+
+        if (start && getTables().size() > 0) {
+            connected.add(getTables().iterator().next());
+        }
+
+        int before;
+
+        do {
+            before = connected.size();
+
+            for (Iterator it = elements.iterator(); it.hasNext(); ) {
+                JoinElement je = (JoinElement) it.next();
+
+                Column from = getFrom(je);
+                Column to = getTo(je);
+
+                if (connected.contains(from.getTable()) &&
+                    !connected.contains(to.getTable())) {
+                    query.addCondition(new Condition(from, to));
+                    connected.add(to.getTable());
+                }
+            }
+
+            for (Iterator it = elements.iterator(); it.hasNext(); ) {
+                JoinElement je = (JoinElement) it.next();
+
+                Column from = getTo(je);
+                Column to = getFrom(je);
+
+                if (connected.contains(from.getTable()) &&
+                    !connected.contains(to.getTable())) {
+                    query.addCondition(new Condition(from, to));
+                    connected.add(to.getTable());
+                }
+            }
+        } while (connected.size() > before);
+
+        if (connected.size() < getTables().size()) {
+            getObjectType().error("Not enough join paths to form this query.");
         }
 
         for (Iterator it = getSelections().iterator(); it.hasNext(); ) {
@@ -208,6 +253,18 @@ abstract class Node {
             Table table = defineTable(prop.getColumn().getTableName());
             sel.setColumn(table.defineColumn(prop.getColumn()));
         }
+    }
+
+    private final Column getFrom(JoinElement je) {
+        return getTable(je.getFrom().getTableName()).getColumn(
+            je.getFrom().getColumnName()
+            );
+    }
+
+    private final Column getTo(JoinElement je) {
+        return getTable(je.getTo().getTableName()).getColumn(
+            je.getTo().getColumnName()
+            );
     }
 
     Table defineTable(String name) {

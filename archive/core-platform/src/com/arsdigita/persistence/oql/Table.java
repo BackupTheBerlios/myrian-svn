@@ -9,12 +9,12 @@ import org.apache.log4j.Category;
  * Table
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/05/21 $
+ * @version $Revision: #3 $ $Date: 2002/05/22 $
  **/
 
 class Table {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Table.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Table.java#3 $ by $Author: rhs $, $DateTime: 2002/05/22 18:02:37 $";
 
     private static final Category s_log = Category.getInstance(Table.class);
 
@@ -64,10 +64,10 @@ class Table {
 
     void addCondition(Condition condition) {
         if (condition.getRight().getTable().equals(this)) {
-            if (m_entering.size() > 0) {
-                getQuery().error("Table is already targeted: " + getAlias());
-            }
             m_entering.add(condition);
+            if (m_entering.size() > 1) {
+                getQuery().error("Table is constrained twice: " + getAlias());
+            }
         } else {
             m_leaving.add(condition);
         }
@@ -75,6 +75,10 @@ class Table {
 
     Set getEntering() {
         return m_entering;
+    }
+
+    Set getLeaving() {
+        return m_leaving;
     }
 
     public Set getConditions() {

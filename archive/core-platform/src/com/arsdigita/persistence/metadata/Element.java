@@ -29,12 +29,12 @@ import java.io.ByteArrayOutputStream;
  * all metadata classes.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/05/21 $
+ * @version $Revision: #3 $ $Date: 2002/05/22 $
  */
 
 abstract public class Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Element.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Element.java#3 $ by $Author: rhs $, $DateTime: 2002/05/22 18:02:37 $";
 
     private static final Category s_log =
         Category.getInstance(Element.class.getName());
@@ -118,6 +118,11 @@ abstract public class Element {
         return m_column;
     }
 
+    public void error(String msg) {
+        throw new Error(
+            m_filename + ": " + m_line + " column " + m_column + ": " + msg
+            );
+    }
 
     /**
      * Sets the line number info for this metadata element.
