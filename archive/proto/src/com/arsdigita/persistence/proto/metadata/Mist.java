@@ -6,12 +6,12 @@ import java.util.*;
  * Mist
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/01/15 $
+ * @version $Revision: #2 $ $Date: 2003/01/15 $
  **/
 
 class Mist implements Collection {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Mist.java#1 $ by $Author: rhs $, $DateTime: 2003/01/15 09:35:55 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Mist.java#2 $ by $Author: rhs $, $DateTime: 2003/01/15 17:57:03 $";
 
     private Object m_parent = null;
     private ArrayList m_children = new ArrayList();
@@ -116,6 +116,10 @@ class Mist implements Collection {
 
     public boolean containsKey(Object key) {
         return m_childrenMap.containsKey(key);
+    }
+
+    public String toString() {
+        return m_children.toString();
     }
 
 }

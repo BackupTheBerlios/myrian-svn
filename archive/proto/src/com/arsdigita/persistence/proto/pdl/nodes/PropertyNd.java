@@ -4,12 +4,12 @@ package com.arsdigita.persistence.proto.pdl.nodes;
  * Property
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/01/15 $
+ * @version $Revision: #2 $ $Date: 2003/01/15 $
  **/
 
 public class PropertyNd extends StatementNd {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/PropertyNd.java#1 $ by $Author: rhs $, $DateTime: 2003/01/15 10:39:47 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/PropertyNd.java#2 $ by $Author: rhs $, $DateTime: 2003/01/15 17:57:03 $";
 
     public static final Field TYPE =
         new Field(PropertyNd.class, "type", TypeNd.class, 1, 1);
@@ -62,6 +62,10 @@ public class PropertyNd extends StatementNd {
 
     public TypeNd getType() {
         return (TypeNd) get(TYPE);
+    }
+
+    public Node getMapping() {
+        return (Node) get(MAPPING);
     }
 
 }
