@@ -31,11 +31,11 @@ import java.io.StringWriter;
  * data type.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #7 $ $Date: 2002/08/14 $
+ * @version $Revision: #8 $ $Date: 2002/08/26 $
  */
 public class ColumnDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ColumnDef.java#7 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ColumnDef.java#8 $ by $Author: rhs $, $DateTime: 2002/08/26 17:54:19 $";
 
     private static int count = 0;
     private static final Logger s_log =
@@ -102,6 +102,7 @@ public class ColumnDef extends Element {
         Table table = root.getTable(m_table);
         if (table == null) {
             table = new Table(m_table);
+            initLineInfo(table);
             root.addTable(table);
         }
 

@@ -24,12 +24,12 @@ import java.io.*;
  * Table
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/08/26 $
  **/
 
-public class Table {
+public class Table extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Table.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Table.java#4 $ by $Author: rhs $, $DateTime: 2002/08/26 17:54:19 $";
 
     private String m_name;
     private Map m_columns = new HashMap();
@@ -241,6 +241,10 @@ public class Table {
 
     public String toString() {
         return m_name;
+    }
+
+    void outputPDL(PrintStream out) {
+        throw new UnsupportedOperationException();
     }
 
 }

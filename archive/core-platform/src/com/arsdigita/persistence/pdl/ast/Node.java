@@ -21,12 +21,12 @@ import java.util.*;
  * The root class for all nodes in the abstract syntax tree (AST).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/08/26 $
  **/
 
 public abstract class Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/Node.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/Node.java#5 $ by $Author: rhs $, $DateTime: 2002/08/26 17:54:19 $";
 
     // The filename that this node was created from.
     private String m_filename = "<none>";
@@ -77,6 +77,10 @@ public abstract class Node {
     public final int getColumnNumber() {
         return m_column;
     }
+
+    void generateColumns() {}
+
+    void generateJoinPaths() {}
 
     void generateAssociationEvents() {}
 

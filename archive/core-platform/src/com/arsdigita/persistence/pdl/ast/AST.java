@@ -30,12 +30,12 @@ import java.util.ArrayList;
  * AST
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/08/26 $
  */
 
 public class AST extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/AST.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/AST.java#5 $ by $Author: rhs $, $DateTime: 2002/08/26 17:54:19 $";
 
     // the various models that make up this AST/Metadata
     private Map m_models = new HashMap();
@@ -143,12 +143,6 @@ public class AST extends Element {
             model.generateLogicalModel();
         }
 
-        // Now generate the mapping metadata.
-        for (int i = 0; i < objectDefs.size(); i++) {
-            ObjectDef od = (ObjectDef) objectDefs.get(i);
-            od.generateMappingMetadata();
-        }
-
         for (Iterator it = m_models.values().iterator(); it.hasNext(); ) {
             ModelDef md = (ModelDef)it.next();
 
@@ -156,6 +150,24 @@ public class AST extends Element {
                 AssociationDef ad = (AssociationDef)assns.next();
                 md.getModel().addAssociation(ad.generateLogicalModel());
             }
+        }
+
+        new Traversal() {
+                public void act(Node node) {
+                    node.generateColumns();
+                }
+            }.traverse(this);
+
+        new Traversal() {
+                public void act(Node node) {
+                    node.generateJoinPaths();
+                }
+            }.traverse(this);
+
+        // Now generate the mapping metadata.
+        for (int i = 0; i < objectDefs.size(); i++) {
+            ObjectDef od = (ObjectDef) objectDefs.get(i);
+            od.generateMappingMetadata();
         }
 
         // Now validate all the event mappings.
@@ -169,12 +181,11 @@ public class AST extends Element {
             od.generateEvents();
         }
 
-        Traversal t = new Traversal() {
+        new Traversal() {
                 public void act(Node node) {
                     node.generateAssociationEvents();
                 }
-            };
-        t.traverse(this);
+            }.traverse(this);
 
         root.generateDDL();
     }

@@ -27,12 +27,12 @@ import com.arsdigita.persistence.Utilities;
  * multiplicity, and whether or not the property is composite.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2002/08/14 $
+ * @version $Revision: #9 $ $Date: 2002/08/26 $
  */
 
 public class PropertyDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/PropertyDef.java#8 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/PropertyDef.java#9 $ by $Author: rhs $, $DateTime: 2002/08/26 17:54:19 $";
 
     // property name
     private String m_name;
@@ -56,6 +56,8 @@ public class PropertyDef extends Element {
 
     // the joinpath that retrieves this association
     private JoinPathDef m_joinPath = null;
+
+    private Property m_prop;
 
     /**
      * Create a new PropertyDef of a given name and type, with a certain
@@ -153,7 +155,6 @@ public class PropertyDef extends Element {
      */
     Property generateLogicalModel() {
         MetadataRoot root = MetadataRoot.getMetadataRoot();
-        Property prop;
         int mult;
 
         if (m_mult == null) {
@@ -165,30 +166,43 @@ public class PropertyDef extends Element {
         DataType datatype;
 
         datatype = root.getPrimitiveType(m_type.getName());
-        int defaultJDBCType = Integer.MIN_VALUE;
 
         if (datatype == null) {
             m_type.resolve();
             datatype = m_type.getResolvedObjectType();
-        } else {
-            defaultJDBCType = ((SimpleType) datatype).getJDBCtype();
         }
 
-        prop = new Property(m_name, datatype, mult, m_isComponent,
-                            m_isComposite);
-        initLineInfo(prop);
+        m_prop = new Property(m_name, datatype, mult, m_isComponent,
+                              m_isComposite);
+        initLineInfo(m_prop);
+        return m_prop;
+    }
+
+
+    void generateColumns() {
+        if (m_prop == null) {
+            System.out.println(getParent());
+        }
+        int defaultJDBCType = Integer.MIN_VALUE;
+
+        if (m_prop.getType() instanceof SimpleType) {
+            defaultJDBCType = ((SimpleType) m_prop.getType()).getJDBCtype();
+        }
 
         if (m_column != null) {
             if (defaultJDBCType > Integer.MIN_VALUE) {
-                prop.setColumn(m_column.generateLogicalModel(defaultJDBCType));
+                m_prop.setColumn(m_column.generateLogicalModel(defaultJDBCType));
             } else {
-                prop.setColumn(m_column.generateLogicalModel());
+                m_prop.setColumn(m_column.generateLogicalModel());
             }
-        } else if (m_joinPath != null) {
-            prop.setJoinPath(m_joinPath.generateLogicalModel());
         }
+    }
 
-        return prop;
+
+    void generateJoinPaths() {
+        if (m_joinPath != null) {
+            m_prop.setJoinPath(m_joinPath.generateLogicalModel());
+        }
     }
 
 
