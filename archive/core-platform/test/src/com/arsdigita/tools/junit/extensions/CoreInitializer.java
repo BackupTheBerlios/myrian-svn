@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * CoreInitializer
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/10/24 $
+ * @version $Revision: #3 $ $Date: 2004/01/19 $
  **/
 
 public class CoreInitializer extends CompoundInitializer {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/tools/junit/extensions/CoreInitializer.java#2 $ by $Author: justin $, $DateTime: 2003/10/24 18:42:25 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/tools/junit/extensions/CoreInitializer.java#3 $ by $Author: jorris $, $DateTime: 2004/01/19 08:16:18 $";
 
     private static final Logger s_log = Logger.getLogger
         (CoreInitializer.class);
@@ -35,47 +35,4 @@ public class CoreInitializer extends CompoundInitializer {
         }
     }
 
-    private static class StringArrayParameter extends StringParameter {
-        private final StringArrayConverter m_converter;
-
-        StringArrayParameter(final String name,
-                             final int multiplicity,
-                             final Object defaalt) {
-            super(name, multiplicity, defaalt);
-
-            m_converter = new StringArrayConverter();
-        }
-
-        protected Object unmarshal(final String literal,
-                                   final ErrorList errors) {
-            final String[] literals = StringUtils.split(literal, ',');
-            final String[] strings = new String[literals.length];
-
-            for (int i = 0; i < literals.length; i++) {
-                final String elem = literals[i];
-
-                strings[i] = (String) super.unmarshal(elem, errors);
-
-                if (!errors.isEmpty()) {
-                    break;
-                }
-            }
-            return strings;
-        }
-
-        protected void doValidate(final Object value,
-                                  final ErrorList errors) {
-            if (value != null) {
-                final String[] strings = (String[]) value;
-
-                for (int i = 0; i < strings.length; i++) {
-                    super.doValidate(strings[i], errors);
-
-                    if (!errors.isEmpty()) {
-                        break;
-                    }
-                }
-            }
-        }
-    }
 }
