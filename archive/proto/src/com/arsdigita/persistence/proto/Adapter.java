@@ -9,12 +9,12 @@ import java.util.*;
  * Adapter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/02/12 $
+ * @version $Revision: #3 $ $Date: 2003/02/12 $
  **/
 
 public abstract class Adapter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Adapter.java#2 $ by $Author: ashah $, $DateTime: 2003/02/12 16:39:50 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Adapter.java#3 $ by $Author: ashah $, $DateTime: 2003/02/12 17:00:37 $";
 
     private static final Map ADAPTERS = new HashMap();
 
@@ -34,9 +34,18 @@ public abstract class Adapter {
     }
 
     public static final Adapter getAdapter(ObjectType type) {
-        for (; type != null; type = type.getSupertype()) {
+        ObjectType superType = type;
+
+        while (superType != null) {
             Adapter a = (Adapter) ADAPTERS.get(type);
             if (a != null) { return a; }
+
+            if (type == null) {
+                superType = null;
+            } else {
+                superType = type;
+                type = type.getSupertype();
+            }
         }
 
         throw new IllegalArgumentException("no adapter for: " + type);

@@ -34,14 +34,14 @@ import java.sql.Connection;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/02/12 $
+ * @version $Revision: #6 $ $Date: 2003/02/12 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
 
     // This is just a temporary way to get an adapter registered.
     static {
-        Adapter.addAdapter(DataObjectImpl.class, new Adapter() {
+        Adapter.addAdapter(DataObjectImpl.class, null, new Adapter() {
                 public Object getKey(Object obj) {
                     return ((DataObjectImpl) obj).getOID();
                 }
