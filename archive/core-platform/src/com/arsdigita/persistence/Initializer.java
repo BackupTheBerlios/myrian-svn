@@ -34,7 +34,7 @@ import org.apache.log4j.Level;
  * the SessionManager of them.
  *
  * @author Archit Shah (ashah@arsdigita.com)
- * @version $Revision: #10 $ $Date: 2002/11/01 $
+ * @version $Revision: #11 $ $Date: 2002/11/29 $
  **/
 
 public class Initializer
@@ -160,9 +160,10 @@ public class Initializer
         PDL.loadPDLFiles(new File(pdlDir));
 
         // Finally the files out of the database
+	TransactionContext txn = null;
         try {
             Session session = SessionManager.getSession();
-            TransactionContext txn = session.getTransactionContext();
+            txn = session.getTransactionContext();
             txn.beginTxn();
 
             MetadataRoot root = MetadataRoot.getMetadataRoot();
@@ -229,6 +230,11 @@ public class Initializer
             throw new InitializationException
                 ("Persistence Initialization error while trying to " +
                  "compile the PDL files: " + e.getMessage());
+        } catch (Exception e2) {
+            if (txn != null) {
+                txn.abortTxn();
+            }
+            throw new InitializationException(e2);
         }
     }
 

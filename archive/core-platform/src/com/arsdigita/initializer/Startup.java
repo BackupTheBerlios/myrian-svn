@@ -30,13 +30,13 @@ import java.util.Collection;
  *
  * @author <a href="mbryzek@arsdigita.com">Michael Bryzek</a>
  * @author <a href="dennis@arsdigita.com">Dennis Gregorovic</a>
- * @version $Revision: #5 $ $Date: 2002/09/09 $
+ * @version $Revision: #6 $ $Date: 2002/11/29 $
  * @since ACS 4.7
  *
  **/
 public class Startup {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Startup.java#5 $ by $Author: jorris $, $DateTime: 2002/09/09 17:12:20 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Startup.java#6 $ by $Author: dennis $, $DateTime: 2002/11/29 17:29:39 $";
 
     /** The name of the property containing the web app root **/
     public static final String WEB_APP_ROOT = "webAppRoot";
