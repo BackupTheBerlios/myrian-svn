@@ -24,13 +24,13 @@ import org.apache.commons.beanutils.converters.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterValue.java#1 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterValue.java#2 $
  */
 public final class ParameterValue {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterValue.java#1 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterValue.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/08/27 12:40:24 $";
+        "$DateTime: 2003/08/28 00:48:42 $";
 
     private Object m_value;
     private final ArrayList m_errors = new ArrayList();
@@ -47,12 +47,6 @@ public final class ParameterValue {
 
     public final boolean isAssigned() {
         return m_assigned;
-    }
-
-    // XXX needs to be globalized
-
-    public final void addError(final String message) {
-        m_errors.add(message);
     }
 
     public final List getErrors() {

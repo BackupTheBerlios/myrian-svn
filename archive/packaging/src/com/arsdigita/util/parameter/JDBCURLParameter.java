@@ -16,33 +16,38 @@
 package com.arsdigita.util.parameter;
 
 import com.arsdigita.util.*;
+import java.net.*;
 import java.util.*;
+import org.apache.commons.beanutils.*;
+import org.apache.oro.text.perl.Perl5Util;
 
 /**
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/SingletonParameter.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/JDBCURLParameter.java#1 $
  */
-public class SingletonParameter extends ClassParameter {
+public class JDBCURLParameter extends StringParameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/SingletonParameter.java#2 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/JDBCURLParameter.java#1 $" +
         "$Author: justin $" +
         "$DateTime: 2003/08/28 00:48:42 $";
 
-    public SingletonParameter(final String name) {
+    private static final Perl5Util s_perl = new Perl5Util();
+    private static final String s_regex =
+        "/^jdbc\\:[a-bA-B1-9]+\\:[a-bA-B1-9\\@\\/\\?\\=]+$/";
+
+    public JDBCURLParameter(final String name) {
         super(name);
     }
 
-    protected Object unmarshal(final String value, final List errors) {
-        final Class clacc = (Class) super.unmarshal(value, errors);
+    protected void validate(final Object value, final List errors) {
+        super.validate(value, errors);
 
-        try {
-            return Classes.newInstance(clacc);
-        } catch (UncheckedWrapperException uwe) {
-            errors.add(uwe.getRootCause().getMessage());
-
-            return null;
+        if (!s_perl.match(s_regex, (String) value)) {
+            errors.add
+                ("The value must start with \"jdbc:\" and take the " +
+                 "form jdbc:subprotocol:subname");
         }
     }
 }

@@ -27,13 +27,13 @@ import org.apache.oro.text.perl.Perl5Util;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/EmailParameter.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/EmailParameter.java#3 $
  */
 public class EmailParameter extends StringParameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/EmailParameter.java#2 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/EmailParameter.java#3 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/08/27 12:11:05 $";
+        "$DateTime: 2003/08/28 00:48:42 $";
 
     private static final Perl5Util s_perl = new Perl5Util();
     private static final String s_regex =
@@ -43,22 +43,21 @@ public class EmailParameter extends StringParameter {
         super(name);
     }
 
-    public void validate(final ParameterValue value) {
-        final InternetAddress address = (InternetAddress) value.getValue();
-
-        if (address != null) {
-            if (!s_perl.match(s_regex, address.toString())) {
-                value.addError("\"" + value + "\" is not a valid " +
-                               "email address");
-            }
-        }
-    }
-
-    protected Object unmarshal(final String value) {
+    protected Object unmarshal(final String value, final List errors) {
         try {
             return new InternetAddress(value);
         } catch (AddressException ae) {
-            throw new ConversionException(ae);
+            errors.add(ae.getMessage());
+
+            return null;
+        }
+    }
+
+    protected void validate(final Object value, final List errors) {
+        super.validate(value, errors);
+
+        if (!s_perl.match(s_regex, ((InternetAddress) value).toString())) {
+            errors.add("The value is not a valid email address");
         }
     }
 }

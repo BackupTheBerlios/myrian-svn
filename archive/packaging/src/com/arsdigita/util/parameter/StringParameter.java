@@ -24,13 +24,13 @@ import org.apache.commons.beanutils.converters.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/StringParameter.java#3 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/StringParameter.java#4 $
  */
 public class StringParameter implements Parameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/StringParameter.java#3 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/StringParameter.java#4 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/08/27 12:11:05 $";
+        "$DateTime: 2003/08/28 00:48:42 $";
 
     private final String m_name;
     private final Class m_type;
@@ -61,7 +61,7 @@ public class StringParameter implements Parameter {
         return m_required;
     }
 
-    public void setRequired(final boolean required) {
+    public final void setRequired(final boolean required) {
         m_required = required;
     }
 
@@ -69,28 +69,41 @@ public class StringParameter implements Parameter {
         return m_name;
     }
 
-    public ParameterValue unmarshal(final ParameterStore store) {
+    public final ParameterValue unmarshal(final ParameterStore store) {
         final ParameterValue value = new ParameterValue();
         final String literal = store.read(this);
 
-        if (literal != null) {
-            try {
-                value.setValue(unmarshal(literal));
-            } catch (ConversionException ce) {
-                value.addError(ce.getMessage());
-            }
+        if (literal == null) {
+            //value.setValue(getDefaultValue());
+        } else {
+            value.setValue(unmarshal(literal, value.getErrors()));
         }
 
         return value;
     }
 
-    public void validate(final ParameterValue value) {
-        if (isRequired() && value.getValue() == null) {
-            value.addError("It cannot be null");
+    protected Object unmarshal(final String value, final List errors) {
+        try {
+            return Converters.convert(m_type, value);
+        } catch (ConversionException ce) {
+            errors.add(ce.getMessage());
+
+            return null;
         }
     }
 
-    protected Object unmarshal(final String string) {
-        return Converters.convert(m_type, string);
+    public final void validate(final ParameterValue value) {
+        final Object object = value.getValue();
+        final List errors = value.getErrors();
+
+        if (isRequired() && object == null) {
+            errors.add("The value must not be null");
+        } else {
+            validate(object, errors);
+        }
+    }
+
+    protected void validate(final Object value, final List errors) {
+        // Nothing by default
     }
 }
