@@ -27,26 +27,18 @@ import org.apache.log4j.Logger;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#2 $
  */
 final class ParameterPrinter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#1 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/26 15:31:04 $";
+        "$DateTime: 2003/10/23 15:28:18 $";
 
     private static final Logger s_log = Logger.getLogger
         (ParameterPrinter.class);
 
     private static final ArrayList s_records = new ArrayList();
-
-    static void register(final ParameterRecord record) {
-        if (s_log.isInfoEnabled()) {
-            s_log.info("Registering " + record);
-        }
-
-        s_records.add(record);
-    }
 
     private static void writeXML(final PrintWriter out) {
         out.write("<?xml version=\"1.0\"?>");
@@ -55,30 +47,77 @@ final class ParameterPrinter {
         final Iterator records = s_records.iterator();
 
         while (records.hasNext()) {
-            ((ParameterRecord) records.next()).writeXML(out);
+            writeRecord(((ParameterRecord) records.next()), out);
         }
 
         out.write("</records>");
         out.close();
     }
 
-    public static final void main(final String[] args) throws IOException {
-        try {
-            // XXX These are cheats to get the config parameters
-            // registered.
+    private static void writeRecord(final ParameterRecord record,
+                                    final PrintWriter out) {
+        out.write("<record>");
 
-            Classes.newInstance("com.arsdigita.util.UtilConfig");
-            Classes.newInstance("com.arsdigita.init.InitConfig");
-            Classes.newInstance("com.arsdigita.templating.TemplatingConfig");
-            Classes.newInstance("com.arsdigita.mail.MailConfig");
-            Classes.newInstance("com.arsdigita.versioning.VersioningConfig");
-            Classes.newInstance("com.arsdigita.web.WebConfig");
-            Classes.newInstance("com.arsdigita.bebop.BebopConfig");
-        } catch (Exception e) {
-            s_log.error(e.getMessage(), e);
+        final Parameter[] params = record.getParameters();
+
+        for (int i = 0; i < params.length; i++) {
+            writeParameter(params[i], out);
         }
 
-        if (args[0].equals("--html") && args.length == 2) {
+        out.write("</record>");
+    }
+
+    private static void writeParameter(final Parameter param,
+                                       final PrintWriter out) {
+        out.write("<parameter>");
+
+        field(out, "name", param.getName());
+
+        if (param.isRequired()) {
+            out.write("<required/>");
+        }
+
+        final ParameterInfo info = param.getInfo();
+
+        if (info != null) {
+            field(out, "title", info.getTitle());
+            field(out, "purpose", info.getPurpose());
+            field(out, "example", info.getExample());
+            field(out, "format", info.getFormat());
+        }
+
+        out.write("</parameter>");
+    }
+
+    private static void field(final PrintWriter out,
+                              final String name,
+                              final String value) {
+        if (value != null) {
+            out.write("<");
+            out.write(name);
+            out.write("><![CDATA[");
+            out.write(value);
+            out.write("]]></");
+            out.write(name);
+            out.write(">");
+        }
+    }
+
+    private static void register(final String classname) {
+        s_records.add((ParameterRecord) Classes.newInstance(classname));
+    }
+
+    public static final void main(final String[] args) throws IOException {
+        register("com.arsdigita.runtime.RuntimeConfig");
+        register("com.arsdigita.templating.TemplatingConfig");
+        register("com.arsdigita.mail.MailConfig");
+        register("com.arsdigita.versioning.VersioningConfig");
+        register("com.arsdigita.web.WebConfig");
+        register("com.arsdigita.bebop.BebopConfig");
+
+        if (args.length == 0) {
+            System.out.println("Usage: ParameterPrinter [--html] output-file");
+        } else if (args[0].equals("--html") && args.length == 2) {
             final StringWriter sout = new StringWriter();
             final PrintWriter out = new PrintWriter(sout);
 
@@ -98,7 +137,7 @@ final class ParameterPrinter {
 
             writeXML(out);
         } else {
-            System.out.println("Usage: command [--html] output-file");
+            System.out.println("Usage: ParameterPrinter [--html] output-file");
         }
     }
 }

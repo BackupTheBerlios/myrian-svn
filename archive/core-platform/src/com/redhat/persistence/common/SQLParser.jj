@@ -14,25 +14,27 @@ import java.io.*;
  * SQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/09/04 $
+ * @version $Revision: #5 $ $Date: 2003/10/23 $
  */
 
 public class SQLParser {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/common/SQLParser.jj#4 $ by $Author: ashah $, $DateTime: 2003/09/04 14:00:08 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/common/SQLParser.jj#5 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
 
     public static interface Mapper {
         Path map(Path path);
     }
 
+    public static class IdentityMapper implements Mapper {
+        public Path map(Path path) {
+            return path;
+        }
+    }
+
     private SQL m_sql = new SQL();
     private StringBuffer m_image = new StringBuffer();
     private ArrayList m_assigns = new ArrayList();
-    private Mapper m_mapper = new Mapper() {
-            public Path map(Path path) {
-                return path;
-            }
-        };
+    private Mapper m_mapper = new IdentityMapper();
 
     public SQLParser(Reader r, Mapper mapper) {
         this(r);
@@ -113,7 +115,6 @@ TOKEN:
   | <INTEGER_LITERAL: ( "+" | "-" )? (<DIGIT>)+>
   | <NUMBER_LITERAL: ( "+" | "-" )? (<DIGIT>)* ( "." (<DIGIT>)+ )?
                      ( "E" | "e" ) ( "+" | "-" ) (<DIGIT>)+>
-  | <QUOTED_ID: "\"" ( ~["\""] | "\"\"" )* "\"">
 }
 
 TOKEN:
@@ -155,9 +156,9 @@ TOKEN [IGNORE_CASE]:
   | <LIKE: "like">
   | <BETWEEN: "between">
   | <IN: "in">
-  | <NOT: "not"> 
+  | <NOT: "not">
   | <AND: "and">
-  | <OR: "or"> 
+  | <OR: "or">
   | <ANY: "any">
   | <SOME: "some">
   | <EXISTS: "exists">
@@ -196,6 +197,7 @@ TOKEN [IGNORE_CASE]:
 TOKEN: {
     <ID: <CH>(<CH>|<DIGIT>)*>
   | <#CH: ["a" - "z", "A" - "Z", "_"]>
+  | <RAW: "RAW[" (~["]"] | "\\]")* "]">
 }
 
 // TODO: Add support for multi-line comments.
@@ -244,7 +246,7 @@ void symbol() :
   | t = <POS>
   | t = <NEG>
   | t = <DIV>
-  | t = <CONCAT> 
+  | t = <CONCAT>
   | t = <EQ>
   | t = <NE>
   | t = <GT>
@@ -281,8 +283,13 @@ void symbol() :
   | t = <AS>
   | t = <MINUS>
   | t = <PRIOR>
-  | t = <QUOTED_ID> )
-    { append(t); }
+  | t = <RAW> {
+      appendSpecial(t);
+      token();
+      m_image.append(t.image);
+      token(SQLToken.RAW);
+  } )
+     { if (t.kind != RAW) { append(t); } }
 }
 
 void clauseStart() :
@@ -333,7 +340,7 @@ void identifier() :
         } )*
     {
         if (bind) {
-            m_image.append(buf);
+            m_image.append(buf.toString());
             token(SQLToken.BIND);
         } else {
             m_image.append(m_mapper.map(Path.get(buf.toString())).getPath());

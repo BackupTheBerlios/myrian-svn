@@ -28,12 +28,12 @@ import java.util.*;
  * MemoryEngine
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/08/15 $
+ * @version $Revision: #3 $ $Date: 2003/10/23 $
  **/
 
 public class MemoryEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/MemoryEngine.java#2 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/MemoryEngine.java#3 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
 
     private static final Logger LOG = Logger.getLogger(MemoryEngine.class);
 
@@ -109,12 +109,12 @@ public class MemoryEngine extends Engine {
         m_unflushed.clear();
     }
 
-    private void checkLiveness(Object o) {
+    private void checkLiveness(Root root, Object o) {
         if (o == null) {
             return;
         }
 
-        if (!Adapter.getAdapter(o.getClass()).getObjectType(o).hasKey()) {
+        if (!root.getAdapter(o.getClass()).getObjectType(o).hasKey()) {
             return;
         }
 
@@ -161,7 +161,7 @@ public class MemoryEngine extends Engine {
             }
 
             for (Iterator it = result.iterator(); it.hasNext(); ) {
-                checkLiveness(it.next());
+                checkLiveness(prop.getRoot(), it.next());
             }
 
             return result;
@@ -175,7 +175,7 @@ public class MemoryEngine extends Engine {
                         if (sev.getProperty().equals(prop) &&
                             obj.equals(sev.getObject())) {
                             Object o = sev.getArgument();
-                            checkLiveness(o);
+                            checkLiveness(prop.getRoot(), o);
                             return o;
                         }
                     }
@@ -219,12 +219,14 @@ public class MemoryEngine extends Engine {
             return obj;
         }
 
+        Root root = query.getSignature().getObjectType().getRoot();
+
         Path parent = p.getParent();
         if (parent == null) {
             Parameter param = query.getSignature().getParameter(p);
             if (param == null) {
                 return get(obj,
-                           Adapter.getAdapter(obj.getClass())
+                           root.getAdapter(obj.getClass())
                            .getObjectType(obj).getProperty(p.getName()));
             } else {
                 return query.get(param);
@@ -235,7 +237,7 @@ public class MemoryEngine extends Engine {
                 return null;
             }
 
-            return get(value, Adapter.getAdapter(obj.getClass())
+            return get(value, root.getAdapter(obj.getClass())
                        .getObjectType(value).getProperty(p.getName()));
         }
     }
@@ -251,12 +253,14 @@ public class MemoryEngine extends Engine {
             super(query.getSignature());
             m_query = query;
 
+            Root root = query.getSignature().getObjectType().getRoot();
+
             EventList[] els = {DATA, m_uncomitted};
             for (int j = 0; j < els.length; j++) {
                 for (int i = 0; i < els[j].size(); i++) {
                     Event ev = els[j].getEvent(i);
                     Object obj = ev.getObject();
-                    if (!Adapter.getAdapter(obj.getClass()).getObjectType(obj)
+                    if (!root.getAdapter(obj.getClass()).getObjectType(obj)
                         .isSubtypeOf(getSignature().getObjectType())) {
                         continue;
                     }

@@ -15,27 +15,30 @@
 
 package com.arsdigita.util.parameter;
 
-import com.arsdigita.util.*;
-import java.util.*;
-import org.apache.commons.beanutils.*;
-import org.apache.commons.beanutils.converters.*;
+import com.arsdigita.util.Assert;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.HashMap;
+
+import org.apache.commons.beanutils.Converter;
 
 /**
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/Converters.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/Converters.java#2 $
  */
-class Converters {
+public class Converters {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/Converters.java#1 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/Converters.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/09 14:53:22 $";
+        "$DateTime: 2003/10/23 15:28:18 $";
 
     private static Map s_converters = Collections.synchronizedMap
         (new HashMap());
 
-    static final Converter get(final Class clacc) {
+    public static final Converter get(final Class clacc) {
         final Converter converter = (Converter) s_converters.get(clacc);
 
         Assert.exists(converter, Converter.class);
@@ -43,11 +46,11 @@ class Converters {
         return converter;
     }
 
-    static final void set(final Class clacc, final Converter converter) {
+    public static final void set(final Class clacc, final Converter converter) {
         s_converters.put(clacc, converter);
     }
 
-    static final Object convert(final Class clacc, final String value) {
+    public static final Object convert(final Class clacc, final String value) {
         return get(clacc).convert(clacc, value);
     }
 }

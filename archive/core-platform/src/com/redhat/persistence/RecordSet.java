@@ -16,6 +16,7 @@
 package com.redhat.persistence;
 
 import com.redhat.persistence.common.*;
+import com.redhat.persistence.metadata.Adapter;
 import com.redhat.persistence.metadata.ObjectType;
 import com.redhat.persistence.metadata.Property;
 
@@ -27,21 +28,19 @@ import org.apache.log4j.Logger;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/15 $
+ * @version $Revision: #3 $ $Date: 2003/10/23 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/RecordSet.java#2 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/RecordSet.java#3 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
 
     private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
     private Signature m_signature;
-    private Adapter m_adapter;
 
     protected RecordSet(Signature signature) {
         m_signature = signature;
-        m_adapter = Adapter.getAdapter(m_signature.getObjectType());
     }
 
     public Signature getSignature() {
@@ -55,6 +54,8 @@ public abstract class RecordSet {
     public abstract void close();
 
     Map load(Session ssn) {
+        Adapter adapter =
+            ssn.getRoot().getAdapter(m_signature.getObjectType());
         Collection paths = m_signature.getPaths();
 
 	LinkedList remaining = new LinkedList();
@@ -100,11 +101,11 @@ public abstract class RecordSet {
                         Object previous = null;
 			if (type.isKeyed()) {
                             previous = ssn.getObject
-                                (m_adapter.getSessionKey(type, pmap));
+                                (adapter.getSessionKey(type, pmap));
 
                             if (previous != null) {
                                 ObjectType prevType =
-                                    m_adapter.getObjectType(previous);
+                                    adapter.getObjectType(previous);
 
                                 if (type.equals(prevType)
                                     || prevType.isSubtypeOf(type)) {
@@ -118,7 +119,7 @@ public abstract class RecordSet {
 			}
 
 			if (obj == null) {
-			    obj = m_adapter.getObject(type, pmap);
+			    obj = adapter.getObject(type, pmap);
                             if (previous != obj) {
                                 ssn.use(obj);
                             }

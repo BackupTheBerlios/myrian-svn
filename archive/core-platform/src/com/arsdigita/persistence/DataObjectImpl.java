@@ -26,12 +26,12 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #15 $ $Date: 2003/10/14 $
+ * @version $Revision: #16 $ $Date: 2003/10/23 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#15 $ by $Author: ashah $, $DateTime: 2003/10/14 16:49:43 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#16 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
 
     final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
@@ -160,7 +160,7 @@ class DataObjectImpl implements DataObject {
     }
 
     private com.redhat.persistence.metadata.Property convert(String property) {
-        return C.prop(getObjectType().getProperty(property));
+        return C.prop(m_ssn.getRoot(), getObjectType().getProperty(property));
     }
 
     public com.arsdigita.persistence.Session getSession() {
@@ -255,7 +255,7 @@ class DataObjectImpl implements DataObject {
             if (!p.isCollection()
                 && !p.isKeyProperty()
                 && p.getType().isSimple()) {
-                m_disconnect.put(p, get(ssn, C.prop(p)));
+                m_disconnect.put(p, get(ssn, C.prop(m_ssn.getRoot(), p)));
             }
         }
 
@@ -390,7 +390,7 @@ class DataObjectImpl implements DataObject {
     public void specialize(String subtypeName) {
         validate();
         ObjectType subtype =
-            MetadataRoot.getMetadataRoot().getObjectType(subtypeName);
+            getSession().getMetadataRoot().getObjectType(subtypeName);
 
         if (subtype == null) {
             throw new PersistenceException("No such type: " + subtypeName);
@@ -430,7 +430,7 @@ class DataObjectImpl implements DataObject {
         for (Iterator it = getObjectType().getProperties();
              it.hasNext(); ) {
             Property p = (Property) it.next();
-            if (!getSsn().isFlushed(this, C.prop(p))) {
+            if (!getSsn().isFlushed(this, C.prop(m_ssn.getRoot(), p))) {
                 // use m_ssn to generate the exception
                 getSsn().assertFlushed(this);
             }

@@ -131,10 +131,10 @@ public class TestPDLGenerator {
 
             writer.setTestPDL(true);
 
-            List tables = new ArrayList(Root.getRoot().getTables());
+            List tables = new ArrayList(root.getRoot().getTables());
             for (Iterator it = tables.iterator(); it.hasNext(); ) {
                 Table table = (Table) it.next();
-                if (!files.contains(Root.getRoot().getFilename(table))) {
+                if (!files.contains(root.getRoot().getFilename(table))) {
                     it.remove();
                 }
             }

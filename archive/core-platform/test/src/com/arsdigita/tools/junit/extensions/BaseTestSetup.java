@@ -15,10 +15,23 @@
 
 package com.arsdigita.tools.junit.extensions;
 
+import com.arsdigita.util.*;
+import com.arsdigita.util.config.*;
+import com.arsdigita.util.parameter.*;
+import com.arsdigita.db.*;
+import com.arsdigita.runtime.*;
+import com.arsdigita.persistence.*;
+import com.arsdigita.persistence.metadata.*;
+import com.arsdigita.persistence.pdl.*;
+
+import java.sql.*;
+import java.io.*;
+
 import com.arsdigita.db.ConnectionManager;
 import com.arsdigita.installer.LoadSQLPlusScript;
 import com.arsdigita.util.DummyServletContext;
 import com.arsdigita.util.ResourceManager;
+import com.arsdigita.util.jdbc.*;
 import junit.extensions.TestDecorator;
 import junit.framework.Protectable;
 import junit.framework.Test;
@@ -35,8 +48,6 @@ import java.util.List;
  * to set up additional state once before the tests are run.
  */
 public class BaseTestSetup extends TestDecorator {
-
-    private boolean m_performInitialization = true;
     private String m_scriptName;
     private String m_iniName;
     private TestSuite m_suite;
@@ -46,6 +57,7 @@ public class BaseTestSetup extends TestDecorator {
 
     public BaseTestSetup(Test test, TestSuite suite) {
         super(test);
+
         m_suite = suite;
     }
 
@@ -54,31 +66,82 @@ public class BaseTestSetup extends TestDecorator {
     }
 
     public void run(final TestResult result) {
-        Protectable p= new Protectable() {
+        final Protectable p = new Protectable() {
             public void protect() throws Exception {
                 setUp();
                 basicRun(result);
                 tearDown();
             }
         };
+
         result.runProtected(this, p);
     }
 
     public void addSQLSetupScript(String setupSQLScript) {
         m_setupSQLScripts.add(setupSQLScript);
     }
+
     public void addSQLTeardownScript(String teardown) {
         m_teardownSQLScripts.add(teardown);
     }
 
-    public void setSetupSQLScript(String setupSQLScript) {
-        m_setupSQLScripts.add(setupSQLScript);
+    /**
+     * Sets up the fixture. Override to set up additional fixture
+     * state.
+     */
+    protected void setUp() throws Exception {
+        if (m_suite.testCount() > 0) {
+            final Connection conn = Connections.acquire
+                (RuntimeConfig.getConfig().getJDBCURL());
+            new Startup(conn).run();
+
+            ResourceManager.getInstance().setServletContext(new DummyServletContext());
+
+            setupSQL();
+        }
+    }
+
+    /**
+     * Tears down the fixture. Override to tear down the additional
+     * fixture state.
+     */
+    protected void tearDown() throws Exception {
+        if (m_suite.testCount() > 0) {
+            teardownSQL ();
+        }
+    }
+
+    protected void setupSQL() throws Exception {
+        if (m_setupSQLScripts.size() > 0) {
+            runScripts(m_setupSQLScripts);
+        }
     }
 
 
-    public void setTeardownSQLScript(String teardownSQLScript) {
-        m_teardownSQLScripts.add(teardownSQLScript);
+    protected void teardownSQL() throws Exception {
+        if (m_teardownSQLScripts.size() > 0) {
+            runScripts(m_teardownSQLScripts);
+        }
     }
+
+    private void runScripts(final List scripts) throws Exception {
+        LoadSQLPlusScript loader = new LoadSQLPlusScript();
+        Connection conn = Connections.acquire
+	    (RuntimeConfig.getConfig().getJDBCURL());
+
+        loader.setConnection(conn);
+
+        for (Iterator iterator = scripts.iterator(); iterator.hasNext(); ) {
+            final String script = (String) iterator.next();
+
+            loader.loadSQLPlusScript(script);
+        }
+
+        conn.commit();
+        conn.close();
+    }
+
+    // Unwanted things
 
     public void setInitScript(String scriptName) {
         m_scriptName = scriptName;
@@ -97,61 +160,18 @@ public class BaseTestSetup extends TestDecorator {
     }
 
     public void setPerformInitialization(boolean performInitialization) {
-        m_performInitialization = performInitialization;
+        // Nooped
     }
 
     public boolean getPerformInitialization() {
-        return m_performInitialization;
+        return true;
     }
 
-    /**
-     * Sets up the fixture. Override to set up additional fixture
-     * state.
-     */
-
-    protected void setUp() throws Exception {
-        if ( m_suite.testCount() > 0 ) {
-            if (m_performInitialization) {
-                ResourceManager.getInstance().setServletContext(new DummyServletContext());
-                Initializer.startup(m_suite, m_scriptName, m_iniName);
-                setupSQL ();
-            }
-        }
+    public void setSetupSQLScript(String setupSQLScript) {
+        m_setupSQLScripts.add(setupSQLScript);
     }
 
-    /**
-     * Tears down the fixture. Override to tear down the additional
-     * fixture state.
-     */
-    protected void tearDown() throws Exception {
-        if ( m_suite.testCount() > 0 ) {
-            teardownSQL ();
-            if (m_performInitialization) {
-                Initializer.shutdown();
-            }
-        }
+    public void setTeardownSQLScript(String teardownSQLScript) {
+        m_teardownSQLScripts.add(teardownSQLScript);
     }
-
-    protected void setupSQL () throws Exception {
-        if (m_setupSQLScripts.size() > 0) {
-            runScripts(m_setupSQLScripts);
-        }
-    }
-
-
-    protected void teardownSQL() throws Exception {
-        if (m_teardownSQLScripts.size() > 0) {
-            runScripts(m_teardownSQLScripts);
-        }
-    }
-
-    private void runScripts(List scripts) throws Exception {
-        LoadSQLPlusScript loader = new LoadSQLPlusScript();
-        loader.setConnection(ConnectionManager.getConnection());
-        for (Iterator iterator = scripts.iterator(); iterator.hasNext();) {
-            String script = (String) iterator.next();
-            loader.loadSQLPlusScript(script, false, true);
-        }
-    }
-
 }

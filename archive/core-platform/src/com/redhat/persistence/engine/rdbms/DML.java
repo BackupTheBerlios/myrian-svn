@@ -25,17 +25,18 @@ import java.util.*;
  * DML
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/15 $
+ * @version $Revision: #3 $ $Date: 2003/10/23 $
  **/
 
 abstract class DML extends Operation {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/DML.java#2 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/DML.java#3 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
 
     private Table m_table;
     private HashMap m_bindings = new HashMap();
 
-    public DML(Table table) {
+    public DML(RDBMSEngine engine, Table table) {
+        super(engine);
         m_table = table;
     }
 

@@ -19,6 +19,8 @@ package com.arsdigita.db;
 import com.arsdigita.util.Assert;
 import com.arsdigita.util.UncheckedWrapperException;
 
+import java.sql.*;
+
 import org.apache.log4j.Logger;
 
 public class DbHelper {
@@ -59,6 +61,38 @@ public class DbHelper {
      */
     public static int getDatabase() {
         return s_database;
+    }
+
+    public static int getDatabase(DatabaseMetaData md) {
+        try {
+            return getDatabaseFromURL(md.getURL());
+        } catch (SQLException e) {
+            throw new UncheckedWrapperException(e);
+        }
+    }
+
+    public static int getDatabase(Connection conn) {
+        try {
+            return getDatabase(conn.getMetaData());
+        } catch (SQLException e) {
+            throw new UncheckedWrapperException(e);
+        }
+    }
+
+    public static int getDatabase(Statement stmt) {
+        try {
+            return getDatabase(stmt.getConnection());
+        } catch (SQLException e) {
+            throw new UncheckedWrapperException(e);
+        }
+    }
+
+    public static int getDatabase(ResultSet rs) {
+        try {
+            return getDatabase(rs.getStatement());
+        } catch (SQLException e) {
+            throw new UncheckedWrapperException(e);
+        }
     }
 
     /**
@@ -139,7 +173,7 @@ public class DbHelper {
         }
 
         String driver = url.substring(5, pos);
-        s_log.info("Got driver name " + driver, new  Throwable());
+        s_log.debug("Got driver name " + driver, new  Throwable());
 
         if ("oracle".equals(driver)) {
             return DB_ORACLE;

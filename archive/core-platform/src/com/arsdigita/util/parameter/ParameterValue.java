@@ -21,26 +21,23 @@ import org.apache.commons.beanutils.*;
 import org.apache.commons.beanutils.converters.*;
 
 /**
- * Subject to change.
- *
- * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterValue.java#2 $
+ * @deprecated The parameter APIs no longer need this class.
  */
 public final class ParameterValue {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterValue.java#2 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterValue.java#3 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/26 15:31:04 $";
+        "$DateTime: 2003/10/23 15:28:18 $";
 
-    private final ArrayList m_errors;
+    private final ErrorList m_errors;
     private String m_string;
     private Object m_object;
 
     public ParameterValue() {
-        m_errors = new ArrayList();
+        m_errors = new ErrorList();
     }
 
-    public final List getErrors() {
+    public final ErrorList getErrors() {
         return m_errors;
     }
 

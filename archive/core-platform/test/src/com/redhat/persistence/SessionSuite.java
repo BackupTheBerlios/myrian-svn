@@ -29,12 +29,12 @@ import org.apache.log4j.Logger;
  * SessionSuite
  *
  * @author <a href="mailto:ashah@redhat.com">ashah@redhat.com</a>
- * @version $Revision: #2 $ $Date: 2003/08/15 $
+ * @version $Revision: #3 $ $Date: 2003/10/23 $
  **/
 
 public class SessionSuite extends PackageTestSuite {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/redhat/persistence/SessionSuite.java#2 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/redhat/persistence/SessionSuite.java#3 $";
 
     private static final Logger s_log = Logger.getLogger(SessionSuite.class);
 
@@ -130,14 +130,15 @@ public class SessionSuite extends PackageTestSuite {
 
     public void initialize() {
         PDL pdl = new PDL();
-        pdl.emit(Root.getRoot());
+        Root root = new Root();
+        pdl.emit(root);
 
         m_model = Model.getInstance("test");
 
         initializeModel();
 
         m_engine = new PassthroughEngine(new MemoryEngine());
-        m_ssn = new Session(m_engine, new DynamicQuerySource());
+        m_ssn = new Session(root, m_engine, new DynamicQuerySource());
 
         initializeData();
 
@@ -258,14 +259,14 @@ public class SessionSuite extends PackageTestSuite {
     }
 
     private void initializeModel() {
-        ObjectType inte = Root.getRoot().getObjectType(INTE);
+        ObjectType inte = m_ssn.getRoot().getObjectType(INTE);
 
         m_root = createKeyedType(m_model, "Root");
         m_one = createKeyedType(m_model, "One");
         m_two = createKeyedType(m_model, "Two");
 
         Adapter a = new Generic.Adapter();
-        Adapter.addAdapter(Generic.class, a);
+        m_ssn.getRoot().addAdapter(Generic.class, a);
 
 //         ObjectType int3 = createUnkeyedType(
 //             m_model, "Int3", new ObjectType[] { inte, inte, inte });
@@ -384,7 +385,7 @@ public class SessionSuite extends PackageTestSuite {
 
     private static final boolean[] B = new boolean[] { false, true };
 
-    private static void addProperties(ObjectType ot, ObjectType target) {
+    private void addProperties(ObjectType ot, ObjectType target) {
         if (s_log.isDebugEnabled()) {
             s_log.debug("props: " + ot.getName() + " " + target.getName());
         }
@@ -428,30 +429,30 @@ public class SessionSuite extends PackageTestSuite {
         }
     }
 
-    private static ObjectType createKeyedType(Model m, String name) {
+    private ObjectType createKeyedType(Model m, String name) {
         ObjectType ot = new ObjectType(m, name, null);
 	ot.setJavaClass(Generic.class);
 
         Role id = new Role(
-            "id", Root.getRoot().getObjectType(INTE),
+            "id", m_ssn.getRoot().getObjectType(INTE),
             false, false, false);
         ot.addProperty(id);
         ObjectMap om = new ObjectMap(ot);
         Collection keys = om.getKeyProperties();
         keys.add(id);
 
-        Root.getRoot().addObjectType(ot);
-        Root.getRoot().addObjectMap(om);
+        m_ssn.getRoot().addObjectType(ot);
+        m_ssn.getRoot().addObjectMap(om);
 
         return ot;
     }
 
-    private static ObjectType createUnkeyedType(Model m, String name,
+    private ObjectType createUnkeyedType(Model m, String name,
                                                 ObjectType[] ots) {
         ObjectType ot = new ObjectType(m, name, null);
 	ot.setJavaClass(Generic.class);
 
-        Root.getRoot().addObjectType(ot);
+        m_ssn.getRoot().addObjectType(ot);
 
         for (int i = 0; i < ots.length; i++) {
             ObjectType prop = ots[i];
@@ -462,7 +463,7 @@ public class SessionSuite extends PackageTestSuite {
         return ot;
     }
 
-    private static void twoWay(ObjectType a, ObjectType b,
+    private void twoWay(ObjectType a, ObjectType b,
                                boolean aCollection, boolean bCollection,
                                boolean aComponent, boolean bComponent,
                                boolean aNullable, boolean bNullable) {
@@ -527,7 +528,7 @@ public class SessionSuite extends PackageTestSuite {
         arole.setReverse(brole);
     }
 
-    private static void oneWay(ObjectType a, ObjectType b,
+    private void oneWay(ObjectType a, ObjectType b,
                                boolean bCollection, boolean bComponent,
                                boolean isNullable) {
         if (!isNullable && bCollection) {

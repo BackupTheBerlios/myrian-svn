@@ -18,24 +18,19 @@ package com.redhat.persistence.metadata;
 import com.redhat.persistence.common.*;
 
 import java.util.*;
+import java.io.*;
 
 
 /**
  * Root
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/15 $
+ * @version $Revision: #3 $ $Date: 2003/10/23 $
  **/
 
 public class Root {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Root.java#2 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
-
-    private static final Root ROOT = new Root();
-
-    public static final Root getRoot() {
-        return ROOT;
-    }
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Root.java#3 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
 
     private static final class Location {
 
@@ -68,8 +63,9 @@ public class Root {
     private Mist m_maps = new Mist(this);
     private Mist m_tables = new Mist(this);
     private Mist m_ops = new Mist(this);
+    private Map m_adapters = new HashMap();
 
-    private Root() {}
+    public Root() {}
 
     public void setLocation(Object element, String filename, int line,
 			    int column) {
@@ -154,6 +150,61 @@ public class Root {
 
     public DataOperation getDataOperation(Path name) {
         return (DataOperation) m_ops.get(name);
+    }
+
+    public void addAdapter(Class javaClass, Adapter ad) {
+        m_adapters.put(javaClass, ad);
+        ad.setRoot(this);
+    }
+
+    public Adapter getAdapter(Class javaClass) {
+        for (Class c = javaClass; c != null; c = c.getSuperclass()) {
+            Adapter a = (Adapter) m_adapters.get(c);
+            if (a != null) { return a; }
+        }
+
+        return null;
+    }
+
+    public Adapter getAdapter(ObjectType type) {
+        for (ObjectType ot = type; ot != null; ot = ot.getSupertype()) {
+	    Class klass = ot.getJavaClass();
+	    if (klass != null) {
+		Adapter a = getAdapter(klass);
+		if (a != null) { return a; }
+	    }
+        }
+
+        Adapter a = (Adapter) m_adapters.get(null);
+        if (a != null) { return a; }
+
+        return null;
+    }
+
+    public void dump(PrintStream out) {
+        out.println("types:");
+        dump(out, m_types);
+        out.println("maps:");
+        dump(out, m_maps);
+        out.println("tables:");
+        dump(out, m_tables);
+        out.println("ops:");
+        dump(out, m_ops);
+        out.println("adapters:");
+        dump(out, m_adapters);
+    }
+
+    private void dump(PrintStream out, Collection c) {
+        for (Iterator it = c.iterator(); it.hasNext(); ) {
+            out.println("    " + it.next());
+        }
+    }
+
+    private void dump(PrintStream out, Map m) {
+        for (Iterator it = m.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry me = (Map.Entry) it.next();
+            out.println("    " + me.getKey() + ": " + me.getValue());
+        }
     }
 
 }

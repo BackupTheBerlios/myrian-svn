@@ -15,20 +15,21 @@
 
 package com.arsdigita.util.parameter;
 
-import com.arsdigita.util.*;
-import java.util.*;
+import com.arsdigita.util.Classes;
+import com.arsdigita.util.UncheckedWrapperException;
+import java.util.List;
 
 /**
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/SingletonParameter.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/SingletonParameter.java#2 $
  */
 public class SingletonParameter extends ClassParameter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/SingletonParameter.java#1 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/SingletonParameter.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/09 14:53:22 $";
+        "$DateTime: 2003/10/23 15:28:18 $";
 
     public SingletonParameter(final String name) {
         super(name);
@@ -40,14 +41,13 @@ public class SingletonParameter extends ClassParameter {
         super(name, multiplicity, defaalt);
     }
 
-    protected Object unmarshal(final String value, final List errors) {
+    protected Object unmarshal(final String value, final ErrorList errors) {
         final Class clacc = (Class) super.unmarshal(value, errors);
 
         try {
             return Classes.newInstance(clacc);
         } catch (UncheckedWrapperException uwe) {
-            errors.add(uwe.getRootCause().getMessage());
-
+            errors.add(new ParameterError(this, uwe.getRootCause()));
             return null;
         }
     }

@@ -24,19 +24,25 @@ import java.util.*;
  * Environment
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/15 $
+ * @version $Revision: #3 $ $Date: 2003/10/23 $
  **/
 
 class Environment {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Environment.java#2 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Environment.java#3 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
 
+    private RDBMSEngine m_engine;
     private ObjectMap m_om;
     private HashMap m_values = new HashMap();
     private HashMap m_types = new HashMap();
 
-    public Environment(ObjectMap om) {
+    public Environment(RDBMSEngine engine, ObjectMap om) {
+        m_engine = engine;
         m_om = om;
+    }
+
+    RDBMSEngine getEngine() {
+        return m_engine;
     }
 
     public boolean contains(Path path) {
@@ -44,14 +50,17 @@ class Environment {
     }
 
     public void set(Path parameter, Object value) {
-        final int type[] = { RDBMSEngine.getType(value) };
+        final int type[] = {
+            RDBMSEngine.getType(m_engine.getSession().getRoot(), value)
+        };
 
         if (m_om != null) {
             Path path = Path.get(parameter.getPath().substring(1));
 
             ObjectType ot = m_om.getObjectType().getType(path);
             if (ot != null) {
-                type[0] = RDBMSEngine.getType(ot.getJavaClass());
+                type[0] = RDBMSEngine.getType
+                    (m_om.getRoot(), ot.getJavaClass());
             }
 
             Mapping m = m_om.getMapping(path);
@@ -98,7 +107,7 @@ class SpliceEnvironment extends Environment {
     private Environment m_splice;
 
     public SpliceEnvironment(Environment base, Path path, Environment splice) {
-        super(null);
+        super(base.getEngine(), null);
         m_base = base;
         m_path = path;
         m_splice = splice;

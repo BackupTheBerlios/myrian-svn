@@ -33,12 +33,12 @@ import org.apache.log4j.Priority;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2003/08/27 $
+ * @version $Revision: #9 $ $Date: 2003/10/23 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#8 $ by $Author: jorris $, $DateTime: 2003/08/27 11:48:02 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#9 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -67,6 +67,13 @@ public class RDBMSEngine extends Engine {
         m_source = source;
         m_writer = writer;
         m_profiler = profiler;
+
+        m_writer.setEngine(this);
+    }
+
+    public Connection getConnection() {
+        acquire();
+        return m_conn;
     }
 
     void acquire() {
@@ -172,7 +179,7 @@ public class RDBMSEngine extends Engine {
     Environment getEnvironment(Object obj) {
         Environment result = (Environment) m_environments.get(obj);
         if (result == null) {
-            result = new Environment(Session.getObjectMap(obj));
+            result = new Environment(this, getSession().getObjectMap(obj));
             m_environments.put(obj, result);
         }
         return result;
@@ -227,7 +234,7 @@ public class RDBMSEngine extends Engine {
         if (LOG.isInfoEnabled()) {
             LOG.info("Executing " + query);
         }
-        QGen qg = new QGen(query, block);
+        QGen qg = new QGen(this, query, block);
         Select sel = qg.generate();
         return new RDBMSRecordSet(query.getSignature(), this, execute(sel),
                                   qg.getMappings(sel));
@@ -241,7 +248,7 @@ public class RDBMSEngine extends Engine {
         if (LOG.isInfoEnabled()) {
             LOG.info("Executing size " + query);
         }
-        QGen qg = new QGen(query, block);
+        QGen qg = new QGen(this, query, block);
         Select sel = qg.generate();
         sel.setCount(true);
         ResultCycle rc = execute(sel);
@@ -354,8 +361,6 @@ public class RDBMSEngine extends Engine {
         }
     }
 
-    private RDBMSQuerySource QS = new RDBMSQuerySource();
-
     public void flush() {
         try {
             generate();
@@ -371,9 +376,10 @@ public class RDBMSEngine extends Engine {
                 SetEvent e = (SetEvent) m_mutations.get(i);
                 int jdbcType = ((Integer) m_mutationTypes.get(i)).intValue();
                 Property prop = e.getProperty();
+                QuerySource qs = getSession().getQuerySource();
                 RDBMSRecordSet rs = (RDBMSRecordSet) execute
-                    (QS.getQuery(e.getObject(), prop));
-                Adapter ad = Adapter.getAdapter(prop.getType());
+                    (qs.getQuery(e.getObject(), prop));
+                Adapter ad = prop.getRoot().getAdapter(prop.getType());
                 try {
                     if (rs.next()) {
                         ad.mutate(rs.getResultSet(),
@@ -385,6 +391,7 @@ public class RDBMSEngine extends Engine {
                             ("cannot update blob");
                     }
                 } catch (SQLException se) {
+                    LOG.error(se.getMessage(), se);
                     throw new Error(se.getMessage());
                 } finally {
                     rs.close();
@@ -421,21 +428,21 @@ public class RDBMSEngine extends Engine {
             }
 
             acquire();
-            
+
             /*
-             * PERFORMANCE HACK: 
+             * PERFORMANCE HACK:
              * If there is more than one DeveloperSupportListener,
              * there is a listener other than then one created in com.arsdigita.dispatcher.Initializer.
              * That means we are logging queries to webdevsupport.
-             */            
+             */
             boolean bLogQuery = DeveloperSupport.getListenerCount() > 1;
-            if (LOG.isDebugEnabled()) {                
+            if (LOG.isDebugEnabled()) {
                 LOG.debug("Logging queries: " + bLogQuery);
-            }                 
-            
+            }
+
             //see what kind of operation this isfor webdevsupport
             String sOpType = "";
-            if (bLogQuery) {                
+            if (bLogQuery) {
 		if (op instanceof Select) {
 			sOpType = "executeQuery";
 		} else if (op instanceof Update) {
@@ -443,8 +450,8 @@ public class RDBMSEngine extends Engine {
 		} else {
 			sOpType = "execute";
 		}
-            }                
-            
+            }
+
             try {
                 StatementLifecycle cycle = null;
                 if (m_profiler != null) {
@@ -464,19 +471,19 @@ public class RDBMSEngine extends Engine {
                 w.bind(ps, cycle);
 
                 if (cycle != null) { cycle.beginExecute(); }
-                long time = System.currentTimeMillis();                
+                long time = System.currentTimeMillis();
                 if (ps.execute()) {
                     time = System.currentTimeMillis() - time;
-                    if (cycle != null) { cycle.endExecute(0); }                       
-                    if (bLogQuery) {                        
-                        DeveloperSupport.logQuery(m_conn.hashCode(), sOpType, sql, collToMap(w.getBindings()), time, null);                                     
-                    }                    
+                    if (cycle != null) { cycle.endExecute(0); }
+                    if (bLogQuery) {
+                        DeveloperSupport.logQuery(m_conn.hashCode(), sOpType, sql, collToMap(w.getBindings()), time, null);
+                    }
                     return new ResultCycle(this, ps.getResultSet(), cycle);
-                } else {                    
+                } else {
                     time = System.currentTimeMillis() - time;
                     if (bLogQuery) {
                         DeveloperSupport.logQuery(m_conn.hashCode(), sOpType, sql, collToMap(w.getBindings()), time, null);
-                    }                                                            
+                    }
                     int updateCount = ps.getUpdateCount();
                     if (cycle != null) { cycle.endExecute(updateCount); }
 
@@ -490,8 +497,8 @@ public class RDBMSEngine extends Engine {
 
                     return null;
                 }
-            } catch (SQLException e) {   
-                //robust connection pooling             
+            } catch (SQLException e) {
+                //robust connection pooling
                 checkBadConnection(e);
                 logQueryDetails(Priority.ERROR, sql, w, op, e);
 
@@ -521,17 +528,20 @@ public class RDBMSEngine extends Engine {
     }
 
     /**
-     * Tests if the SQLException was caused by a bad connection to the database.
-     * If it is, disconnects ConnectionManager and returns true.  
+     * Tests if the SQLException was caused by a bad connection to the
+     * database. If it is, disconnects ConnectionManager and returns
+     * true.
+     *
      * @param e the SQLException to check
-     * @return true if the SQLException was caused by a bad connection to the database
+     * @return true if the SQLException was caused by a bad connection
+     *         to the database
      */
     boolean checkBadConnection(SQLException e) {
         //      robust connection pooling
         SQLException result = SQLExceptionHandler.wrap(e);
         if (result instanceof com.arsdigita.db.DbNotAvailableException) {
             LOG.warn("Bad Connection...calling ConnectionManager.badConnection()");
-            ConnectionManager.badConnection(m_conn);            
+            ConnectionManager.badConnection(m_conn);
             return true;
         } else {
             return false;
@@ -539,25 +549,27 @@ public class RDBMSEngine extends Engine {
     }
 
     public void execute(SQLBlock sql, Map parameters) {
-        Environment env = new Environment(null);
+        Environment env = new Environment(this, null);
         for (Iterator it = parameters.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry me = (Map.Entry) it.next();
             env.set((Path) me.getKey(), me.getValue());
         }
-        Operation op = new StaticOperation(sql, env, false);
-        execute(op, new RetainUpdatesWriter());
+        Operation op = new StaticOperation(this, sql, env, false);
+        SQLWriter w = new RetainUpdatesWriter();
+        w.setEngine(this);
+        execute(op, w);
     }
-    
+
     private HashMap collToMap(Collection c) {
         Iterator iter = c.iterator();
         HashMap map = new HashMap();
         for (int i=1; iter.hasNext(); i++) {
             map.put(new Integer(i), iter.next());
         }
-        
+
         return map;
     }
-        
+
     static final Path[] getKeyPaths(ObjectType type, Path prefix) {
         return getPaths(type, prefix, false);
     }
@@ -600,7 +612,7 @@ public class RDBMSEngine extends Engine {
         return (Path[]) result.toArray(new Path[0]);
     }
 
-    static final Object get(Object obj, Path path) {
+    Object get(Object obj, Path path) {
         if (path == null) {
             return obj;
         }
@@ -610,20 +622,20 @@ public class RDBMSEngine extends Engine {
             return null;
         }
 
-        PropertyMap props = Session.getProperties(o);
+        PropertyMap props = getSession().getProperties(o);
         return props.get(props.getObjectType().getProperty(path.getName()));
     }
 
-    static final int getType(Object obj) {
+    final static int getType(Root root, Object obj) {
         if (obj == null) {
             return Types.INTEGER;
         } else {
-            return getType(obj.getClass());
+            return getType(root, obj.getClass());
         }
     }
 
-    static final int getType(Class klass) {
-        return Adapter.getAdapter(klass).defaultJDBCType();
+    final static int getType(Root root, Class klass) {
+        return root.getAdapter(klass).defaultJDBCType();
     }
 
 }

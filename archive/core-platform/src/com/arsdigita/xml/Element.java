@@ -18,6 +18,7 @@ package com.arsdigita.xml;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
+import com.arsdigita.util.Assert;
 import com.arsdigita.util.UncheckedWrapperException;
 import java.util.Iterator;
 import org.w3c.dom.NamedNodeMap;
@@ -28,14 +29,14 @@ import org.w3c.dom.Attr;
  * <code>org.jdom.Element</code> using <code>org.w3c.dom.Element</code>.
  *
  * @author Patrick McNeill 
- * @version $Revision: #11 $ $Date: 2003/08/15 $
+ * @version $Revision: #12 $ $Date: 2003/10/23 $
  * @since ACS 4.5a
  */
 public class Element {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/xml/Element.java#11 $" +
-        "$Author: dennis $" +
-        "$DateTime: 2003/08/15 13:46:34 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/xml/Element.java#12 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/10/23 15:28:18 $";
 
     private static final Logger s_log = Logger.getLogger
         (Element.class.getName());
@@ -82,6 +83,8 @@ public class Element {
      */
     public Element( String name ) {
         this();
+        Assert.exists(name, String.class);
+
         m_element = getDocument().createElement(name);
     }
 
@@ -94,6 +97,9 @@ public class Element {
      * @param uri the URI for the namespace definition
      */
     public Element( String name, String uri ) {
+        Assert.exists(name, String.class);
+        Assert.exists(uri, String.class);
+
         m_element = getDocument().createElementNS( uri, name );
     }
 
@@ -111,6 +117,8 @@ public class Element {
      * @pre m_element != null
      */
     public Element newChildElement(String name) {
+        Assert.exists(name, String.class);
+
         if (m_doc == null) {
             m_doc = this.m_element.getOwnerDocument();
         }
@@ -137,6 +145,9 @@ public class Element {
      * @pre m_element != null
      */
     public Element newChildElement(String name, String uri) {
+        Assert.exists(name, String.class);
+        Assert.exists(uri, String.class);
+
         if (m_doc == null) {
             m_doc = this.m_element.getOwnerDocument();
         }
@@ -152,6 +163,8 @@ public class Element {
      * Element.
      */
     public Element newChildElement(Element copyFrom) {
+        Assert.exists(copyFrom, Element.class);
+
         if (m_doc == null) {
             m_doc = this.m_element.getOwnerDocument();
         }
@@ -190,7 +203,20 @@ public class Element {
      * @return this element.
      */
     public Element addAttribute( String name, String value ) {
+        Assert.exists(name, String.class);
+
         m_element.setAttribute( name, value );
+
+        return this;
+    }
+
+    public Element addAttribute(String name, 
+                                String value,
+                                String ns) {
+        Assert.exists(name, String.class);
+        Assert.exists(ns, String.class);
+
+        m_element.setAttributeNS(ns, name, value);
 
         return this;
     }
@@ -202,6 +228,8 @@ public class Element {
      * @return this element.
      */
     public Element addContent( Element newContent ) {
+        Assert.exists(newContent, Element.class);
+
         newContent.importInto(m_element.getOwnerDocument());
         m_element.appendChild(newContent.getInternalElement());
 

@@ -24,12 +24,12 @@ import java.util.*;
  * DynamicQuerySource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/15 $
+ * @version $Revision: #3 $ $Date: 2003/10/23 $
  **/
 
 public class DynamicQuerySource extends QuerySource {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/DynamicQuerySource.java#2 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/DynamicQuerySource.java#3 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
 
     private Signature getSignature(ObjectType type) {
         Signature result = new Signature(type);
@@ -46,7 +46,7 @@ public class DynamicQuerySource extends QuerySource {
     public Query getQuery(PropertyMap keys) {
         ObjectType type = keys.getObjectType();
         Signature sig = getSignature(type);
-        ObjectMap map = Root.getRoot().getObjectMap(type);
+        ObjectMap map = type.getRoot().getObjectMap(type);
         Collection keyProps = map.getKeyProperties();
 
         Query query = new Query(sig, null);
@@ -73,7 +73,7 @@ public class DynamicQuerySource extends QuerySource {
     }
 
     public Query getQuery(Object obj) {
-        ObjectType type = Session.getObjectType(obj);
+        ObjectType type = getSession().getObjectType(obj);
         Signature sig = getSignature(type);
         Parameter start = new Parameter(type, Path.get("start__"));
         sig.addParameter(start);
@@ -103,7 +103,7 @@ public class DynamicQuerySource extends QuerySource {
             q.set(start, obj);
             return q;
         } else {
-            ObjectType type = Session.getObjectType(obj);
+            ObjectType type = getSession().getObjectType(obj);
             Signature sig = new Signature(type);
             sig.addPath(prop.getName());
             sig.addDefaultProperties(Path.get(prop.getName()));

@@ -46,7 +46,7 @@ import org.apache.log4j.varia.StringMatchFilter;
  */
 public class AggressiveConnectionCloseTest extends Log4jBasedTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/AggressiveConnectionCloseTest.java#11 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/AggressiveConnectionCloseTest.java#12 $";
 
     private Session ssn;
 
@@ -70,7 +70,7 @@ public class AggressiveConnectionCloseTest extends Log4jBasedTestCase {
         super.setUp();
 
         ssn = getSession();
-        originalCloseValue = ssn.getTransactionContext().getAggressiveClose();
+        throw new Error("fix: originalCloseValue = ssn.getTransactionContext().getAggressiveClose();");
     }
 
     /**
@@ -79,7 +79,7 @@ public class AggressiveConnectionCloseTest extends Log4jBasedTestCase {
     public void tearDown() throws Exception {
         super.tearDown();
 
-        ssn.getTransactionContext().setAggressiveClose(originalCloseValue);
+        throw new Error("fix: ssn.getTransactionContext().setAggressiveClose(originalCloseValue);");
     }
 
     public void testAggressiveClosing() {
@@ -90,7 +90,7 @@ public class AggressiveConnectionCloseTest extends Log4jBasedTestCase {
         log.addFilter(filterReturn);
         log.addFilter(new DenyAllFilter());
 
-        ssn.getTransactionContext().setAggressiveClose(true);
+        if (true) throw new Error("fix: ssn.getTransactionContext().setAggressiveClose(true);");
 
         // do something simple, should result in a holding on to the
         // connection
@@ -113,7 +113,7 @@ public class AggressiveConnectionCloseTest extends Log4jBasedTestCase {
         try {
             assertLogContains(returnString);
 
-            ssn.getTransactionContext().setAggressiveClose(false);
+            if (true) throw new Error("fix: ssn.getTransactionContext().setAggressiveClose(false);");
 
             // abort prev transaction, start a new one, so that we can have a
             // clean connection

@@ -25,15 +25,15 @@ import java.io.*;
  * StringAd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/15 $
+ * @version $Revision: #3 $ $Date: 2003/10/23 $
  **/
 
 public class StringAd extends SimpleAdapter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/adapters/StringAd.java#2 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/adapters/StringAd.java#3 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
 
     public StringAd() {
-	super(Root.getRoot().getObjectType("global.String"), Types.VARCHAR);
+	super("global.String", Types.VARCHAR);
     }
 
     public void bind(PreparedStatement ps, int index, Object obj, int type)
@@ -44,7 +44,7 @@ public class StringAd extends SimpleAdapter {
     public Object fetch(ResultSet rs, String column) throws SQLException {
         ResultSetMetaData md = rs.getMetaData();
         if (md.getColumnType(rs.findColumn(column)) == Types.CLOB &&
-            DbHelper.getDatabase() != DbHelper.DB_POSTGRES) {
+            DbHelper.getDatabase(rs) != DbHelper.DB_POSTGRES) {
             Clob clob = rs.getClob(column);
             if (clob == null) {
                 return null;
@@ -62,23 +62,24 @@ public class StringAd extends SimpleAdapter {
 
     public void mutate(ResultSet rs, String column, Object value, int jdbcType)
         throws SQLException {
-        if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
+        if (DbHelper.getDatabase(rs) == DbHelper.DB_POSTGRES) {
             // do nothing
-        } else {
-            oracle.sql.CLOB clob =
-                (oracle.sql.CLOB) rs.getClob(column);
-            Writer out = clob.getCharacterOutputStream();
-            try {
-                out.write(((String) value).toCharArray());
-                out.flush();
-                out.close();
-            } catch (IOException e) {
-                // This used to be a persistence exception, but using
-                // persistence exception here breaks ant verify-pdl
-                // because the classpath isn't set up to include
-                // com.arsdigita.util.*
-                throw new Error("Unable to write LOB: " + e);
-            }
+            return;
+        }
+
+        oracle.sql.CLOB clob =
+            (oracle.sql.CLOB) rs.getClob(column);
+        Writer out = clob.getCharacterOutputStream();
+        try {
+            out.write(((String) value).toCharArray());
+            out.flush();
+            out.close();
+        } catch (IOException e) {
+            // This used to be a persistence exception, but using
+            // persistence exception here breaks ant verify-pdl
+            // because the classpath isn't set up to include
+            // com.arsdigita.util.*
+            throw new Error("Unable to write LOB: " + e);
         }
     }
 

@@ -24,13 +24,13 @@ import org.apache.commons.beanutils.converters.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/AbstractParameter.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/AbstractParameter.java#2 $
  */
 public abstract class AbstractParameter implements Parameter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/AbstractParameter.java#1 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/AbstractParameter.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/26 15:31:04 $";
+        "$DateTime: 2003/10/23 15:28:18 $";
 
     private final String m_name;
     private final Class m_type;
@@ -44,13 +44,18 @@ public abstract class AbstractParameter implements Parameter {
                                 final Class type) {
         if (Assert.isEnabled()) {
             Assert.exists(name, String.class);
-            Assert.exists(type, Class.class);
         }
 
         m_name = name;
         m_type = type;
         m_multiplicity = multiplicity;
         m_default = defaalt;
+    }
+
+    protected AbstractParameter(final String name,
+                                final int multiplicity,
+                                final Object defaalt) {
+        this(name, multiplicity, defaalt, null);
     }
 
     protected AbstractParameter(final String name,
@@ -83,67 +88,85 @@ public abstract class AbstractParameter implements Parameter {
     // Lifecycle events
     //
 
-    public final void unmarshal(final ParameterValue value) {
-        Assert.exists(value, ParameterValue.class);
+    public final Object read(final ParameterReader reader,
+                             final ErrorList errors) {
+        if (Assert.isEnabled()) {
+            Assert.exists(reader, ParameterReader.class);
+            Assert.exists(errors, ErrorList.class);
+        }
 
-        final String string = value.getString();
+        return doRead(reader, errors);
+    }
+
+    protected Object doRead(final ParameterReader reader,
+                            final ErrorList errors) {
+        final String string = reader.read(this, errors);
 
         if (string == null) {
-            value.setObject(getDefaultValue());
+            return null;
         } else {
-            final List errors = value.getErrors();
-
-            final Object result = unmarshal(string, errors);
-
-            value.setObject(result);
+            return unmarshal(string, errors);
         }
     }
 
-    protected Object unmarshal(final String value, final List errors) {
+    // value != null
+    protected Object unmarshal(final String value, final ErrorList errors) {
+        Assert.exists(value, String.class);
+
         try {
             return Converters.convert(m_type, value);
         } catch (ConversionException ce) {
-            errors.add(ce.getMessage());
-
+            errors.add(new ParameterError(this, ce));
             return null;
         }
     }
 
-    public final void validate(final ParameterValue value) {
-        final Object object = value.getObject();
-        final List errors = value.getErrors();
+    public final void validate(final Object value, final ErrorList errors) {
+        Assert.exists(errors, ErrorList.class);
 
-        if (isRequired() && object == null) {
-            errors.add("The value must not be null");
-        } else {
-            validate(object, errors);
-        }
-    }
+        if (value == null) {
+            // If the value is null, validation stops here.
 
-    protected void validate(final Object value, final List errors) {
-        // Nothing by default
-    }
-
-    public final void check(final ParameterValue value)
-            throws ParameterException {
-        Assert.exists(value, ParameterValue.class);
-
-        final List errors = value.getErrors();
-
-        if (!errors.isEmpty()) {
-            final StringBuffer buffer = new StringBuffer();
-
-            final Iterator iter = errors.iterator();
-
-            while (iter.hasNext()) {
-                buffer.append("\n\t");
-                buffer.append(iter.next().toString());
+            if (isRequired()) {
+                final ParameterError error = new ParameterError
+                    (this, "The value must not be null");
+                errors.add(error);
             }
+        } else {
+            // Always do further validation for non-null values.
 
-            throw new ParameterException
-                ("Parameter " + getName() +
-                 " failed with the following errors: " + buffer.toString(),
-                 errors);
+            doValidate(value, errors);
         }
+    }
+
+    // value != null
+    protected void doValidate(final Object value, final ErrorList errors) {
+        Assert.exists(value, Object.class);
+
+        // Nothing
+    }
+
+    public final void write(final ParameterWriter writer, final Object value) {
+        Assert.exists(writer);
+
+        // XXX what to do about nulls here?
+
+        doWrite(writer, value);
+    }
+
+    protected void doWrite(final ParameterWriter writer, final Object value) {
+        writer.write(this, marshal(value));
+    }
+
+    protected String marshal(final Object value) {
+        if (value == null) {
+            return null;
+        } else {
+            return value.toString();
+        }
+    }
+
+    public String toString() {
+        return super.toString() + "," + getName() + "," + isRequired();
     }
 }

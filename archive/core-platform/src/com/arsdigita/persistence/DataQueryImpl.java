@@ -37,16 +37,14 @@ import org.apache.log4j.Logger;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #31 $ $Date: 2003/08/15 $
+ * @version $Revision: #32 $ $Date: 2003/10/23 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#31 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#32 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
 
     private static final Logger s_log = Logger.getLogger(DataQueryImpl.class);
-
-    private static final FilterFactory s_factory = new FilterFactoryImpl();
 
     private Session m_ssn;
     private com.redhat.persistence.Session m_pssn;
@@ -54,13 +52,14 @@ class DataQueryImpl implements DataQuery {
     final private Query m_original;
     private Query m_query;
     Cursor m_cursor = null;
-    private CompoundFilter m_filter = getFilterFactory().and();
+    private CompoundFilter m_filter;
 
     // This indicates the limits on the number of rows returned by the query
     private int m_lowerBound = 0;
     private int m_upperBound = Integer.MAX_VALUE;
 
     private final List m_aliases = new ArrayList();
+    private final FilterFactory m_factory;
 
     DataQueryImpl(Session ssn, PersistentCollection pc) {
 	this(ssn, pc.getDataSet().getQuery());
@@ -71,6 +70,8 @@ class DataQueryImpl implements DataQuery {
         m_pssn = ssn.getProtoSession();
 	m_original = query;
 	m_query = new Query(m_original, null);
+        m_factory = new FilterFactoryImpl(ssn);
+        m_filter = getFilterFactory().and();
     }
 
     Session getSession() {
@@ -231,7 +232,7 @@ class DataQueryImpl implements DataQuery {
     }
 
     public FilterFactory getFilterFactory() {
-        return s_factory;
+        return m_factory;
     }
 
 
@@ -269,7 +270,8 @@ class DataQueryImpl implements DataQuery {
                 secondElement = ":" + var;
                 setParameter(var, orderTwo);
                 if (orderOne != null) {
-                    if (!Root.getRoot().getObjectType("global.String").equals
+                    Root root = getSession().getRoot();
+                    if (!root.getObjectType("global.String").equals
                         (m_query.getSignature().getType
                          (Path.get(orderOne)))) {
                         // this means that there is going to be a type conflict
@@ -490,7 +492,7 @@ class DataQueryImpl implements DataQuery {
     private String unalias(String expr) {
         SQLParser p = new SQLParser
             (new StringReader(expr),
-             new SQLParser.Mapper() {
+             new SQLParser.IdentityMapper() {
                  public Path map(Path path) {
                      return unalias(path);
                  }

@@ -24,12 +24,12 @@ import java.util.*;
  * Select
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/15 $
+ * @version $Revision: #3 $ $Date: 2003/10/23 $
  **/
 
 class Select extends Operation {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Select.java#2 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Select.java#3 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
 
     private Join m_join;
     private Expression m_filter;
@@ -41,12 +41,13 @@ class Select extends Operation {
     private Integer m_limit = null;
     private boolean m_isCount = false;
 
-    public Select(Join join, Expression filter) {
-        this(join, filter, new Environment(null));
+    public Select(RDBMSEngine engine, Join join, Expression filter) {
+        this(engine, join, filter, new Environment(engine, null));
     }
 
-    public Select(Join join, Expression filter, Environment env) {
-        super(env);
+    public Select(RDBMSEngine engine, Join join, Expression filter,
+                  Environment env) {
+        super(engine, env);
         m_join = join;
         m_filter = filter;
     }

@@ -111,7 +111,7 @@ SKIP:
 
 TOKEN:
 {
-    <INCLUDE: "@@" | "\\i" | "include" >
+    <INCLUDE: "@@" | "\\i" | "include" | "@" >
   | <NAKED_BEGIN: "begin">
   | <DECLARE: "declare">
   | <PLSQL_BEGIN:

@@ -22,27 +22,28 @@ import java.util.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/SymbolicNameParameter.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/SymbolicNameParameter.java#2 $
  */
 public class SymbolicNameParameter extends StringParameter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/SymbolicNameParameter.java#1 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/SymbolicNameParameter.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/09 14:53:22 $";
+        "$DateTime: 2003/10/23 15:28:18 $";
 
     public SymbolicNameParameter(final String name) {
         super(name);
     }
 
-    protected void validate(final Object value, final List errors) {
-        super.validate(value, errors);
+    protected void doValidate(final Object value, final ErrorList errors) {
+        super.doValidate(value, errors);
 
         final String string = (String) value;
 
         for (int i = 0; i < string.length(); i++) {
             if (!Character.isJavaIdentifierPart(string.charAt(i))) {
-                errors.add("The value may contain letters, digits, " +
-                           "and underscores only");
+                final ParameterError error = new ParameterError
+                    (this, "The value may contain letters, digits, " +
+                     "and underscores only");
                 break;
             }
         }

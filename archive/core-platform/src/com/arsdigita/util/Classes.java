@@ -19,6 +19,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Constructor;
 import org.apache.log4j.Logger;
 
+import java.util.Arrays;
+
 /**
  * A collection of static utility methods for dealing with Java
  * classes.
@@ -27,9 +29,9 @@ import org.apache.log4j.Logger;
  */
 public final class Classes {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/Classes.java#1 $" +
-        "$Author: dan $" +
-        "$DateTime: 2003/09/08 06:01:11 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/Classes.java#2 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/10/23 15:28:18 $";
 
     private static final Logger s_log = Logger.getLogger(Classes.class);
 
@@ -75,13 +77,32 @@ public final class Classes {
 
             return constructor.newInstance(values);
         } catch (NoSuchMethodException ex) {
-            throw new UncheckedWrapperException(ex);
+            throw new UncheckedWrapperException
+                (message(clacc, params, values), ex);
         } catch (IllegalAccessException ex) {
-            throw new UncheckedWrapperException(ex);
+            throw new UncheckedWrapperException
+                (message(clacc, params, values), ex);
         } catch (InvocationTargetException ex) {
-            throw new UncheckedWrapperException(ex);
+            throw new UncheckedWrapperException
+                (message(clacc, params, values), ex);
         } catch (InstantiationException ex) {
-            throw new UncheckedWrapperException(ex);
+            throw new UncheckedWrapperException
+                (message(clacc, params, values), ex);
+        }
+    }
+
+    private static String message(Class klass, Class[] params,
+                                  Object[] values) {
+        return "class = " + klass +
+            ", params = " + message(params) +
+            ", values = " + message(values);
+    }
+
+    private static String message(Object[] array) {
+        if (array == null) {
+            return "" + null;
+        } else {
+            return Arrays.asList(array).toString();
         }
     }
 

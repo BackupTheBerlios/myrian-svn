@@ -14,54 +14,49 @@
  */
 
 package com.arsdigita.persistence;
+import com.arsdigita.persistence.metadata.DataType;
+import com.arsdigita.persistence.metadata.ObjectType;
+import com.arsdigita.persistence.metadata.Property;
 import com.arsdigita.util.Assert;
-import com.arsdigita.persistence.metadata.*;
-import java.math.*;
-import java.util.*;
-import java.io.*;
-import org.apache.log4j.*;
+import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
+import org.apache.log4j.Level;
+
+import java.util.Iterator;
 
 /**
  * ObjectTypeValidator
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #6 $ $Date: 2003/08/15 $
+ * @version $Revision: #7 $ $Date: 2003/10/23 $
  */
 
 public class ObjectTypeValidator  {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/ObjectTypeValidator.java#6 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/ObjectTypeValidator.java#7 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
     private static final Logger s_log =
         Logger.getLogger(ObjectTypeValidator.class.getName());
-    private Session m_session;
     DataObjectManipulator m_manipulator;
 
     static  {
-        s_log.setPriority(Priority.DEBUG);
+       s_log.setLevel(Level.DEBUG);
     }
 
-    public ObjectTypeValidator(Session session) {
-        m_session = session;
-        m_manipulator = new DataObjectManipulator(session);
+    public ObjectTypeValidator() {
+        m_manipulator = new DataObjectManipulator();
     }
-
-    private Session getSession() {
-        return m_session;
-    }
-
-
 
     public void performCRUDTest(String objectTypeName) throws Exception {
         try {
             s_log.info("CRUDTest on " + objectTypeName);
-            DataObject object = getSession().create(objectTypeName);
+            DataObject object = SessionManager.getSession().create(objectTypeName);
             reportPropertyTypes(object);
 
             initializeObject( object, null );
             OID id = object.getOID();
             s_log.info("Initialized object with id: " + id);
             object.save();
-            object = getSession().retrieve(id);
+            object = SessionManager.getSession().retrieve(id);
             Assert.assertNotNull(object, "Object of type: " + objectTypeName + "and id: " + id + " was not found!");
             checkDefaultValues(object);
 
@@ -111,7 +106,7 @@ public class ObjectTypeValidator  {
                 }
             };
 
-        DataObject data = getSession(). retrieve(id);
+        DataObject data = SessionManager.getSession(). retrieve(id);
         s_log.info("");
         String objectName = data.getObjectType().getName();
         s_log.info("Deleting object: " + objectName + " with OID: " + data.getOID());
@@ -122,9 +117,9 @@ public class ObjectTypeValidator  {
         data.save();
         s_log.info("about to delete!");
         data.delete();
-        Assert.assertTrue(data.isDeleted());
-        data = getSession(). retrieve(id);
-        Assert.assertTrue( null == data );
+        Assert.truth(data.isDeleted());
+        data = SessionManager.getSession(). retrieve(id);
+        Assert.truth( null == data );
         s_log.info("END Removing object: " + objectName);
         s_log.info("");
 
@@ -194,7 +189,7 @@ public class ObjectTypeValidator  {
                         dataInner.set(p.getName(), associatedObject);
                     } else {
                         DataObject object =
-                            getSession().create(p.getType().getQualifiedName());
+                            SessionManager.getSession().create(p.getType().getQualifiedName());
                         reportPropertyTypes(object);
                         initializeObject(object, dataInner);
                     }
@@ -243,7 +238,7 @@ public class ObjectTypeValidator  {
         s_log.info("Making associated object: " + fullTypeName +
                    " for ObjectType: " + data.getObjectType().getQualifiedName());
 
-        DataObject associatedObject = getSession().create(fullTypeName);
+        DataObject associatedObject = SessionManager.getSession().create(fullTypeName);
         reportPropertyTypes(associatedObject);
         initializeObject(associatedObject, data);
         associatedObject.save();
@@ -280,7 +275,7 @@ public class ObjectTypeValidator  {
         s_log.info("Making child object: " + fullTypeName +
                    " for ObjectType: " + parent.getObjectType().getQualifiedName());
 
-        DataObject child = getSession().create(fullTypeName);
+        DataObject child = SessionManager.getSession().create(fullTypeName);
         reportPropertyTypes(child);
 
         initializeObject(child, parent);

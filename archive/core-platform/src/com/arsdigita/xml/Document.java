@@ -36,7 +36,7 @@ import java.io.UnsupportedEncodingException;
  * @since ACS 4.5a
  */
 public class Document {
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/xml/Document.java#7 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/xml/Document.java#8 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
 
     private static final Logger s_log =
         Logger.getLogger(Document.class.getName());
@@ -48,13 +48,36 @@ public class Document {
      * Also, this XSLT will strip the <bebop:structure> debugging info
      * from the XML document if present.
      */
+    // XXX For some reason JD.XSLT doesn't copy xmlns: attributes
+    // to the output doc with <xsl:copy>
+    /*
     private final static String identityXSL =
         "<xsl:stylesheet version=\"1.0\""
         + " xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">\n"
-        + "<xsl:output method=\"html\"/>\n"
+        + "<xsl:output method=\"xml\"/>\n"
         + "<xsl:template match=\"*|@*|text()\">\n"
         + "  <xsl:copy><xsl:apply-templates select=\"node()|@*\"/></xsl:copy>"
         + "\n</xsl:template>\n"
+        + "<xsl:template match=\"bebop:structure\" "
+        + " xmlns:bebop=\"http://www.arsdigita.com/bebop/1.0\">\n"
+        + "</xsl:template>\n"
+        + "</xsl:stylesheet>";
+    */
+    // Explicitly create elements & attributes to avoid namespace
+    // problems
+    private final static String identityXSL =
+        "<xsl:stylesheet version=\"1.0\""
+        + " xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">\n"
+        + "<xsl:output method=\"xml\"/>\n"
+        + "<xsl:template match=\"text()|comment()|processing-instruction()\">\n"
+        + "  <xsl:copy/>\n"
+        + "</xsl:template>\n"
+        + "<xsl:template match=\"*\">\n"
+        + "  <xsl:element name=\"{name()}\" namespace=\"{namespace-uri()}\"><xsl:apply-templates select=\"node()|@*\"/></xsl:element>\n"
+        + "</xsl:template>\n"
+        + "<xsl:template match=\"@*\">\n"
+        + "  <xsl:attribute name=\"{name()}\" namespace=\"{namespace-uri()}\"><xsl:value-of select=\".\"/></xsl:attribute>\n"
+        + "</xsl:template>\n"
         + "<xsl:template match=\"bebop:structure\" "
         + " xmlns:bebop=\"http://www.arsdigita.com/bebop/1.0\">\n"
         + "</xsl:template>\n"
@@ -133,7 +156,8 @@ public class Document {
         m_document.appendChild(rootNode.getInternalElement());
     }
 
-    public Document( String xmlString ) throws ParserConfigurationException, org.xml.sax.SAXException {
+    public Document( String xmlString ) 
+        throws ParserConfigurationException, org.xml.sax.SAXException {
         DocumentBuilder db = (DocumentBuilder)s_db.get();
         if (db == null) {
             throw new ParserConfigurationException
@@ -249,10 +273,8 @@ public class Document {
                 new StreamSource(new StringReader(identityXSL));
             identity = TransformerFactory.newInstance()
                 .newTransformer(identitySource);
-            if (indent) {
-                identity.setOutputProperty("method", "xml");
-                identity.setOutputProperty("indent", "yes");
-            }
+            identity.setOutputProperty("method", "xml");
+            identity.setOutputProperty("indent", (indent ? "yes" : "no"));
             identity.setOutputProperty("encoding", "UTF-8");
             identity.transform(new DOMSource(document), new StreamResult(os));
         } catch (javax.xml.transform.TransformerException e) {

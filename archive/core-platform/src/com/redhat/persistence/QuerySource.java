@@ -22,12 +22,22 @@ import com.redhat.persistence.metadata.*;
  * QuerySource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/15 $
+ * @version $Revision: #3 $ $Date: 2003/10/23 $
  **/
 
 public abstract class QuerySource {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/QuerySource.java#2 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/QuerySource.java#3 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+
+    private Session m_ssn;
+
+    void setSession(Session ssn) {
+        m_ssn = ssn;
+    }
+
+    public Session getSession() {
+        return m_ssn;
+    }
 
     public abstract Query getQuery(ObjectType type);
 

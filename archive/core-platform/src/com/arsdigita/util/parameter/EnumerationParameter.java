@@ -23,18 +23,19 @@ import org.apache.log4j.Logger;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/EnumerationParameter.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/EnumerationParameter.java#2 $
  */
-public class EnumerationParameter extends StringParameter {
+public class EnumerationParameter extends AbstractParameter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/EnumerationParameter.java#1 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/EnumerationParameter.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/09 14:53:22 $";
+        "$DateTime: 2003/10/23 15:28:18 $";
 
     private static final Logger s_log = Logger.getLogger
         (EnumerationParameter.class);
 
     private final HashMap m_entries;
+    private final HashMap m_reverse;
 
     public EnumerationParameter(final String name,
                                 final int multiplicity,
@@ -42,6 +43,7 @@ public class EnumerationParameter extends StringParameter {
         super(name, multiplicity, defaalt);
 
         m_entries = new HashMap();
+        m_reverse = new HashMap();
     }
 
     public EnumerationParameter(final String name) {
@@ -49,16 +51,33 @@ public class EnumerationParameter extends StringParameter {
     }
 
     public final void put(final String name, final Object value) {
+        if (m_entries.containsKey(name)) {
+            throw new IllegalArgumentException
+                ("name already has a value: " + name);
+        }
+        if (m_reverse.containsKey(value)) {
+            throw new IllegalArgumentException
+                ("value already has a name: " + value);
+        }
         m_entries.put(name, value);
+        m_reverse.put(value, name);
     }
 
-    protected Object unmarshal(final String value, final List errors) {
+    protected Object unmarshal(final String value, final ErrorList errors) {
         if (m_entries.containsKey(value)) {
             return m_entries.get(value);
         } else {
-            errors.add("The value must be one of " + m_entries.keySet());
+            final ParameterError error = new ParameterError
+                (this, "The value must be one of " + m_entries.keySet());
+
+            errors.add(error);
 
             return null;
         }
     }
+
+    protected String marshal(Object value) {
+        return (String) m_reverse.get(value);
+    }
+
 }

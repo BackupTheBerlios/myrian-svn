@@ -25,13 +25,13 @@ import org.apache.oro.text.perl.Perl5Util;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/csv/CSVParameterLoader.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/csv/CSVParameterLoader.java#2 $
  */
 public final class CSVParameterLoader implements ParameterLoader {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/csv/CSVParameterLoader.java#1 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/csv/CSVParameterLoader.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/26 15:31:04 $";
+        "$DateTime: 2003/10/23 15:28:18 $";
 
     private final LineNumberReader m_reader;
     private final Parameter[] m_params;
@@ -43,13 +43,17 @@ public final class CSVParameterLoader implements ParameterLoader {
         m_line = new HashMap(params.length);
     }
 
+    public final String read(final Parameter param, final ErrorList errors) {
+        return (String) m_line.get(param);
+    }
+
     public final ParameterValue load(final Parameter param) {
         final ParameterValue value = new ParameterValue();
 
-        value.setString((String) m_line.get(param));
+        // XXX this won't work correctly with compound parameters
+        value.setObject(param.read(this, value.getErrors()));
 
-        param.unmarshal(value);
-        param.check(value);
+        value.getErrors().check();
 
         return value;
     }

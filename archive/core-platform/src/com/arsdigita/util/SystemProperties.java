@@ -15,7 +15,6 @@
 
 package com.arsdigita.util;
 
-import com.arsdigita.util.config.*;
 import com.arsdigita.util.parameter.*;
 import java.io.*;
 import java.util.*;
@@ -28,24 +27,25 @@ import org.apache.log4j.Logger;
  *
  * @see java.lang.System
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/SystemProperties.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/SystemProperties.java#2 $
  */
 public final class SystemProperties {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/SystemProperties.java#1 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/SystemProperties.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/26 15:31:04 $";
+        "$DateTime: 2003/10/23 15:28:18 $";
 
     private static final Logger s_log = Logger.getLogger
         (SystemProperties.class);
 
-    private static final ParameterLoader s_loader = new JavaPropertyLoader
+    private static final ParameterReader s_reader = new JavaPropertyReader
         (System.getProperties());
 
     /**
      * Uses <code>param</code> to decode, validate, and return the
      * value of a Java system property.
      *
+     * @see com.arsdigita.util.parameter.Parameter
      * @param param The <code>Parameter</code> representing the type
      * and name of the field you wish to recover; it cannot be null
      * @return A value that may be cast to the type enforced by the
@@ -59,26 +59,26 @@ public final class SystemProperties {
 
         Assert.exists(param, Parameter.class);
 
-        final ParameterValue value = s_loader.load(param);
+        final ErrorList errors = new ErrorList();
+
+        final Object value = param.read(s_reader, errors);
+
+        errors.check();
 
         if (value == null) {
-            final ParameterValue dephault = new ParameterValue();
+            final Object dephalt = param.getDefaultValue();
 
-            dephault.setObject(param.getDefaultValue());
+            param.validate(dephalt, errors);
 
-            param.validate(dephault);
+            errors.check();
 
-            param.check(dephault);
-
-            return dephault.getObject();
+            return dephalt;
         } else {
-            param.check(value);
+            param.validate(value, errors);
 
-            param.validate(value);
+            errors.check();
 
-            param.check(value);
-
-            return value.getObject();
+            return value;
         }
     }
 }

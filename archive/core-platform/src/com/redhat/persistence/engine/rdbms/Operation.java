@@ -27,15 +27,16 @@ import java.util.*;
  * Operation
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/08/15 $
+ * @version $Revision: #5 $ $Date: 2003/10/23 $
  **/
 
 abstract class Operation {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Operation.java#4 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Operation.java#5 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
 
     private static final Logger LOG = Logger.getLogger(Operation.class);
 
+    private RDBMSEngine m_engine;
     private Environment m_env;
     private HashSet m_parameters = new HashSet();
     private HashMap m_mappings = new HashMap();
@@ -44,12 +45,13 @@ abstract class Operation {
     private ArrayList m_events = null;
     private Query m_query = null;
 
-    protected Operation(Environment env) {
+    protected Operation(RDBMSEngine engine, Environment env) {
+        m_engine = engine;
         m_env = env;
     }
 
-    protected Operation() {
-        this(new Environment(null));
+    protected Operation(RDBMSEngine engine) {
+        this(engine, new Environment(engine, null));
     }
 
     public boolean isParameter(Path path) {
@@ -126,6 +128,7 @@ abstract class Operation {
 
     public String toString() {
         SQLWriter w = new ANSIWriter();
+        w.setEngine(m_engine);
         w.write(this);
         return w.getSQL() + "\n" + w.getBindings();
     }

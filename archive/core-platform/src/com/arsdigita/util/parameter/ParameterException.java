@@ -26,18 +26,18 @@ import org.apache.log4j.Logger;
  * An error to indicate invalid configurations.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterException.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterException.java#2 $
  */
 public final class ParameterException extends RuntimeException {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterException.java#1 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterException.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/26 15:31:04 $";
+        "$DateTime: 2003/10/23 15:28:18 $";
 
     private static final Logger s_log = Logger.getLogger
         (ParameterException.class);
 
-    private final List m_errors;
+    private final ErrorList m_errors;
 
     /**
      * Constructs a new parameter exception with the content
@@ -46,7 +46,7 @@ public final class ParameterException extends RuntimeException {
      * @param message A <code>String</code> describing what's wrong;
      * it cannot be null
      */
-    public ParameterException(final String message, final List errors) {
+    public ParameterException(final String message, final ErrorList errors) {
         super(message);
 
         if (Assert.isEnabled()) {
@@ -57,7 +57,7 @@ public final class ParameterException extends RuntimeException {
         m_errors = errors;
     }
 
-    public final List getErrors() {
+    public final ErrorList getErrors() {
         return m_errors;
     }
 }

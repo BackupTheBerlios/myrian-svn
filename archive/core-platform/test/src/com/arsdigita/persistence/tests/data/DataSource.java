@@ -44,12 +44,12 @@ import java.security.*;
  * value of the correct type for the specified property.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/08/15 $
+ * @version $Revision: #8 $ $Date: 2003/10/23 $
  **/
 
 public class DataSource {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/DataSource.java#7 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/DataSource.java#8 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
 
     private static final Logger LOG = Logger.getLogger(DataSource.class);
 
@@ -124,7 +124,7 @@ public class DataSource {
     }
 
     private static final Column getColumn(Property p) {
-	Root root = Root.getRoot();
+	Root root = SessionManager.getSession().getMetadataRoot().getRoot();
 	ObjectMap om = root.getObjectMap
 	    (root.getObjectType(p.getContainer().getQualifiedName()));
 	Mapping m = om.getMapping(Path.get(p.getName()));

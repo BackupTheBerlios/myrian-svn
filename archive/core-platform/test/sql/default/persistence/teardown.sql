@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/test/sql/default/persistence/teardown.sql#10 $
--- $DateTime: 2003/08/15 13:46:34 $
+-- $Id: //core-platform/dev/test/sql/default/persistence/teardown.sql#11 $
+-- $DateTime: 2003/10/23 15:28:18 $
 
 
 --
@@ -20,11 +20,11 @@
 -- tests to run.
 --
 -- @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
--- @version $Revision: #10 $ $Date: 2003/08/15 $
+-- @version $Revision: #11 $ $Date: 2003/10/23 $
 --
 
 -- Right now this is duplicated from the individual files. This should
 -- be fixed at some point.
 
 drop table PLSQLTestTable;
-@@ aggressive-teardown.sql
+@@ ../../default/persistence/aggressive-teardown.sql

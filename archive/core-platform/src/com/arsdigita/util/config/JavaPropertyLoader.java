@@ -22,20 +22,15 @@ import java.util.*;
 import org.apache.log4j.Logger;
 
 /**
- * Subject to change.
- *
- * An implementation of <code>ParameterLoader</code> that uses standard
- * Java properties to store and retrieve values.
- *
- * @see com.arsdigita.util.parameter.ParameterLoader
- * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/config/JavaPropertyLoader.java#1 $
+ * @deprecated Use {@link com.arsdigita.util.JavaPropertyReader}
+ * instead
  */
-public class JavaPropertyLoader implements ParameterLoader {
+public class JavaPropertyLoader extends JavaPropertyReader
+        implements ParameterLoader {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/config/JavaPropertyLoader.java#1 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/config/JavaPropertyLoader.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/26 15:31:04 $";
+        "$DateTime: 2003/10/23 15:28:18 $";
 
     private static final Logger s_log = Logger.getLogger
         (JavaPropertyLoader.class);
@@ -49,17 +44,9 @@ public class JavaPropertyLoader implements ParameterLoader {
      * property values; it cannot be null
      */
     public JavaPropertyLoader(final Properties props) {
-        Assert.exists(props, Properties.class);
+        super(props);
 
         m_props = props;
-    }
-
-    public final void load(final InputStream in) {
-        try {
-            m_props.load(in);
-        } catch (IOException ioe) {
-            throw new UncheckedWrapperException(ioe);
-        }
     }
 
     public final ParameterValue load(final Parameter param) {
@@ -74,9 +61,7 @@ public class JavaPropertyLoader implements ParameterLoader {
         if (m_props.containsKey(key)) {
             final ParameterValue value = new ParameterValue();
 
-            value.setString(m_props.getProperty(key));
-
-            param.unmarshal(value);
+            value.setObject(param.read(this, value.getErrors()));
 
             return value;
         } else {

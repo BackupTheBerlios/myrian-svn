@@ -64,7 +64,7 @@ public class StatementProfiler implements RDBMSProfiler {
                 for (Iterator it = statement.getEvents().iterator();
                      it.hasNext(); ) {
                     Event ev = (Event) it.next();
-                    type = Session.getObjectType(ev.getObject());
+                    type = ev.getSession().getObjectType(ev.getObject());
                     break;
                 }
             }

@@ -23,12 +23,12 @@ import java.util.*;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/09/02 $
+ * @version $Revision: #5 $ $Date: 2003/10/23 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Signature.java#4 $ by $Author: ashah $, $DateTime: 2003/09/02 11:56:35 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Signature.java#5 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
 
     private ArrayList m_paths = new ArrayList();
 
@@ -228,8 +228,8 @@ public class Signature {
     }
 
     public void addDefaultProperties(Path path) {
-        Root root = Root.getRoot();
         ObjectType type = getObjectType().getType(path);
+        Root root = type.getRoot();
         if (type.isKeyed()) {
             addPaths(path, root.getObjectMap(type).getFetchedPaths());
         } else {
@@ -241,8 +241,9 @@ public class Signature {
     }
 
     public void addDefaultProperties() {
-        Root root = Root.getRoot();
-        addPaths(root.getObjectMap(getObjectType()).getFetchedPaths());
+        ObjectType type = getObjectType();
+        Root root = type.getRoot();
+        addPaths(root.getObjectMap(type).getFetchedPaths());
     }
 
     private void addKeyProperties() {

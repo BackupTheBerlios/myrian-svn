@@ -25,15 +25,15 @@ import java.io.*;
  * BlobAd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/15 $
+ * @version $Revision: #3 $ $Date: 2003/10/23 $
  **/
 
 public class BlobAd extends SimpleAdapter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/adapters/BlobAd.java#2 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/adapters/BlobAd.java#3 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
 
     public BlobAd() {
-	super(Root.getRoot().getObjectType("global.Blob"), Types.BLOB);
+	super("global.Blob", Types.BLOB);
     }
 
     public void bind(PreparedStatement ps, int index, Object obj, int type)
@@ -44,7 +44,7 @@ public class BlobAd extends SimpleAdapter {
     }
 
     public Object fetch(ResultSet rs, String column) throws SQLException {
-        if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
+        if (DbHelper.getDatabase(rs) == DbHelper.DB_POSTGRES) {
             return rs.getBytes(column);
         } else {
             Blob blob = rs.getBlob(column);
@@ -57,15 +57,16 @@ public class BlobAd extends SimpleAdapter {
     }
 
     public boolean isMutation(Object value, int jdbcType) {
-        if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
-            return false;
-        } else {
-            return (value != null && jdbcType == Types.BLOB);
-        }
+        return (value != null && jdbcType == Types.BLOB);
     }
 
     public void mutate(ResultSet rs, String column, Object value, int jdbcType)
         throws SQLException {
+        if (DbHelper.getDatabase(rs) == DbHelper.DB_POSTGRES) {
+            // do nothing;
+            return;
+        }
+
         oracle.sql.BLOB blob =
             (oracle.sql.BLOB) rs.getBlob(column);
         OutputStream out = blob.getBinaryOutputStream();

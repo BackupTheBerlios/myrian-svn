@@ -28,9 +28,9 @@ import org.apache.log4j.Logger;
  */
 public final class Connections {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/jdbc/Connections.java#1 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/jdbc/Connections.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/26 15:31:04 $";
+        "$DateTime: 2003/10/23 15:28:18 $";
 
     private static final Logger s_log = Logger.getLogger(Connections.class);
 
@@ -71,6 +71,14 @@ public final class Connections {
             Assert.exists(conn, Connection.class);
 
             conn.setAutoCommit(false);
+
+	    // XXX Use connection metadata to find out if this is the
+	    // bad oracle.  Do we need to do this this often?
+	    //if (false) {
+	    //    final PreparedStatement stmt = conn.prepareStatement
+	    //        ("alter session set \"_push_join_union_view\" = false");
+	    //    stmt.execute();
+	    //}
 
             return conn;
         } catch (ClassNotFoundException e) {

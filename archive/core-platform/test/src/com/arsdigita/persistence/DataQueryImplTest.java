@@ -27,7 +27,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import com.arsdigita.persistence.metadata.Utilities;
-import com.arsdigita.db.ConnectionManager;
 
 import org.apache.log4j.Logger;
 
@@ -39,11 +38,11 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #18 $ $Date: 2003/09/04 $
+ * @version $Revision: #19 $ $Date: 2003/10/23 $
  */
 public class DataQueryImplTest extends DataQueryTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#18 $ by $Author: ashah $, $DateTime: 2003/09/04 16:38:12 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#19 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
 
     private static Logger s_log =
         Logger.getLogger(DataQueryImplTest.class.getName());
@@ -584,36 +583,32 @@ public class DataQueryImplTest extends DataQueryTest {
 
     public void testReachedEndHandling() throws java.sql.SQLException {
         DataQuery dq = getDefaultQuery();
-        Connection conn = ConnectionManager.getConnection();
+        Connection conn = getSession().getConnection();
+        PreparedStatement ps =
+            (java.sql.PreparedStatement)conn.prepareStatement
+            ("select entry_id, action, description, priority, " +
+             "action_time from t_data_query t");
         try {
-            PreparedStatement ps =
-                (java.sql.PreparedStatement)conn.prepareStatement
-                ("select entry_id, action, description, priority, " +
-                 "action_time from t_data_query t");
-            try {
-                ResultSet rs = ps.executeQuery();
-                checkRSandDQpositionFunctions(rs, dq);
+            ResultSet rs = ps.executeQuery();
+            checkRSandDQpositionFunctions(rs, dq);
 
-                // can't do first with a forward-only resultset.
-                while (rs.next()) {
-                    assertTrue("ResultSet and DataQuery next should match",
-                               dq.next());
-                    checkRSandDQpositionFunctions(rs, dq);
-                }
+            // can't do first with a forward-only resultset.
+            while (rs.next()) {
                 assertTrue("ResultSet and DataQuery next should match",
-                           !dq.next());
+                           dq.next());
                 checkRSandDQpositionFunctions(rs, dq);
-
-                // can't do previous with a forward-only resultset.
-
-                // also can't do last with a forward-only resultset...
-
-                rs.close();
-            } finally {
-                ps.close();
             }
+            assertTrue("ResultSet and DataQuery next should match",
+                       !dq.next());
+            checkRSandDQpositionFunctions(rs, dq);
+
+            // can't do previous with a forward-only resultset.
+
+            // also can't do last with a forward-only resultset...
+
+            rs.close();
         } finally {
-            ConnectionManager.returnConnection(conn);            
+            ps.close();
         }
     }
 

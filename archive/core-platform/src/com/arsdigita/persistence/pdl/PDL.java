@@ -30,6 +30,7 @@ import com.arsdigita.db.DbHelper;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.InputStream;
@@ -49,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.zip.ZipInputStream;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -60,20 +62,17 @@ import org.apache.log4j.Logger;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #23 $ $Date: 2003/08/15 $
+ * @version $Revision: #24 $ $Date: 2003/10/23 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#23 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#24 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
     private static boolean s_quiet = false;
 
-    // the abstract syntax tree root nod
-    private com.redhat.persistence.pdl.PDL m_pdl =
-        new com.redhat.persistence.pdl.PDL();
-    private StringBuffer m_file = new StringBuffer(1024*10);
+    private PDLCompiler m_pdlc = new PDLCompiler();
 
     /**
      * Generates the metadata that corresponds to the AST generated from the
@@ -82,9 +81,7 @@ public class PDL {
      * @param root the metadata root node to build the metadata beneath
      */
     public void generateMetadata(MetadataRoot root) {
-        m_pdl.emit(Root.getRoot());
-        m_pdl.emitVersioned();
-        MetadataRoot.loadPrimitives();
+        m_pdlc.emit(root);
     }
 
     /**
@@ -94,8 +91,9 @@ public class PDL {
      * @param filename the name of the PDL file read by "r"
      * @throws PDLException thrown on a parsing error.
      */
-    public void load(Reader r, String filename) throws PDLException {
-        m_pdl.load(r, filename);
+    public void load(final Reader r, final String filename)
+        throws PDLException {
+        m_pdlc.parse(r, filename);
     }
 
     /**
@@ -208,11 +206,24 @@ public class PDL {
             DbHelper.setDatabase(DbHelper.DB_ORACLE);
         }
 
-        List library = findPDLFiles((File[]) options.get("-library-path"));
-        List files = findPDLFiles((File[]) options.get("-path"));
-        files.addAll(Arrays.asList(args));
+        final PDLFilter filter =
+            new NameFilter(DbHelper.getDatabaseSuffix(), "pdl");
+        final HashSet output = new HashSet();
+        PDLFilter tracker = new PDLFilter() {
+            public boolean accept(String name) {
+                boolean result = filter.accept(name);
+                if (result) {
+                    output.add(name);
+                }
+                return result;
+            }
+        };
 
-        if (files.size() < 1) {
+        PDLCompiler compiler = new PDLCompiler();
+        parse(compiler, (File[]) options.get("-library-path"), filter);
+        parse(compiler, (File[]) options.get("-path"), tracker);
+        parse(compiler, args, tracker);
+        if (output.size() < 1) {
             if (s_quiet) {
                 return;
             }
@@ -227,13 +238,8 @@ public class PDL {
             setDebugDirectory(debugDir);
         }
 
-        List all = new LinkedList();
-        all.addAll(library);
-        all.addAll(files);
-
-        compilePDLFiles(all);
-
         MetadataRoot root = MetadataRoot.getMetadataRoot();
+        compiler.emit(root);
 
         String ddlDir = (String) options.get("-generate-ddl");
         if (ddlDir != null) {
@@ -249,10 +255,10 @@ public class PDL {
                 writer.setTestPDL(true);
             }
 
-            List tables = new ArrayList(Root.getRoot().getTables());
+            List tables = new ArrayList(root.getRoot().getTables());
             for (Iterator it = tables.iterator(); it.hasNext(); ) {
                 Table table = (Table) it.next();
-                if (!files.contains(Root.getRoot().getFilename(table))) {
+                if (!output.contains(root.getRoot().getFilename(table))) {
                     it.remove();
                 }
             }
@@ -260,6 +266,42 @@ public class PDL {
                 writer.write(tables);
             } catch (IOException ioe) {
                 throw new PDLException(ioe.getMessage());
+            }
+        }
+    }
+
+    private static void parse(PDLCompiler compiler, String[] path,
+                              PDLFilter filter) {
+        File[] fpath =new File[path.length];
+        for (int i = 0; i < path.length; i++) {
+            fpath[i] = new File(path[i]);
+        }
+        parse(compiler, fpath, filter);
+    }
+
+    private static void parse(PDLCompiler compiler, File[] path,
+                              PDLFilter filter) {
+        for (int i = 0; i < path.length; i++) {
+            File f = path[i];
+            if (!f.exists()) { continue; }
+            if (f.isDirectory()) {
+                new DirSource(f, filter).parse(compiler);
+            } else if (f.isFile()
+                       && (f.getName().endsWith(".jar")
+                           || f.getName().endsWith(".zip"))) {
+                try {
+                    ZipInputStream zis = new ZipInputStream
+                        (new FileInputStream(f));
+                    try {
+                        new ZipSource(zis, filter).parse(compiler);
+                    } finally {
+                        zis.close();
+                    }
+                } catch (IOException e) {
+                    throw new UncheckedWrapperException(e);
+                }
+            } else if (filter.accept(f.getPath())) {
+                new FileSource(f).parse(compiler);
             }
         }
     }
@@ -285,31 +327,16 @@ public class PDL {
     /**
      * Loads all the PDL files in a given directory
      */
-    public static void loadPDLFiles(File dir) {
-        ResourceManager rm = ResourceManager.getInstance();
-
-        File webAppRoot = rm.getWebappRoot();
-
-        // If we're not running inside a webapp, we don't want the wrong
-        // thing to happen.
-        try {
-            if ( webAppRoot != null ) {
-                dir = new File(webAppRoot.getCanonicalPath() + dir);
-            }
-        } catch (IOException e) {
-            throw new UncheckedWrapperException("cannot get file path", e);
-        }
-
+    public static MetadataRoot loadDirectory(File dir) {
         List files = findPDLFiles(dir);
         s_log.warn("Found " + files.size() + " files in the " +
                    dir.toString() + " directory.");
 
         try {
-            compilePDLFiles(files);
+            return compilePDLFiles(files);
         } catch (PDLException ex) {
             throw new UncheckedWrapperException
-                ("Persistence Initialization error while trying to " +
-                 "compile the PDL files", ex);
+                ("error while trying to compile PDL files", ex);
         }
     }
 
@@ -504,7 +531,7 @@ public class PDL {
      *
      * @param files array of PDL files to process
      */
-    public static void compilePDLFiles(Collection files)
+    public static MetadataRoot compilePDLFiles(Collection files)
         throws PDLException {
         StringBuffer sb = new StringBuffer();
         PDL pdl = new PDL();
@@ -527,13 +554,15 @@ public class PDL {
                     PDLOutputter.writePDL(MetadataRoot.getMetadataRoot(),
                                           new java.io.File(s_debugDirectory));
                 } catch (java.io.IOException ex) {
-                    s_log.error(
-                                "There was a problem generating debugging output", ex
-                                );
+                    s_log.error
+                        ("There was a problem generating debugging output",
+                         ex);
                 }
             }
         } else {
             throw new PDLException(sb.toString());
         }
+
+        return MetadataRoot.getMetadataRoot();
     }
 }

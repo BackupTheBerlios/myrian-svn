@@ -24,13 +24,13 @@ import org.apache.commons.beanutils.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/URLParameter.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/URLParameter.java#3 $
  */
 public class URLParameter extends StringParameter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/URLParameter.java#2 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/URLParameter.java#3 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/26 15:31:04 $";
+        "$DateTime: 2003/10/23 15:28:18 $";
 
     public URLParameter(final String name) {
         super(name);
@@ -42,12 +42,11 @@ public class URLParameter extends StringParameter {
         super(name, multiplicity, defaalt);
     }
 
-    protected Object unmarshal(final String value, final List errors) {
+    protected Object unmarshal(final String value, final ErrorList errors) {
         try {
             return new URL(value);
         } catch (MalformedURLException mue) {
-            errors.add(mue.getMessage());
-
+            errors.add(new ParameterError(this, mue));
             return null;
         }
     }

@@ -1,15 +1,17 @@
 package com.arsdigita.persistence.pdl;
 
+import java.io.File;
+
 /**
  * NameFilter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/09/26 $
+ * @version $Revision: #2 $ $Date: 2003/10/23 $
  **/
 
 public class NameFilter implements PDLFilter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/NameFilter.java#1 $ by $Author: justin $, $DateTime: 2003/09/26 16:16:05 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/NameFilter.java#2 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
 
     private final String m_suffix;
     private final String m_extension;
@@ -33,8 +35,9 @@ public class NameFilter implements PDLFilter {
         }
 
         idx = base.lastIndexOf('.');
+        int idx2 = base.lastIndexOf(File.separatorChar);
         String sfx;
-        if (idx > -1) {
+        if (idx > -1 && idx > idx2) {
             sfx = base.substring(idx + 1);
             return sfx.equals(m_suffix);
         } else {

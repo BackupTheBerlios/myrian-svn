@@ -139,8 +139,16 @@ public class XML {
                         " with " + handler.getClass());
         }
 
-        InputStream stream = ResourceManager.getInstance().getResourceAsStream(path);
-        Assert.exists(stream, InputStream.class);
+        if (path.startsWith("/")) {
+            path = path.substring(1);
+        }
+
+        ClassLoader cload = Thread.currentThread().getContextClassLoader();
+        InputStream stream = cload.getResourceAsStream(path);
+
+        if (stream == null) {
+            throw new IllegalArgumentException("no such resource: " + path);
+        }
 
         parse(stream, handler);
     }

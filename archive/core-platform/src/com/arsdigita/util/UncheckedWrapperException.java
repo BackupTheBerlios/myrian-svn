@@ -17,6 +17,9 @@ package com.arsdigita.util;
 
 import org.apache.log4j.Logger;
 
+import com.arsdigita.logging.Exceptions;
+import com.arsdigita.logging.ExceptionUnwrapper;
+
 /**
  * A wrapper exception that can be used to rethrow another
  * exception.
@@ -34,11 +37,22 @@ import org.apache.log4j.Logger;
  * <tt>new UncheckedWrapperException(e.getMessage(), e);</tt>
  *
  * @author David Eison
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/UncheckedWrapperException.java#6 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/UncheckedWrapperException.java#7 $
  */
 public class UncheckedWrapperException extends RuntimeException {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/UncheckedWrapperException.java#6 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/UncheckedWrapperException.java#7 $";
+
+    static {
+        Exceptions.registerUnwrapper(
+            UncheckedWrapperException.class,
+            new ExceptionUnwrapper() {
+                public Throwable unwrap(Throwable t) {
+                    UncheckedWrapperException ex = (UncheckedWrapperException)t;
+                    return ex.getRootCause();
+                }
+            });
+    }
 
     Throwable m_rootCause;
 

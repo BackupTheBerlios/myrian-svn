@@ -28,18 +28,27 @@ import java.io.*;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2003/09/09 $
+ * @version $Revision: #8 $ $Date: 2003/10/23 $
  **/
 
 public abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#7 $ by $Author: ashah $, $DateTime: 2003/09/09 16:10:19 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#8 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
 
+    private RDBMSEngine m_engine;
     private Operation m_op = null;
     private StringBuffer m_sql = new StringBuffer();
     private ArrayList m_bindings = new ArrayList();
     private ArrayList m_types = new ArrayList();
     private HashSet m_expanded = new HashSet();
+
+    void setEngine(RDBMSEngine engine) {
+        m_engine = engine;
+    }
+
+    public RDBMSEngine getEngine() {
+        return m_engine;
+    }
 
     public void clear() {
         m_op = null;
@@ -73,6 +82,7 @@ public abstract class SQLWriter {
     }
 
     public void bind(PreparedStatement ps, StatementLifecycle cycle) {
+        Root root = m_engine.getSession().getRoot();
         for (int i = 0; i < m_bindings.size(); i++) {
             int index = i+1;
             Object obj = m_bindings.get(i);
@@ -83,7 +93,7 @@ public abstract class SQLWriter {
                 if (obj == null) {
                     ps.setNull(index, type);
                 } else {
-                    Adapter ad = Adapter.getAdapter(obj.getClass());
+                    Adapter ad = root.getAdapter(obj.getClass());
                     ad.bind(ps, index, obj, type);
                 }
                 if (cycle != null) { cycle.endSet(); }
@@ -160,9 +170,16 @@ public abstract class SQLWriter {
     }
 
     public void write(SQLToken start, SQLToken end, boolean map) {
-        Root r = Root.getRoot();
+        Root r = m_engine.getSession().getRoot();
 
         for (SQLToken t = start; t != end; t = t.getNext()) {
+            if (t.isRaw()) {
+                // XXX: ignore escapes for now
+                String raw = t.getImage();
+                write(raw.substring(4, raw.length() - 1));
+                continue;
+            }
+
             if (t.isBind()) {
                 write(Path.get(t.getImage()));
                 continue;
@@ -263,7 +280,7 @@ public abstract class SQLWriter {
     }
 
     public void write(Query q) {
-        QGen qg = new QGen(q);
+        QGen qg = new QGen(getEngine(), q);
         write((Operation) qg.generate());
     }
 
@@ -281,7 +298,9 @@ public abstract class SQLWriter {
     }
 
     public void write(Expression.Value v) {
-        writeBind(v.getValue(), RDBMSEngine.getType(v.getValue()));
+        int type = RDBMSEngine.getType
+            (getEngine().getSession().getRoot(), v.getValue());
+        writeBind(v.getValue(), type);
     }
 
     public void write(Expression.Passthrough e) {

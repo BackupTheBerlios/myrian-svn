@@ -22,19 +22,20 @@ import com.redhat.persistence.PersistentCollection;
  * DataCollectionImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2003/08/15 $
+ * @version $Revision: #9 $ $Date: 2003/10/23 $
  **/
 
 class DataCollectionImpl extends DataQueryImpl implements DataCollection {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataCollectionImpl.java#8 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataCollectionImpl.java#9 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
 
     DataCollectionImpl(Session ssn, PersistentCollection pc) {
         super(ssn, pc);
     }
 
     public ObjectType getObjectType() {
-        return C.fromType(getOriginal().getSignature().getObjectType());
+        return C.fromType(getSession().getMetadataRoot(),
+                          getOriginal().getSignature().getObjectType());
     }
 
     public DataObject getDataObject() {

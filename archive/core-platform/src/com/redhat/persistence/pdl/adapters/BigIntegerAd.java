@@ -23,16 +23,15 @@ import java.sql.*;
  * BigIntegerAd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/15 $
+ * @version $Revision: #3 $ $Date: 2003/10/23 $
  **/
 
 public class BigIntegerAd extends SimpleAdapter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/adapters/BigIntegerAd.java#2 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/adapters/BigIntegerAd.java#3 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
 
     public BigIntegerAd() {
-	super(Root.getRoot().getObjectType("global.BigInteger"),
-              Types.NUMERIC);
+	super("global.BigInteger", Types.NUMERIC);
     }
 
     public void bind(PreparedStatement ps, int index, Object obj, int type)

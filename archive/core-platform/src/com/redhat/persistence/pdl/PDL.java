@@ -15,7 +15,6 @@
 
 package com.redhat.persistence.pdl;
 
-import com.redhat.persistence.Adapter;
 import com.redhat.persistence.common.*;
 import com.redhat.persistence.pdl.nodes.*;
 import com.redhat.persistence.metadata.*;
@@ -31,36 +30,23 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2003/10/10 $
+ * @version $Revision: #12 $ $Date: 2003/10/23 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDL.java#11 $ by $Author: vadim $, $DateTime: 2003/10/10 15:02:04 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDL.java#12 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
-    private ErrorReport m_errors = new ErrorReport();
-    private SymbolTable m_symbols;
-    private HashSet m_links = new HashSet();
-    private HashSet m_fks = new HashSet();
-    private HashMap m_propertyCollisions = new HashMap();
-    private HashMap m_emitted = new HashMap();
-    private HashMap m_nodes = new HashMap();
+    private boolean m_autoLoad;
 
-    public PDL() {}
-
-    void emit(Node node, Object emitted) {
-        m_nodes.put(emitted, node);
-        m_emitted.put(node, emitted);
+    public PDL() {
+        this(true);
     }
 
-    Node getNode(Object emitted) {
-        return (Node) m_nodes.get(emitted);
-    }
-
-    Object getEmitted(Node node) {
-        return m_emitted.get(node);
+    private PDL(boolean autoLoad) {
+        m_autoLoad = autoLoad;
     }
 
     public void load(Reader r, String filename) {
@@ -81,6 +67,12 @@ public class PDL {
         load(new InputStreamReader(is), s);
     }
 
+    private void emitGlobal(Root root) {
+        PDL glob = new PDL(false);
+        glob.loadResource("com/redhat/persistence/pdl/global.pdl");
+        glob.emit(root);
+    }
+
     private String linkName(AssociationNd assn) {
 	Model m = Model.getInstance(assn.getFile().getModel().getName());
 	return m.getQualifiedName() + "." +
@@ -96,10 +88,37 @@ public class PDL {
     }
 
     private Root m_root;
+    private ErrorReport m_errors;
+    private SymbolTable m_symbols;
+    private HashSet m_links;
+    private HashSet m_fks;
+    private HashMap m_propertyCollisions;
+    private HashMap m_emitted;
+    private HashMap m_nodes;
+
+    void emit(Node node, Object emitted) {
+        m_nodes.put(emitted, node);
+        m_emitted.put(node, emitted);
+    }
+
+    Node getNode(Object emitted) {
+        return (Node) m_nodes.get(emitted);
+    }
+
+    Object getEmitted(Node node) {
+        return m_emitted.get(node);
+    }
 
     public void emit(Root root) {
 	m_root = root;
+        m_errors = new ErrorReport();
         m_symbols = new SymbolTable(m_errors, m_root);
+        m_links = new HashSet();
+        m_fks = new HashSet();
+        m_propertyCollisions = new HashMap();
+        m_emitted = new HashMap();
+        m_nodes = new HashMap();
+
         m_ast.traverse(new Node.Switch() {
             public void onNode(Node nd) {
                 for (Iterator it = nd.getFields().iterator(); it.hasNext(); ) {
@@ -113,13 +132,13 @@ public class PDL {
 
         m_errors.check();
 
+        if (m_autoLoad && root.getObjectType("global.String") == null) {
+            emitGlobal(root);
+        }
+
         for (Iterator it = m_root.getObjectTypes().iterator();
 	     it.hasNext(); ) {
             m_symbols.addEmitted((ObjectType) it.next());
-        }
-
-        if (root.getObjectType("global.String") == null) {
-            loadResource("com/redhat/persistence/pdl/global.pdl");
         }
 
         m_ast.traverse(new Node.Switch() {
@@ -366,7 +385,7 @@ public class PDL {
 		    try {
 			Class adapterClass = Class.forName(acn.getName());
 			Adapter ad = (Adapter) adapterClass.newInstance();
-			Adapter.addAdapter(javaClass, ad);
+			m_root.addAdapter(javaClass, ad);
 		    } catch (IllegalAccessException e) {
 			m_errors.fatal(acn, e.getMessage());
 		    } catch (ClassNotFoundException e) {
@@ -389,7 +408,7 @@ public class PDL {
                 ObjectType ot = m_symbols.getEmitted(pnd.getType());
                 Column col = lookup((ColumnNd)n);
                 if (col.getType() == Integer.MIN_VALUE) {
-                    Adapter ad = Adapter.getAdapter(ot.getJavaClass());
+                    Adapter ad = m_root.getAdapter(ot.getJavaClass());
                     col.setType(ad.defaultJDBCType());
                 }
             }
@@ -1336,7 +1355,8 @@ public class PDL {
         for (int i = 0; i < args.length; i++) {
             pdl.load(new FileReader(args[i]), args[i]);
         }
-        pdl.emit(Root.getRoot());
+        Root root = new Root();
+        pdl.emit(root);
     }
 
 }

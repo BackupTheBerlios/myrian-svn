@@ -117,13 +117,13 @@ import org.apache.log4j.Logger;
  * no query string.</p>
  *
  * @author Justin Ross &lt;<a href="mailto:jross@redhat.com">jross@redhat.com</a>&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/servlet/HttpResourceLocator.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/servlet/HttpResourceLocator.java#2 $
  */
 public class HttpResourceLocator {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/servlet/HttpResourceLocator.java#1 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/servlet/HttpResourceLocator.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/26 15:31:04 $";
+        "$DateTime: 2003/10/23 15:28:18 $";
 
     private static final Logger s_log = Logger.getLogger
         (HttpResourceLocator.class);
@@ -327,6 +327,8 @@ public class HttpResourceLocator {
     }
 
     final void toString(final StringBuffer buffer) {
+	buffer.append("http://");
+
         m_host.toString(buffer);
 
         buffer.append(m_contextPath);
@@ -336,7 +338,9 @@ public class HttpResourceLocator {
             buffer.append(m_pathInfo);
         }
 
-        m_params.toString(buffer);
+	if (m_params != null) {
+	    m_params.toString(buffer);
+	}
     }
 
     /**

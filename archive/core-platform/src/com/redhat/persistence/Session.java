@@ -30,24 +30,25 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2003/09/30 $
+ * @version $Revision: #9 $ $Date: 2003/10/23 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Session.java#8 $ by $Author: ashah $, $DateTime: 2003/09/30 13:19:19 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Session.java#9 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
     private static final PersistentObjectSource POS =
         new PersistentObjectSource();
 
+    private final Root m_root;
     private final Engine m_engine;
     private final QuerySource m_qs;
 
     private HashMap m_odata = new HashMap();
 
-    private EventStream m_events = new EventStream();
+    private EventStream m_events = new EventStream(this);
 
     private Set m_violations = new HashSet();
 
@@ -58,9 +59,24 @@ public class Session {
 
     private Event m_beforeFlushMarker = null;
 
-    public Session(Engine engine, QuerySource source) {
+    public Session(Root root, Engine engine, QuerySource source) {
+        m_root = root;
         m_engine = engine;
+        m_engine.setSession(this);
         m_qs = source;
+        m_qs.setSession(this);
+    }
+
+    public Root getRoot() {
+        return m_root;
+    }
+
+    Engine getEngine() {
+        return m_engine;
+    }
+
+    public QuerySource getQuerySource() {
+        return m_qs;
     }
 
     EventStream getEventStream() { return m_events; }
@@ -376,24 +392,25 @@ public class Session {
         }
     }
 
-    public static Object getObject(PropertyMap pmap) {
-	Adapter ad = Adapter.getAdapter(pmap.getObjectType());
+    public Object getObject(PropertyMap pmap) {
+	Adapter ad = m_root.getAdapter(pmap.getObjectType());
 	return ad.getObject(pmap.getObjectType(), pmap);
     }
 
-    public static ObjectType getObjectType(Object obj) {
+    public ObjectType getObjectType(Object obj) {
         return getAdapter(obj).getObjectType(obj);
     }
 
-    static Adapter getAdapter(Object obj) {
-        return Adapter.getAdapter(obj.getClass());
+    Adapter getAdapter(Object obj) {
+        return m_root.getAdapter(obj.getClass());
     }
 
-    public static ObjectMap getObjectMap(Object obj) {
-        return Root.getRoot().getObjectMap(getAdapter(obj).getObjectType(obj));
+    public ObjectMap getObjectMap(Object obj) {
+        ObjectType type = getAdapter(obj).getObjectType(obj);
+        return type.getRoot().getObjectMap(type);
     }
 
-    public static PropertyMap getProperties(Object obj) {
+    public PropertyMap getProperties(Object obj) {
         return getAdapter(obj).getProperties(obj);
     }
 
@@ -668,10 +685,6 @@ public class Session {
         }
     }
 
-    Engine getEngine() {
-        return m_engine;
-    }
-
     void load(Object obj, Property prop, Object value) {
         if (LOG.isDebugEnabled()) {
             trace("load", new Object[] {obj, prop.getName(), value});
@@ -730,13 +743,13 @@ public class Session {
         process(m_afterActivate, activated);
     }
 
-    static Object getSessionKey(PropertyMap pmap) {
+    Object getSessionKey(PropertyMap pmap) {
         ObjectType ot = pmap.getObjectType();
-        Adapter ad = Adapter.getAdapter(ot);
+        Adapter ad = m_root.getAdapter(ot);
         return ad.getSessionKey(ot, pmap);
     }
 
-    static Object getSessionKey(Object obj) {
+    Object getSessionKey(Object obj) {
         Adapter ad = getAdapter(obj);
         return ad.getSessionKey(obj);
     }
@@ -862,7 +875,8 @@ public class Session {
 		}
             } else if (values == null) {
                 throw new MetadataException
-                    (prop, "Query for: " + prop.getContainer() + "." + prop
+                    (prop.getRoot(), prop,
+                     "Query for: " + prop.getContainer() + "." + prop
                      + " failed to return rows" );
 	    }
 

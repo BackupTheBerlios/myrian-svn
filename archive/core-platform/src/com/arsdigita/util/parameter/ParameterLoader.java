@@ -18,16 +18,14 @@ package com.arsdigita.util.parameter;
 import java.util.*;
 
 /**
- * Subject to change.
- *
- * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterLoader.java#1 $
+ * @deprecated Use {@link
+ * com.arsdigita.util.parameter.ParameterReader} instead.
  */
-public interface ParameterLoader {
+public interface ParameterLoader extends ParameterReader {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterLoader.java#1 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterLoader.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/26 15:31:04 $";
+        "$DateTime: 2003/10/23 15:28:18 $";
 
     ParameterValue load(Parameter param);
 }
