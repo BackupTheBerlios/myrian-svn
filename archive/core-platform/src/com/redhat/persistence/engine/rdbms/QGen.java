@@ -30,14 +30,35 @@ import org.apache.log4j.Logger;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/08/26 $
+ * @version $Revision: #5 $ $Date: 2003/09/04 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/QGen.java#4 $ by $Author: ashah $, $DateTime: 2003/08/26 15:50:26 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/QGen.java#5 $ by $Author: ashah $, $DateTime: 2003/09/04 14:00:08 $";
 
     private static final Logger LOG = Logger.getLogger(QGen.class);
+
+    private static final Collection s_functions = new HashSet();
+    static {
+        String[] functions = {
+            /* sql standard functions supported by both oracle and postgres.
+             * there is an added caveat that the function uses normal function
+             * syntax and not keywords as arguments (e.g. trim)
+             */
+            "current_date", "current_timestamp",
+            "upper", "lower",
+            // postgres supported oracle-isms
+            "substr", "length", "nvl"
+        };
+        for (int i = 0; i < functions.length; i++) {
+            s_functions.add(Path.get(functions[i]));
+        }
+    }
+
+    private static final boolean isAllowedFunction(Path p) {
+        return s_functions.contains(p);
+    }
 
     private static final HashMap SOURCES = new HashMap();
     private static final HashMap BLOCKS = new HashMap();
@@ -617,9 +638,14 @@ class QGen {
                          Root r = Root.getRoot();
                          if (r.hasObjectType(path.getPath())) {
                              return path;
-                         } else {
+                         } else if (m_query.getSignature().exists(path)) {
                              genPath(path);
                              return getColumn(path);
+                         } else if (isAllowedFunction(path)) {
+                             return path;
+                         } else {
+                             throw new RDBMSException
+                                 ("unknown value in expression: " + path) {};
                          }
                      }
                  });
