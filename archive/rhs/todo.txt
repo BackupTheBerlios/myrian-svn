@@ -6,3 +6,6 @@
  * remove dead sql scripts
  * import -> resource search
  * allow adapters to fault properties before object has been resurrected
+ * make session aware of both object identity and datastore identity
+   and all the various permutations and mappings in between the two
+   kinds of identity
