@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/categorization/Category.pdl#26 $
-// $DateTime: 2003/11/17 15:52:45 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/categorization/Category.pdl#27 $
+// $DateTime: 2004/01/20 17:56:18 $
 
 model com.arsdigita.categorization;
 
@@ -40,17 +40,18 @@ object type Category extends ACSObject {
 }
 
 
-association {
-    Category[0..n] rootCategory = join acs_objects.object_id
-                                    to cat_root_cat_object_map.object_id,
-                                  join cat_root_cat_object_map.category_id
-                                    to cat_categories.category_id;
-    ACSObject[0..n] categoryOwner = join cat_categories.category_id
-                                      to cat_root_cat_object_map.category_id,
-                                    join cat_root_cat_object_map.object_id
+object type UseContext {
+    BigDecimal[1..1] id = cat_root_cat_object_map.id;
+
+    Category[0..n] rootCategory =join cat_root_cat_object_map.category_id
+                                   to cat_categories.category_id;
+    ACSObject[0..n] categoryOwner = join cat_root_cat_object_map.object_id
                                       to acs_objects.object_id;
 
     String[0..1] useContext = cat_root_cat_object_map.use_context;
+
+    unique (categoryOwner, useContext);
+    object key (id);
 }
 
 association {
