@@ -6,16 +6,20 @@ import com.arsdigita.db.DbHelper;
 import java.sql.*;
 import java.util.*;
 
+import org.apache.log4j.Logger;
+
 /**
  * Schema
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/07/06 $
  **/
 
 public class Schema {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/Schema.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/Schema.java#2 $ by $Author: vadim $, $DateTime: 2004/07/06 16:21:13 $";
+
+    private final static Logger LOG = Logger.getLogger(Schema.class);
 
     private Schema() {}
 
@@ -40,6 +44,7 @@ public class Schema {
             for (int i = 0; i < tables.size(); i++) {
                 Table table = (Table) tables.get(i);
                 String sql = table.getSQL();
+                LOG.debug(sql);
                 stmt.execute(sql);
                 addDeferred(constraints, table);
             }
@@ -48,6 +53,7 @@ public class Schema {
                 Constraint con = (Constraint) constraints.get(i);
                 String sql = "alter table " + con.getTable().getName() +
                     " add " + con.getSQL();
+                LOG.debug(sql);
                 stmt.execute(sql);
             }
         } finally {
@@ -72,12 +78,14 @@ public class Schema {
                 Constraint con = (Constraint) constraints.get(i);
                 String sql = "alter table " + con.getTable().getName() +
                     " drop constraint " + con.getName();
+                LOG.debug(sql);
                 stmt.execute(sql);
             }
 
             for (int i = 0; i < tables.size(); i++) {
                 Table table = (Table) tables.get(i);
                 String sql = "drop table " + table.getName();
+                LOG.debug(sql);
                 stmt.execute(sql);
             }
         } finally {
