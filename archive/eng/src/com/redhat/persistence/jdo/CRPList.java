@@ -14,12 +14,12 @@ import javax.jdo.JDOHelper;
  * CRPList
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/07/08 $
+ * @version $Revision: #4 $ $Date: 2004/07/08 $
  **/
 
 class CRPList extends CRPCollection implements List {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/CRPList.java#3 $ by $Author: rhs $, $DateTime: 2004/07/08 11:51:12 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/CRPList.java#4 $ by $Author: vadim $, $DateTime: 2004/07/08 13:45:51 $";
 
     transient private Session m_ssn;
     transient private Object m_object;
@@ -27,6 +27,8 @@ class CRPList extends CRPCollection implements List {
     transient private Property m_container;
     transient private Property m_index;
     transient private Property m_element;
+
+    CRPList() {}
 
     CRPList(Session ssn, Object object, Property property) {
         m_ssn = ssn;
@@ -74,8 +76,6 @@ class CRPList extends CRPCollection implements List {
             }
         }
     }
-
-    CRPList() {}
 
     Session ssn() {
         if (m_ssn == null) {
