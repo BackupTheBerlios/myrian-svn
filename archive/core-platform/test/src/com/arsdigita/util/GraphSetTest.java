@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ *
+ * The contents of this file are subject to the CCM Public
+ * License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of
+ * the License at http://www.redhat.com/licenses/ccmpl.html
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ */
+
 package com.arsdigita.util;
 
 import java.util.ArrayList;
@@ -7,26 +22,19 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-// The easiest way to run this is to add the following target to
-// //core-platform/dev/build.xml:
-// 
-//  <target name="graph-test">
-//    <junit printsummary="yes" fork="yes" haltonfailure="yes">
-//      <classpath refid="build.classpath"/>
-//      <formatter type="plain"/>
-//      <test name="GraphTest"/>
-//      <test name="GraphUtilTest"/>
-//    </junit>
-//  </target>
-
-public class GraphTest extends TestCase {
+/**
+ * @author Vadim Nasardinov (vadimn@redhat.com)
+ * @version $Date: 2003/01/22 $
+ * @since 2003-01-22
+ **/
+public class GraphSetTest extends TestCase {
     private static final String NODE_A = "A";
     private static final String NODE_B = "B";
     private static final String NODE_C = "C";
     private static final String NODE_D = "D";
 
     public void testAddNode() {
-        Graph graph = new Graph();
+        Graph graph = new GraphSet();
         graph.addNode(NODE_A);
         assertTrue("node count=1", graph.nodeCount() == 1);
         graph.addNode(NODE_B);
@@ -35,13 +43,13 @@ public class GraphTest extends TestCase {
         assertTrue("after adding twice, node count=2", graph.nodeCount() == 2);
 
         assertTrue("A has no outgoing edges",
-                   !graph.getOutgoingEdges(NODE_A).iterator().hasNext());
+                   graph.getOutgoingEdges(NODE_A).size() == 0);
         assertTrue("A has no incoming edges", 
-                   !graph.getIncomingEdges(NODE_A).hasNext());
+                   graph.getIncomingEdges(NODE_A).size() == 0);
     }
 
     public void testAddEdge() {
-        Graph graph = new Graph();
+        Graph graph = new GraphSet();
         final String label = "a to b";
         graph.addEdge(NODE_A, NODE_B, label);
         countEdges(graph);
@@ -66,7 +74,7 @@ public class GraphTest extends TestCase {
     }
 
     public void testCopy() {
-        Graph graphX = new Graph();
+        Graph graphX = new GraphSet();
         graphX.setLabel("X");
         graphX.addEdge(NODE_A, NODE_B, "a -> b");
         graphX.addEdge(NODE_A, NODE_C, "a -> c");

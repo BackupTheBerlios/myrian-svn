@@ -1,6 +1,19 @@
-package com.arsdigita.util;
+/*
+ * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ *
+ * The contents of this file are subject to the CCM Public
+ * License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of
+ * the License at http://www.redhat.com/licenses/ccmpl.html
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ */
 
-import com.arsdigita.util.Assert;
+package com.arsdigita.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,17 +23,26 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
+/**
+ * A collection of methods that operate on {@link com.arsdigita.util.Graph
+ * graphs}.
+ *
+ * @author Archit Shah (ashah@mit.edu)
+ * @author Vadim Nasardinov (vadimn@redhat.com)
+ * @version $Date: 2003/01/22 $
+ * @since 2003-01-22
+ **/
 public class GraphUtil {
-    private GraphUtil() { } // prevent construction
+    private GraphUtil() {}
 
     /**
-     * Finds a path in g from begin to end
+     * Finds a path in <code>graph</code> from begin to end
      * 
      *
      * @returns list of edges representing the found path
      **/
-    public static final List findPath(Graph g, Object begin, Object end) {
-        List path = new ArrayList(findPathRecurse(g, begin, end, new HashSet()));
+    public static final List findPath(Graph graph, Object begin, Object end) {
+        List path = new ArrayList(findPathRecurse(graph, begin, end, new HashSet()));
         Collections.reverse(path);
         return path;
     }
@@ -92,7 +114,7 @@ public class GraphUtil {
      **/
     public static Graph nodesReachableFrom(Graph graph, Object start) {
         Assert.assertTrue(graph.hasNode(start));
-        Graph result = new Graph();
+        Graph result = new GraphSet();
         result.addNode(start);
         Set processedTails = new HashSet();
         nodesReachableRecurse(graph, start, processedTails, result);

@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ *
+ * The contents of this file are subject to the CCM Public
+ * License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of
+ * the License at http://www.redhat.com/licenses/ccmpl.html
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ */
+
 package com.arsdigita.util;
 
 import java.util.Arrays;
@@ -7,6 +22,11 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+/**
+ * @author Vadim Nasardinov (vadimn@redhat.com)
+ * @version $Date: 2003/01/22 $
+ * @since 2003-01-22
+ **/
 public class GraphUtilTest extends TestCase {
     private static final String NODE_A = "A";
     private static final String NODE_B = "B";
@@ -17,7 +37,7 @@ public class GraphUtilTest extends TestCase {
     private Graph m_graph;
 
     public void setUp() {
-        m_graph = new Graph();
+        m_graph = new GraphSet();
         m_graph.addEdge(NODE_A, NODE_C, "a -> c");
         m_graph.addEdge(NODE_B, NODE_C, "b -> c");
         m_graph.addEdge(NODE_C, NODE_D, "c -> d");
@@ -56,7 +76,7 @@ public class GraphUtilTest extends TestCase {
         Collections.sort(expectedResult);
         assertEquals("nodes reachable from B", expectedResult, computedResult);
 
-        Graph simpleGraph = new Graph();
+        Graph simpleGraph = new GraphSet();
         simpleGraph.setLabel("simple_graph");
         simpleGraph.addEdge(NODE_A, NODE_B, "a -> b");
         Graph result = GraphUtil.nodesReachableFrom
@@ -71,7 +91,7 @@ public class GraphUtilTest extends TestCase {
         List sinkNodes = GraphUtil.getSinkNodes(m_graph);
         assertEquals("sink node count in m_graph", 0, sinkNodes.size());
 
-        Graph gg = new Graph();
+        Graph gg = new GraphSet();
         gg.addEdge(NODE_A, NODE_B, "a -> b");
         gg.addEdge(NODE_A, NODE_C, "a -> c");
         gg.addEdge(NODE_B, NODE_D, "b -> d");
