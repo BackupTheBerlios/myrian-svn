@@ -22,6 +22,6 @@ public class DuplicateObjectException extends ProtoException {
     public Object getObject() { return m_object; }
 
     public String getMessage() {
-        return "object : " + m_object + " already exists";
+        return "object : " + Session.str(m_object) + " already exists";
     }
 }
