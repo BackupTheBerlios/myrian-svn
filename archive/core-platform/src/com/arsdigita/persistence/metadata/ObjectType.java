@@ -31,12 +31,12 @@ import com.arsdigita.util.StringUtils;
  * be marked as special "key" properties.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/06 $
+ * @version $Revision: #4 $ $Date: 2002/08/07 $
  **/
 
 public class ObjectType extends CompoundType {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ObjectType.java#3 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ObjectType.java#4 $ by $Author: rhs $, $DateTime: 2002/08/07 15:23:06 $";
 
     private static boolean m_optimizeDefault = true;
 
@@ -722,7 +722,8 @@ public class ObjectType extends CompoundType {
                                      "a supertype.");
             }
             if (!m_referenceKey.isForeignKey()) {
-                new ForeignKey(null, m_referenceKey, m_super.getColumn());
+                new ForeignKey(null, m_referenceKey, m_super.getColumn(),
+                               true);
             }
         }
 
@@ -733,7 +734,7 @@ public class ObjectType extends CompoundType {
 
         for (Iterator it = getJoinPaths(); it.hasNext(); ) {
             JoinPath jp = (JoinPath) it.next();
-            jp.generateForeignKeys();
+            jp.generateForeignKeys(true);
         }
     }
 

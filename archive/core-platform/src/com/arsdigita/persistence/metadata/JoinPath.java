@@ -27,7 +27,7 @@ import java.io.PrintStream;
  * particular columns to join, and in what order.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinPath.java#4 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinPath.java#5 $
  * @since 4.6
  *
  * @invariant getPath() != null 
@@ -35,7 +35,7 @@ import java.io.PrintStream;
 
 public class JoinPath extends Element {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinPath.java#4 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinPath.java#5 $ by $Author: rhs $, $DateTime: 2002/08/07 15:23:06 $";
 
     private List m_path;
     // a List of JoinElements
@@ -137,14 +137,14 @@ public class JoinPath extends Element {
         }
     }
 
-    void generateForeignKeys() {
+    void generateForeignKeys(boolean cascade) {
         for (int i = 0; i < m_path.size(); i++) {
             JoinElement je = getJoinElement(i);
             if (je.getTo().isUniqueKey() && !je.getFrom().isForeignKey()) {
-                new ForeignKey(null, je.getFrom(), je.getTo());
+                new ForeignKey(null, je.getFrom(), je.getTo(), cascade);
             } else if (je.getFrom().isUniqueKey() &&
                        !je.getTo().isForeignKey()) {
-                new ForeignKey(null, je.getTo(), je.getFrom());
+                new ForeignKey(null, je.getTo(), je.getFrom(), cascade);
             }
         }
 

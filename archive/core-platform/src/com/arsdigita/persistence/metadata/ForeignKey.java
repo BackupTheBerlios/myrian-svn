@@ -4,17 +4,18 @@ package com.arsdigita.persistence.metadata;
  * ForeignKey
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/08/06 $
+ * @version $Revision: #2 $ $Date: 2002/08/07 $
  **/
 
 public class ForeignKey extends Constraint {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ForeignKey.java#1 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ForeignKey.java#2 $ by $Author: rhs $, $DateTime: 2002/08/07 15:23:06 $";
 
     private UniqueKey m_key;
+    private boolean m_cascade;
 
     public ForeignKey(Table table, String name, Column[] columns,
-                      UniqueKey key) {
+                      UniqueKey key, boolean cascade) {
         super(table, name, columns);
         if (key == null) {
             throw new IllegalArgumentException(
@@ -22,6 +23,7 @@ public class ForeignKey extends Constraint {
                 );
         }
         m_key = key;
+        m_cascade = cascade;
 
         Column[] fk = getColumns();
         Column[] uk = m_key.getColumns();
@@ -49,9 +51,18 @@ public class ForeignKey extends Constraint {
         m_key.addForeignKey(this);
     }
 
-    public ForeignKey(String name, Column from, Column to) {
+    public ForeignKey(Table table, String name, Column[] columns,
+                      UniqueKey key) {
+        this(table, name, columns, key, false);
+    }
+
+    public ForeignKey(String name, Column from, Column to, boolean cascade) {
         this(from.getTable(), name, new Column[] {from},
-             to.getTable().getUniqueKey(new Column[] {to}));
+             to.getTable().getUniqueKey(new Column[] {to}), cascade);
+    }
+
+    public ForeignKey(String name, Column from, Column to) {
+        this(name, from, to, false);
     }
 
     public UniqueKey getUniqueKey() {
@@ -80,6 +91,10 @@ public class ForeignKey extends Constraint {
         result.append(m_key.getTable().getName());
         result.append(m_key.getColumnList());
 
+        if (m_cascade) {
+            result.append(" on delete cascade");
+        }
+
         return result.toString();
     }
 
@@ -97,6 +112,10 @@ public class ForeignKey extends Constraint {
         result.append("\n      references ");
         result.append(m_key.getTable().getName());
         result.append(m_key.getColumnList());
+
+        if (m_cascade) {
+            result.append(" on delete cascade");
+        }
 
         return result.toString();
     }

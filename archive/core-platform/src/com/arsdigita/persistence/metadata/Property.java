@@ -28,7 +28,7 @@ import java.util.*;
  * REQUIRED, and COLLECTION.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/06 $
+ * @version $Revision: #5 $ $Date: 2002/08/07 $
  **/
 
 public class Property extends Element {
@@ -82,7 +82,7 @@ public class Property extends Element {
         "[0..n]"
     };
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Property.java#4 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Property.java#5 $ by $Author: rhs $, $DateTime: 2002/08/07 15:23:06 $";
 
     /**
      * The container type of the property.
@@ -606,7 +606,25 @@ public class Property extends Element {
 
     void generateForeignKeys() {
         if (m_joinPath != null) {
-            m_joinPath.generateForeignKeys();
+            boolean cascade = false;
+            switch (m_joinPath.getPath().size()) {
+            case 1:
+                if (m_joinPath.getJoinElement(0).getFrom().isUniqueKey()) {
+                    cascade = true;
+                } else {
+                    cascade = false;
+                }
+                break;
+            case 2:
+                cascade = true;
+                break;
+            default:
+                m_joinPath.error("Don't know how to deal with length " +
+                                 m_joinPath.getPath().size() + " join paths.");
+                break;
+            }
+
+            m_joinPath.generateForeignKeys(cascade);
         }
     }
 
