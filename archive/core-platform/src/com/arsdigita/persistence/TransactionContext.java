@@ -15,7 +15,6 @@
 
 package com.arsdigita.persistence;
 
-
 /**
  * Title:       TransactionContext class
  *              This class is intentionally NOT threadsafe;
@@ -23,11 +22,11 @@ package com.arsdigita.persistence;
  * Description: The TransactionContext class encapsulates a database transaction.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/10/16 $
+ * @version $Revision: #7 $ $Date: 2002/10/16 $
  */
 
 public interface TransactionContext extends com.arsdigita.db.ConnectionUseListener {
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/TransactionContext.java#6 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/TransactionContext.java#7 $ by $Author: dennis $, $DateTime: 2002/10/16 15:37:20 $";
 
     /**
      * 

@@ -23,23 +23,19 @@ import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
 import com.arsdigita.persistence.pdl.PDL;
 import com.arsdigita.persistence.pdl.PDLException;
-
 import java.io.File;
 import java.io.StringReader;
-
-
 import java.lang.IllegalArgumentException;
 import java.util.List;
-
 import org.apache.log4j.Logger;
-
+import org.apache.log4j.Level;
 
 /**
  * Initializer gets the information required to create Sessions and informs
  * the SessionManager of them.
  *
  * @author Archit Shah (ashah@arsdigita.com)
- * @version $Revision: #8 $ $Date: 2002/09/30 $
+ * @version $Revision: #9 $ $Date: 2002/10/16 $
  **/
 
 public class Initializer
@@ -103,7 +99,9 @@ public class Initializer
      * initialization parameter.
      **/
     public void startup() {
-        s_log.warn("Persistence initializer is starting");
+	if (s_log.isEnabledFor(Level.WARN)) {
+	    s_log.warn("Persistence initializer is starting");
+	}
 
         int database = DbHelper.getDatabase();
 
@@ -140,7 +138,6 @@ public class Initializer
                                               "metadataXmlFileNames with pdlDirectory.");
         }
 
-
         SessionManager.setSchemaConnectionInfo( "",  "", "", "");
         final SessionFactory factory = getSessionFactory();
         SessionManager.setSessionFactory(factory);
@@ -149,11 +146,15 @@ public class Initializer
         Boolean aggressiveClose =
             (Boolean)m_conf.getParameter(AGGRESSIVE_CONNECTION_CLOSE);
         if (aggressiveClose != null && aggressiveClose.booleanValue()) {
-            s_log.info("Using aggressive connection closing");
+	    if (s_log.isInfoEnabled()) {
+		s_log.info("Using aggressive connection closing");
+	    }
             factory.setAggressiveConnectionClose(true);
         } else {
-            s_log.info("Not using aggressive connection closing " +
-                       "[aggressiveConnectionClose parameter]");
+	    if (s_log.isInfoEnabled()) {
+		s_log.info("Not using aggressive connection closing " + 
+			   "[aggressiveConnectionClose parameter]");
+	    }
         }
 
         //SessionManager.setSessionFactory();
@@ -178,10 +179,12 @@ public class Initializer
                 if (root.getObjectType(currentFile) != null) {
                     // this means that there is a type in the database
                     // that has already been defined so we write an error
-                    s_log.warn
-                        ("The Object Type [" + currentFile + "] has already " +
-                         "been defined in the static files.  Ignoring " +
-                         "object type definition from the database");
+		    if (s_log.isEnabledFor(Level.WARN)) {
+			s_log.warn
+			    ("The Object Type [" + currentFile + "] has already " +
+			     "been defined in the static files.  Ignoring " + 
+			     "object type definition from the database");
+		    }
                     continue;
                 }
 

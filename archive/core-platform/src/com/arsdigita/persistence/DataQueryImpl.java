@@ -54,6 +54,7 @@ import java.io.PrintWriter;
 import java.io.PrintStream;
 import java.io.ByteArrayOutputStream;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -63,7 +64,7 @@ import org.apache.log4j.Logger;
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@arsdigita.com">randyg@arsdigita.com</a>
  * @author <a href="mailto:deison@arsdigita.com">deison@arsdigita.com</a>
- * @version $Revision: #16 $ $Date: 2002/10/16 $
+ * @version $Revision: #17 $ $Date: 2002/10/16 $
  */
 // NOTE if we ever support anything other than forward-only,
 // we'll need to shut off the auto-closing functionality
@@ -71,7 +72,7 @@ import org.apache.log4j.Logger;
 // results and general confusion.
 class DataQueryImpl extends AbstractDataOperation implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#16 $ by $Author: richardl $, $DateTime: 2002/10/16 14:39:19 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#17 $ by $Author: dennis $, $DateTime: 2002/10/16 15:37:20 $";
 
     private static final Logger log =
         Logger.getLogger(DataQueryImpl.class);
@@ -202,7 +203,9 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
                 msg.println("DataQuery.next() was last called here:");
                 m_lastNext.printStackTrace(msg);
             }
-            log.warn(w);
+	    if (log.isEnabledFor(Level.WARN)) {
+		log.warn(w);
+	    }
         }
 
         try {
@@ -963,7 +966,9 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
                 if (stmt != null) { stmt.close(); }
                 rs.close();
             } catch (SQLException e) {
-                log.warn("Couldn't close result set.", e);
+		if (log.isEnabledFor(Level.WARN)) {
+		    log.warn("Couldn't close result set.", e);
+		}
             }
         }
 
@@ -1400,30 +1405,45 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
     private String[] unalias(String[] path) {
         String[] result = path;
 
-        log.debug("External Path: " + toString(path));
-
-        log.debug("Aliases: " + m_aliases.toString());
+	if (log.isDebugEnabled()) {
+	    log.debug("External Path: " + toString(path));
+	    log.debug("Aliases: " + m_aliases.toString());
+	}
 
         for (Iterator it = m_aliases.iterator(); it.hasNext(); ) {
             Alias alias = (Alias) it.next();
-            log.debug("Testing Alias: " + alias);
+	    if (log.isDebugEnabled()) { 
+		log.debug("Testing Alias: " + alias); 
+	    }
             if (alias.isMatch(path)) {
-                log.debug("Matched");
+		if (log.isDebugEnabled()) {
+		    log.debug("Matched");
+		}
                 String[] candidate = alias.unalias(path);
-                log.debug("Candidate: " + toString(candidate));
+		if (log.isDebugEnabled()) {
+		    log.debug("Candidate: " + toString(candidate));
+		}
                 if (propertyExists(candidate)) {
-                    log.debug("Candidate exists.");
+		    if (log.isDebugEnabled()) {
+			log.debug("Candidate exists.");
+		    }
                     result = candidate;
                     break;
                 } else {
-                    log.debug("Candidate doesn't exist.");
+		    if (log.isDebugEnabled()) {
+			log.debug("Candidate doesn't exist.");
+		    }
                 }
             } else {
-                log.debug("Didn't Matched");
+		if (log.isDebugEnabled()) {
+		    log.debug("Didn't Matched");
+		}
             }
         }
 
-        log.debug("Internal Path: " + toString(result));
+	if (log.isDebugEnabled()) {
+	    log.debug("Internal Path: " + toString(result));
+	}
 
         return result;
     }

@@ -20,18 +20,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import com.arsdigita.util.Assert;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
  * CompoundFilters are used to AND or OR multiple filters together.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/10/16 $
  */
 
 class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/CompoundFilterImpl.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/CompoundFilterImpl.java#5 $ by $Author: dennis $, $DateTime: 2002/10/16 15:37:20 $";
 
     private static final Logger m_log =
         Logger.getLogger(CompoundFilterImpl.class);
@@ -118,12 +119,14 @@ class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
             addBindings(bindings);
             if (getBindings().size() < numberBindings) {
                 // there was name overlapping so log a warning
-                m_log.warn(
-                           "When the filter was added, there was a naming" +
-                           " conflict with the variables." + Utilities.LINE_BREAK +
-                           "Filter 1: " + filter.toString() + Utilities.LINE_BREAK +
-                           "Filter 2: " + toString()
-                           );
+		if (m_log.isEnabledFor(Level.WARN)) {
+		    m_log.warn(
+			       "When the filter was added, there was a naming" +
+			       " conflict with the variables." + Utilities.LINE_BREAK +
+			       "Filter 1: " + filter.toString() + Utilities.LINE_BREAK +
+			       "Filter 2: " + toString()
+			       );
+		}
             }
         }
 

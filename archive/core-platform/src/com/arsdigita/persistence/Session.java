@@ -30,7 +30,7 @@ import java.sql.Connection;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2002/10/16 $
+ * @version $Revision: #10 $ $Date: 2002/10/16 $
  * @see com.arsdigita.persistence.SessionManager
  */
 public interface Session {

@@ -23,20 +23,20 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.lang.StringBuffer;
 import java.io.StringReader;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 
 /**
  * Filter is used to restrict the results of a query.  Filters can
  * be combined and manipulated to create complex queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/22 $
+ * @version $Revision: #7 $ $Date: 2002/10/16 $
  */
 
 class FilterImpl implements Filter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterImpl.java#6 $ by $Author: jorris $, $DateTime: 2002/08/22 10:38:41 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterImpl.java#7 $ by $Author: dennis $, $DateTime: 2002/10/16 15:37:20 $";
 
     private static final Logger m_log =
         Logger.getLogger(Filter.class.getName());
@@ -430,11 +430,13 @@ class FilterImpl implements Filter {
      */
     public Filter set(String parameterName, Object value) {
         if (m_bindings.containsKey(parameterName)) {
-            m_log.warn("The existing filter already contains a parameter " +
-                       "named \"" + parameterName + "\".  Overwriting the" +
-                       " the old value " + m_bindings.get(parameterName) +
-                       " with " + value);
-        }
+	    if (m_log.isEnabledFor(Level.WARN)) {
+		m_log.warn("The existing filter already contains a parameter " +
+			   "named \"" + parameterName + "\".  Overwriting the" +
+			   " the old value " + m_bindings.get(parameterName) +
+			   " with " + value);
+	    }
+        } 
         m_bindings.put(parameterName, value);
         return this;
     }
